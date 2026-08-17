@@ -1,0 +1,13 @@
+services:
+  web:
+    image: harbor.precia.site/precia/precia-docs:dev
+    container_name: precia_docs${CONTAINER_SUFFIX}
+    ports:
+      - "13004:3000"
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
