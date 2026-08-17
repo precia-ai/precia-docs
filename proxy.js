@@ -2,6 +2,6 @@ export { proxy } from 'nextra/locales'
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|manifest|screenshots|_pagefind).*)'
+    '/((?!api|_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|manifest|screenshots|brand|_pagefind).*)'
   ]
 }

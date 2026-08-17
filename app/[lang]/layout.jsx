@@ -9,11 +9,22 @@ export const metadata = {
     template: '%s | Panduan Pengguna PRECIA'
   },
   description:
-    'Panduan resmi penggunaan PRECIA untuk dokter, admin unit, admin organisasi, dan admin platform.'
+    'Panduan resmi penggunaan PRECIA untuk dokter, admin unit, admin organisasi, dan admin platform.',
+  icons: {
+    icon: '/brand/precia-mark.png'
+  }
 }
 
 const navbar = (
-  <Navbar logo={<b>Panduan PRECIA</b>}>
+  <Navbar
+    logo={
+      <span style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/precia-mark.png" alt="" width={22} height={22} />
+        <b>Panduan PRECIA</b>
+      </span>
+    }
+  >
     <LocaleSwitch lite />
   </Navbar>
 )
