@@ -1,0 +1,103 @@
+---
+title: Evaluation Cycle Detail
+---
+
+The cycle detail page shows everything that happens inside one evaluation cycle: current adoption metrics, the management review conclusion, agreed follow-ups, and supporting attachments. This is also where a cycle gets closed once its evaluation period is done.
+
+## Opening a cycle's detail page
+
+1. Open the **Evaluation** menu from the sidebar.
+2. In the cycle list, click the row of the cycle you want to view. You land on that cycle's detail page.
+
+The top of the page shows the cycle's identity:
+
+- The **cycle title**, with a **status** badge (Draft, In review, or Closed) and a **trigger** badge (Scheduled for a routine scheduled cycle, Ad hoc for a cycle opened outside the schedule).
+- The cycle's **objective**, the period being evaluated, and the trigger reason if one was entered when the cycle was created.
+- A **Close cycle** button in the top-right corner. It only appears for users authorized to close a cycle, and disappears once the cycle is Closed.
+- A row of counts: Reviews, Action plans, Change programs, Capacity plans, and Artifacts recorded so far in this cycle.
+
+Below the header are 4 tabs: **Overview**, **Review**, **Follow-ups**, and **Artifacts**.
+
+## Overview tab
+
+This tab opens by default, and its figures are recomputed every time the page loads (marked with a **Live** badge) for as long as the cycle stays open.
+
+![Overview tab: Unit adoption and Validator adoption cards, module utilization chart, gap tables per unit and per module](/screenshots/en/evaluasi-adopsi/detail-siklus/01-overview.png)
+
+What the Overview tab shows, top to bottom:
+
+- **Unit adoption** — the percentage of clinical units that used at least one AI module during the cycle period, plus the count of active units out of the total.
+- **Validator adoption** — the percentage of validators who actively validated AI results during the cycle period.
+- **Module utilization** — a bar chart of inference (usage) counts per AI module over the period. A module with zero traffic still shows on the axis with an empty bar, so an unused module stays visible rather than disappearing.
+- A note when this period has no prior cycle to compare against (no baseline) — in that case the Gap column in the tables below stays empty, but the actual figures still stand on their own.
+- **Indicators** — the standing-target indicators in scope for this cycle, each row stating the direction counted as "meeting the target." If no indicator is in scope, this table shows an empty message instead.
+- **Gaps per unit** and **Gaps per AI module** — tables of actual vs. target values per clinical unit / per AI module, with a Gap column and a **Missed**/met result.
+
+## Review tab
+
+This tab holds the cycle's official management conclusion, plus the operational discussion behind it.
+
+![Review tab: Management review card and the Operational context request/response thread](/screenshots/en/evaluasi-adopsi/detail-siklus/02-review.png)
+
+**Management review** is a single conclusion per cycle. To record one:
+
+1. Click **Record review**.
+2. Fill in **Conclusion** — a narrative summary of what the cycle found.
+3. Fill in **Gap findings** — one finding per line. This field is pre-filled from the indicators marked Missed on the Overview tab, so you edit or add lines instead of typing everything from scratch.
+4. Click **Save review**.
+
+A saved review shows as a card with the reviewer's name, the time it was recorded, the conclusion, and the list of gap findings.
+
+**Operational context** is a separate question-and-answer thread that explains what the numbers mean on the ground:
+
+1. Click **Ask for context** to raise a new question, or **Add context** to post a note without waiting for a question.
+2. Fill in the text box, and optionally pick a related **Unit** and **AI module** so the note is easier to trace later.
+3. Click **Post request** (for a question) or **Post response** (for a note).
+
+An open question can be answered directly from its card with the **Respond** button, so the answer appears nested under the original question.
+
+## Follow-ups tab
+
+This tab holds three kinds of follow-up: **Action plans**, **Change programs**, and **Capacity plans**. All three require an **owner** and a **date** (Due date / End date / Target date, respectively) before the cycle can be closed — if any is missing either, closing is refused and the offending rows are listed one by one.
+
+![Follow-ups tab: the Action plans table filled in, Change programs and Capacity plans still empty](/screenshots/en/evaluasi-adopsi/detail-siklus/03-follow-ups.png)
+
+To record an action plan:
+
+1. Click **New action plan**.
+2. Fill in **Title** and **Rationale** (why this action was taken).
+3. Pick an **Owner**, fill in **Due date**, and pick a **Status** (Planned, In progress, Done, etc.).
+4. Click **Create**.
+
+An existing action plan can be updated with the **Edit** button on its row.
+
+Change programs (training, mentoring, or SOP-update work) and capacity plans (resource scale-up/down decisions) are recorded with the same form pattern, via the **New change program** and **New capacity plan** buttons. Both also require an owner and a date.
+
+> **Note:** at the time this documentation was written, saving a Change program or Capacity plan on the demo environment did not consistently save or display correctly. If you run into the same thing (the page fails to show the data, or an error appears while saving), report it to your platform administrator before retrying.
+
+## Artifacts tab
+
+This tab holds the cycle's attachments: meeting minutes, reports, presentation material, or other supporting evidence.
+
+![Artifacts tab: the Upload artifact button and the table of uploaded artifacts](/screenshots/en/evaluasi-adopsi/detail-siklus/04-artifacts.png)
+
+To upload an artifact:
+
+1. Click **Upload artifact**.
+2. Pick a **Type** (meeting minutes, report, presentation, evidence, or other).
+3. Fill in **Title**, an optional **Description**, then pick a **File** from your device.
+4. Click **Upload** and wait for the progress bar to finish.
+
+Uploaded artifacts appear in the table with their type, file size, and who uploaded them. The **Download** button opens the file through a temporary link (it expires automatically) once the upload status is confirmed; while the status still reads **Unconfirmed**, the Download button stays disabled.
+
+## Closing a cycle
+
+Closing a cycle freezes every metric into a permanent snapshot — the figures stop moving even as transaction or validation data keeps coming in afterward, and **this action cannot be undone**. A Closed cycle becomes read-only: every add/edit button on the Review, Follow-ups, and Artifacts tabs disappears.
+
+1. Click **Close cycle** in the page header.
+2. Fill in a **Closing note** — a one-paragraph summary of the cycle's conclusion (optional, but recommended).
+3. Click **Close cycle** in the dialog footer to confirm.
+
+![Close evaluation cycle dialog with the closing note field and the confirm button](/screenshots/en/evaluasi-adopsi/detail-siklus/05-close-cycle-dialog.png)
+
+If any action plan, change program, or capacity plan is still missing an owner or a date, closing fails and the dialog lists the items that need to be completed first — fix those on the Follow-ups tab, then try closing again.

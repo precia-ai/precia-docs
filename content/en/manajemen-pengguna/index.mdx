@@ -1,0 +1,58 @@
+---
+title: User List
+---
+
+# User List
+
+The **Users & Access** page shows every user account registered in your organization. From here you can see each account's status, the roles assigned to it, and manage access (activate, deactivate, or lock an account).
+
+Only organization administrators and platform administrators can access this page. The data shown is scoped to your organization, so an organization administrator only sees users belonging to their own organization.
+
+## How to open this page
+
+1. Log in to PRECIA.
+2. Click **Users & Access** in the left sidebar.
+
+![User list page with summary statistics and the user directory table](/screenshots/en/manajemen-pengguna/index/01-daftar-pengguna.png)
+
+## Summary statistics
+
+Four summary tiles appear at the top of the page:
+
+- **Total users** — the total number of accounts registered in the organization.
+- **Active** — the number of accounts that are active and can log in normally.
+- **Locked** — the number of accounts that are locked and cannot log in.
+- **Pending** — the number of accounts that have not completed activation yet.
+
+The **Add User** button in the top-right corner is used to register a new user. See [Adding a New User](/manajemen-pengguna/menambah-pengguna) for the full steps.
+
+## Reading the User Directory table
+
+The table below the summary statistics lists every user with the following columns:
+
+- **User** — avatar initials, full name, and email address.
+- **Status** — a colored label: green (Active), red (Locked), yellow (Pending Activation), gray (Inactive).
+- **Role** — one or more role badges assigned to that user (for example Clinician, Nurse / Technician). If no role has been assigned yet, this column shows "No roles yet".
+- **Actions** — a **Detail** button to open the user's full profile, and a three-dot (⋯) button to open a quick actions menu.
+
+## Quick actions menu
+
+Click the three-dot (⋯) icon on a user's row to open the quick actions menu without going into the detail page.
+
+![Quick actions menu open with Deactivate and Lock Account options](/screenshots/en/manajemen-pengguna/index/02-menu-tindakan.png)
+
+This menu contains:
+
+- **Activate / Deactivate** — toggles the account between active and inactive. If the account is currently active, the option shown is "Deactivate"; if it is currently inactive, the option shown is "Activate".
+- **Lock Account** — locks the account so the user cannot log in at all, without changing their data or roles. Before the account is actually locked, the system shows a confirmation containing the email address of the user about to be locked. This option only appears when the account is not already locked.
+- **Unlock** — replaces "Lock Account" once the user's status is Locked, and is used to restore the user's login access.
+
+After choosing an action, the row shows a loading indicator until the status change finishes processing, then the table refreshes automatically.
+
+**Notes:**
+- Deactivating an account is different from locking it. Deactivate suits users who temporarily don't need access (for example, extended leave), while Lock Account better suits security cases (for example, suspected account misuse).
+- To view a user's full details or change their role, click the **Detail** button — see [User Detail](/manajemen-pengguna/detail-pengguna) and [Managing User Roles](/manajemen-pengguna/mengatur-peran-pengguna).
+
+## Empty list state
+
+If the organization has no matching users yet (for example, a brand-new organization), the table shows a message that there is no user data yet. Use the **Add User** button to start registering accounts.

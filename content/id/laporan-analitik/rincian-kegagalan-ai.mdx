@@ -1,0 +1,72 @@
+---
+title: Rincian Kegagalan AI
+---
+
+# Rincian Kegagalan AI
+
+Halaman ini menampilkan daftar lengkap setiap pekerjaan AI yang gagal diproses dalam periode tertentu, lengkap dengan penyebab, waktu kejadian, dan tautan langsung ke kasus terkait. Gunakan halaman ini saat perlu menelusuri satu per satu kegagalan yang muncul di grafik "Alasan kegagalan" pada Dashboard Analitik.
+
+## Cara Membuka Halaman
+
+Ada dua cara membuka halaman ini:
+
+1. Dari **Dashboard Analitik**, cari kartu "Alasan kegagalan" lalu klik tautan "Lihat seluruh kegagalan".
+2. Klik langsung menu **Analitik** di sidebar, lalu buka bagian rincian kegagalan.
+
+Halaman ini memerlukan akses laporan pemantauan. Jika akun Anda tidak memiliki akses tersebut, sistem akan menampilkan pesan bahwa detail kegagalan tidak tersedia untuk peran Anda.
+
+## Tampilan Halaman
+
+![Tampilan awal halaman rincian kegagalan AI dengan filter dan tabel daftar kegagalan](/screenshots/id/laporan-analitik/rincian-kegagalan-ai/01-tampilan-awal.png)
+
+Halaman terdiri dari tiga bagian:
+
+1. **Baris filter** di bagian atas (ditandai kotak biru pada gambar) untuk mempersempit data yang ditampilkan.
+2. **Ringkasan jumlah hasil**, misalnya "1 sampai 6 dari 6", beserta tombol navigasi halaman "Sebelumnya" dan "Berikutnya".
+3. **Tabel daftar kegagalan** yang berisi setiap pekerjaan AI yang gagal, satu baris per kegagalan.
+
+## Menggunakan Filter
+
+Baris filter berisi lima kontrol:
+
+- **Dari** dan **Sampai**: rentang tanggal kegagalan yang ingin dilihat. Secara default halaman terbuka dengan rentang 30 hari terakhir.
+- **Alasan**: memilih satu kategori penyebab kegagalan saja (misalnya "Invalid Input" atau "Connection"). Daftar pilihan ini otomatis mengikuti kategori yang benar-benar ada pada data di rentang tanggal terpilih, jadi Anda tidak akan melihat pilihan yang datanya kosong.
+- **Unit**: mempersempit hasil ke satu unit klinis saja.
+- **Modul AI**: mempersempit hasil ke satu modul AI saja.
+
+Setiap kali salah satu filter diubah, tabel otomatis dimuat ulang dan halaman kembali ke hasil pertama. Tombol **Muat ulang** di sebelah kanan filter dipakai untuk menyegarkan data tanpa mengubah filter, misalnya setelah menunggu beberapa saat untuk melihat apakah ada kegagalan baru.
+
+> Catatan: jika akun Anda sudah mengetahui alasan kegagalan tertentu dari grafik di Dashboard Analitik lalu mengklik batang grafik tersebut, halaman ini akan otomatis terbuka dengan filter Alasan sudah terisi sesuai batang yang diklik.
+
+## Membaca Tabel Daftar Kegagalan
+
+Setiap baris pada tabel mewakili satu pekerjaan AI yang gagal, dengan kolom berikut:
+
+| Kolom | Keterangan |
+|---|---|
+| Waktu | Tanggal dan jam pekerjaan tersebut masuk antrean AI. |
+| Alasan | Kategori penyebab kegagalan (badge abu-abu), misalnya Invalid Input, Connection, Timeout, atau Other. |
+| Modul | Nama modul AI yang memproses pekerjaan tersebut. |
+| Unit | Unit klinis asal kasus tersebut. |
+| Galat | Pesan kesalahan asli yang dikembalikan oleh layanan AI. Jika tidak ada pesan tercatat, kolom ini menampilkan "Tidak ada detail galat yang tercatat." |
+| Percobaan ulang | Jumlah percobaan ulang otomatis yang sudah dilakukan sistem sebelum akhirnya gagal. |
+| Kasus | Tautan ke nomor transaksi terkait (misalnya TRX-2026...). Klik untuk membuka detail kasus tersebut. |
+
+Klik tautan pada kolom **Kasus** untuk langsung berpindah ke halaman detail transaksi yang bersangkutan, misalnya untuk memeriksa data klinis yang dikirim atau mengulang proses AI secara manual.
+
+## Menavigasi Banyak Data
+
+Jika jumlah kegagalan pada rentang tanggal lebih dari 25 baris, gunakan tombol **Sebelumnya** dan **Berikutnya** di kanan atas tabel untuk berpindah halaman. Tombol akan nonaktif otomatis saat sudah berada di halaman pertama atau terakhir.
+
+## Kapan Tabel Kosong
+
+Jika tidak ada kegagalan pada rentang tanggal dan filter yang dipilih, tabel akan menampilkan pesan "Tidak ada kegagalan pada pilihan ini" beserta saran untuk memperluas rentang tanggal atau menghapus salah satu filter. Ini adalah kabar baik, bukan kesalahan sistem: artinya tidak ada pekerjaan AI yang gagal pada periode tersebut.
+
+## Catatan Tentang Kategori Alasan
+
+Kategori pada kolom Alasan diperoleh dengan mencocokkan teks galat yang tercatat terhadap daftar pola tetap di sistem. Dua kategori khusus perlu diperhatikan:
+
+- **Other**: teks galat ada, tetapi tidak cocok dengan pola apa pun yang dikenali sistem.
+- **Unknown**: tidak ada teks galat yang tercatat sama sekali untuk pekerjaan tersebut.
+
+Kolom Galat selalu menampilkan keluaran asli dari layanan AI apa adanya, terlepas dari kategori apa yang diberikan pada kolom Alasan. Gunakan kolom Galat untuk investigasi teknis lebih lanjut jika diperlukan.

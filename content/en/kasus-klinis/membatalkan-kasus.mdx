@@ -1,0 +1,53 @@
+---
+title: Cancelling a Case
+---
+
+# Cancelling a Case
+
+A case created by mistake (wrong unit, wrong patient data, duplicate, and so on) can be cancelled directly from the case detail page, as long as it hasn't reached AI processing or been sent to a doctor yet. This page explains the requirements, the steps, and what happens after cancellation.
+
+## When a case can be cancelled
+
+The cancellation option is only active when the case's current status is one of:
+
+- **Draft**
+- **Unprocessed**
+- **Invalid Data**
+- **Upload Failed**
+
+Once a case is **Sent to Doctor**, **Doctor Reviewed**, being processed by AI, or already **Completed**, the cancel button is automatically disabled. If your case is already at that stage and still needs to be cancelled, contact your unit admin or organization admin.
+
+## 1. Open the case you want to cancel
+
+From the transaction worklist under the **Clinical** menu, click the row of the case you want to cancel to open its detail page. Make sure you're on the **Patient Info** tab (active by default). Scroll down until you find the pink **Cancel Transaction** card, usually located after the Clinical Review section.
+
+![Cancel Transaction card on the case detail page](/screenshots/en/kasus-klinis/membatalkan-kasus/01-tombol-batalkan.png)
+
+If the case's status doesn't meet the cancellation requirements, this card is still visible but its reason field and button are disabled (greyed out), with a note reading "Current status is not eligible for cancellation."
+
+## 2. Enter a cancellation reason
+
+The **Cancellation reason** field is required — the system won't allow cancellation without a reason. Write a clear, concise reason, for example "Patient data entered incorrectly, recreating with the correct MRN." This reason is recorded permanently in the case history and is visible to other users who have access to the case.
+
+![Cancellation reason field filled in, Cancel Transaction button ready to click](/screenshots/en/kasus-klinis/membatalkan-kasus/02-isi-alasan.png)
+
+If this field is left empty and the cancel button is clicked, the system shows the error "Cancellation reason is required." and the cancellation is not processed.
+
+## 3. Click Cancel Transaction
+
+Once the reason is filled in, click the red **Cancel Transaction** button. The action happens immediately with no additional confirmation dialog — as soon as you click the button, the case moves straight to **Cancelled** status.
+
+![Case detail page after successful cancellation, showing the success message and a disabled cancellation card](/screenshots/en/kasus-klinis/membatalkan-kasus/03-hasil-dibatalkan.png)
+
+After a successful cancellation:
+
+- A green "Transaction cancelled successfully." message appears at the top of the page.
+- The case status changes to **Cancelled** and can no longer be processed by AI.
+- The **Cancel Transaction** card becomes disabled — the reason field is locked and the button turns grey, since an already-cancelled case cannot be cancelled again.
+- The file upload, send-to-doctor, and retake request buttons are also disabled for this case.
+
+## Important notes
+
+- **Cancellation cannot be undone.** Once the status becomes Cancelled, there is no button on this page to reactivate the case. If a case was cancelled by mistake, create a new case and re-enter the data.
+- The submitted cancellation reason is recorded permanently in the case's **Transaction History** (click **View History** at the bottom of the detail page to see it).
+- A case whose status has already moved past Unprocessed (for example, already sent to a doctor) cannot be self-cancelled from this page — this is intentional, so a case another clinician is actively reviewing doesn't disappear unexpectedly.

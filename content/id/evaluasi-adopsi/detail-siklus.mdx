@@ -1,0 +1,103 @@
+---
+title: Detail Siklus Evaluasi
+---
+
+Halaman detail siklus menampilkan semua hal yang terjadi di satu siklus evaluasi: metrik adopsi terkini, kesimpulan tinjauan manajemen, tindak lanjut yang disepakati, dan lampiran pendukung. Dari sini juga siklus ditutup ketika periode evaluasinya selesai.
+
+## Membuka detail siklus
+
+1. Buka menu **Evaluation** dari sidebar.
+2. Di daftar siklus, klik baris siklus yang ingin dilihat. Anda akan masuk ke halaman detail siklus tersebut.
+
+Bagian atas halaman menampilkan identitas siklus:
+
+- **Judul siklus** beserta badge **status** (Draft, In review, atau Closed) dan badge **trigger** (Scheduled untuk siklus terjadwal rutin, Ad hoc untuk siklus yang dibuka di luar jadwal).
+- **Objektif** siklus, periode yang dievaluasi, dan alasan trigger jika diisi saat siklus dibuat.
+- Tombol **Close cycle** di pojok kanan atas. Tombol ini hanya muncul untuk pengguna yang berwenang menutup siklus, dan hilang begitu siklus berstatus Closed.
+- Baris ringkasan jumlah: Reviews, Action plans, Change programs, Capacity plans, dan Artifacts yang sudah tercatat di siklus ini.
+
+Di bawah header ada 4 tab: **Overview**, **Review**, **Follow-ups**, dan **Artifacts**.
+
+## Tab Overview
+
+Tab ini terbuka pertama kali saat halaman dimuat, dan berisi metrik yang dihitung ulang setiap kali halaman dibuka (ditandai badge **Live**) selama siklus masih berjalan.
+
+![Tab Overview: kartu Unit adoption dan Validator adoption, chart module utilization, tabel gap per unit dan per modul](/screenshots/id/evaluasi-adopsi/detail-siklus/01-overview.png)
+
+Isi tab Overview, dari atas ke bawah:
+
+- **Unit adoption** — persentase unit klinis yang memakai minimal satu modul AI selama periode siklus, beserta jumlah unit aktif dari total unit.
+- **Validator adoption** — persentase validator yang aktif memvalidasi hasil AI selama periode siklus.
+- **Module utilization** — grafik batang jumlah inferensi (pemakaian) tiap modul AI selama periode. Modul yang sama sekali tidak dipakai tetap muncul di sumbu chart dengan batang kosong, supaya modul yang "diam" mudah terlihat.
+- Catatan bila periode ini tidak punya siklus pembanding (baseline) sebelumnya — dalam hal ini kolom Gap di tabel akan kosong, tapi angka aktualnya tetap valid berdiri sendiri.
+- **Indicators** — tabel indikator standing target yang menjadi cakupan siklus ini, beserta arah yang dihitung sebagai "memenuhi target" untuk tiap indikator. Kalau tidak ada indikator dalam cakupan, tabel ini menampilkan pesan kosong.
+- **Gaps per unit** dan **Gaps per AI module** — tabel nilai aktual vs target per unit klinis / per modul AI, dengan kolom Gap dan hasil **Missed**/terpenuhi.
+
+## Tab Review
+
+Tab ini berisi kesimpulan resmi manajemen atas siklus, dan diskusi konteks operasional di baliknya.
+
+![Tab Review: kartu Management review dan thread Operational context (request/response)](/screenshots/id/evaluasi-adopsi/detail-siklus/02-review.png)
+
+**Management review** adalah kesimpulan tunggal per siklus. Untuk mencatatnya:
+
+1. Klik **Record review**.
+2. Isi **Conclusion** — kesimpulan naratif tentang hasil siklus.
+3. Isi **Gap findings** — daftar temuan gap, satu per baris. Kolom ini otomatis terisi dari indikator yang berstatus Missed pada tab Overview, jadi Anda tinggal menyunting atau menambah baris, bukan mengetik ulang dari nol.
+4. Klik **Save review**.
+
+Review yang tersimpan tampil sebagai kartu berisi nama reviewer, waktu pencatatan, kesimpulan, dan daftar gap findings.
+
+**Operational context** adalah utas tanya-jawab terpisah dari review, untuk menjelaskan angka di lapangan:
+
+1. Klik **Ask for context** untuk mengajukan pertanyaan baru, atau **Add context** untuk menambahkan catatan tanpa menunggu pertanyaan.
+2. Isi kotak teks, dan opsional pilih **Unit** serta **AI module** terkait supaya catatan lebih mudah ditelusuri.
+3. Klik **Post request** (untuk pertanyaan) atau **Post response** (untuk catatan).
+
+Pertanyaan yang sudah diajukan bisa dijawab langsung dari kartunya lewat tombol **Respond**, sehingga jawaban tampil menyatu di bawah pertanyaan aslinya.
+
+## Tab Follow-ups
+
+Tab ini berisi tiga jenis tindak lanjut: **Action plans**, **Change programs**, dan **Capacity plans**. Ketiganya wajib punya **owner** dan **tanggal** (Due date / End date / Target date) sebelum siklus bisa ditutup — kalau ada yang belum lengkap, proses penutupan siklus akan ditolak dan baris yang bermasalah ditunjukkan satu per satu.
+
+![Tab Follow-ups: tabel Action plans terisi, Change programs dan Capacity plans masih kosong](/screenshots/id/evaluasi-adopsi/detail-siklus/03-follow-ups.png)
+
+Untuk mencatat action plan:
+
+1. Klik **New action plan**.
+2. Isi **Title** dan **Rationale** (alasan tindakan ini diambil).
+3. Pilih **Owner** (penanggung jawab), isi **Due date**, dan pilih **Status** (Planned, In progress, Done, dsb).
+4. Klik **Create**.
+
+Action plan yang sudah ada bisa diubah lewat tombol **Edit** di baris tabelnya.
+
+Change programs (program pelatihan/mentoring/pembaruan SOP) dan capacity plans (keputusan penambahan/pengurangan sumber daya) dicatat dengan pola form yang sama, lewat tombol **New change program** dan **New capacity plan**. Field yang wajib sama-sama owner dan tanggal.
+
+> **Catatan:** pada saat dokumentasi ini dibuat, penyimpanan Change program dan Capacity plan di environment demo belum berhasil tersimpan/tertampil dengan benar. Jika Anda mengalami hal serupa (halaman gagal menampilkan data atau muncul pesan error saat menyimpan), laporkan ke admin platform sebelum mencoba lagi.
+
+## Tab Artifacts
+
+Tab ini menyimpan lampiran siklus: notula rapat, laporan, materi presentasi, atau bukti pendukung lain.
+
+![Tab Artifacts: tombol Upload artifact dan tabel daftar artefak yang sudah diunggah](/screenshots/id/evaluasi-adopsi/detail-siklus/04-artifacts.png)
+
+Untuk mengunggah artefak:
+
+1. Klik **Upload artifact**.
+2. Pilih **Type** (meeting minutes, report, presentation, evidence, atau other).
+3. Isi **Title**, opsional **Description**, lalu pilih **File** dari perangkat Anda.
+4. Klik **Upload** dan tunggu progress bar sampai selesai.
+
+Artefak yang sudah diunggah tampil di tabel dengan tipe, ukuran file, dan siapa yang mengunggahnya. Tombol **Download** membuka file lewat tautan sementara (kedaluwarsa otomatis) begitu status unggahan sudah terkonfirmasi; selama status masih **Unconfirmed**, tombol Download tetap nonaktif.
+
+## Menutup siklus (Close cycle)
+
+Menutup siklus membekukan (freeze) semua metrik menjadi snapshot permanen — angka tidak lagi berubah meski data transaksi/validasi terus bertambah setelahnya, dan **tindakan ini tidak bisa dibatalkan**. Siklus yang sudah Closed menjadi *read-only*: semua tombol tambah/ubah data di tab Review, Follow-ups, dan Artifacts hilang.
+
+1. Klik **Close cycle** di header halaman.
+2. Isi **Closing note** — ringkasan satu paragraf tentang kesimpulan siklus (opsional, tapi disarankan diisi).
+3. Klik **Close cycle** di footer dialog untuk konfirmasi.
+
+![Dialog Close evaluation cycle dengan kotak catatan penutup dan tombol konfirmasi](/screenshots/id/evaluasi-adopsi/detail-siklus/05-close-cycle-dialog.png)
+
+Jika ada action plan, change program, atau capacity plan yang belum punya owner atau tanggal, penutupan akan gagal dan dialog menampilkan daftar item yang harus dilengkapi dulu — lengkapi item tersebut di tab Follow-ups, lalu ulangi proses penutupan.

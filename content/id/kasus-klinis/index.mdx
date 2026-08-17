@@ -1,0 +1,62 @@
+---
+title: Kasus Klinis
+---
+
+# Kasus Klinis
+
+Kasus klinis adalah satu berkas kerja untuk satu pasien, mulai dari data pasien dan berkas pemeriksaan diunggah, dianalisis oleh satu atau lebih modul AI, sampai hasilnya ditinjau dan divalidasi oleh dokter.
+
+Setiap kasus punya dua lapis status yang perlu Anda bedakan:
+
+- **Status kasus**: posisi kasus secara keseluruhan (masih draf, sudah dikirim ke dokter, sudah selesai ditinjau, dan seterusnya).
+- **Status modul AI**: posisi pemrosesan AI untuk tiap modul yang dipakai di kasus itu (menunggu, sedang diproses, selesai, gagal). Satu kasus bisa memakai lebih dari satu modul AI sekaligus, dan tiap modul punya status sendiri-sendiri.
+
+## Status kasus
+
+Status kasus menunjukkan posisi kasus dalam alur kerja unit, dari dibuat sampai ditutup.
+
+| Status | Arti |
+|---|---|
+| **Draf** | Kasus baru dibuat. Data pasien masih bisa diubah bebas. |
+| **Belum Diproses** | Data kasus sudah lengkap. Ini status kerja utama: berkas diunggah dan modul AI dijalankan selagi kasus masih di status ini. |
+| **Data Tidak Valid** | Ada masalah pada data yang diunggah (misalnya berkas tidak terbaca). Perlu diperbaiki sebelum lanjut. |
+| **Unggah Gagal** | Proses unggah berkas gagal di tengah jalan. Coba unggah ulang. |
+| **Dikirim ke Dokter** | Kasus sudah diserahkan ke antrean validasi dokter/validator unit. |
+| **Perlu Pengambilan Ulang** | Dokter atau validator meminta pemeriksaan diulang, biasanya karena kualitas data kurang baik. Wajib disertai alasan. |
+| **Ditinjau Dokter** | Dokter sudah memvalidasi hasil. Status akhir, tidak ada perubahan lebih lanjut. |
+| **Dibatalkan** | Kasus dibatalkan dan tidak diproses lebih lanjut. Status akhir. |
+
+Catatan penting soal alur status kasus:
+
+- Kasus **tidak** otomatis pindah status hanya karena AI mulai atau selesai memproses. Selama modul AI bekerja, status kasus tetap **Belum Diproses**. Yang berubah adalah status modul AI-nya (lihat bagian berikut).
+- Kasus baru bisa dikirim ke dokter (**Dikirim ke Dokter**) kalau minimal satu modul AI di kasus itu sudah berstatus **Selesai**, dan unit punya minimal satu anggota dengan peran validator. Kalau salah satu syarat ini belum terpenuhi, tombol kirim ke dokter tidak akan berfungsi.
+- **Ditinjau Dokter** dan **Dibatalkan** adalah status akhir. Tidak ada transisi keluar dari status ini lewat aplikasi.
+- Kasus hanya bisa dibatalkan selama belum ada modul AI yang mulai diproses (belum masuk status **Diproses** atau **Selesai**). Setelah AI mulai berjalan, pembatalan lewat aplikasi tidak tersedia lagi, hubungi admin unit Anda kalau kasus tetap perlu dihentikan.
+
+## Status modul AI
+
+Tiap modul AI yang dipakai di sebuah kasus (misalnya analisis EKG dan uroflow sekaligus) punya status pemrosesan sendiri, terpisah dari status kasus:
+
+| Status | Arti |
+|---|---|
+| **Menunggu** | Modul dipilih untuk kasus ini, belum ada berkas yang diunggah. |
+| **Data Terunggah** | Berkas untuk modul ini sudah diunggah. |
+| **Siap** | Data sudah ditandai siap dianalisis, menunggu giliran diproses. |
+| **Diproses** | Sistem sedang menjalankan analisis AI untuk modul ini. |
+| **Selesai** | Hasil analisis modul ini sudah tersedia untuk dilihat dan divalidasi. |
+| **Gagal** | Pemrosesan modul ini gagal. Perlu diperiksa ulang atau dijalankan kembali. |
+
+Anda bisa melihat status kasus dan status tiap modul AI di daftar kasus (worklist), biasanya ditandai label berwarna di samping nama pasien dan nama modul. Lihat halaman **Worklist per Modul AI** untuk cara menyaring daftar kasus berdasarkan status modul.
+
+## Bagian terkait
+
+- **Membuat Kasus Baru**: untuk satu pasien pada satu waktu.
+- **Mengunggah Berkas Pasien**: melengkapi kasus dengan berkas pemeriksaan.
+- **Mengimpor Banyak Kasus Sekaligus**: kalau Anda punya banyak berkas pasien sekaligus (misalnya dari kunjungan lapangan).
+- **Worklist per Modul AI**: menyaring dan memantau kasus berdasarkan status modul AI.
+- **Melihat Hasil Analisis AI**: cara membaca hasil yang diberikan sistem.
+- **Meninjau dan Validasi**: khusus untuk dokter/validator, langkah terakhir sebelum kasus dianggap selesai.
+- **Riwayat Perubahan Kasus**: melihat jejak perubahan status sebuah kasus.
+- **Membatalkan Kasus**: syarat dan cara membatalkan kasus yang belum diproses AI.
+
+Hasil AI di PRECIA adalah alat bantu, bukan keputusan akhir. Keputusan klinis tetap ada di tangan dokter yang menangani kasus tersebut.

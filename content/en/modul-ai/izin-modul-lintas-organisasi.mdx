@@ -1,0 +1,59 @@
+---
+title: Cross-Organization Module Permissions
+---
+
+# Cross-Organization Module Permissions
+
+Every AI module in PRECIA can only be used by organizations (tenants) that have been explicitly permitted. The **AI Module Detail** page shows, across organizations, which tenants are currently permitted to use a module, through the **Tenant Permissions** card. From the same card, an admin opens the **Manage Permissions** dialog to change that permission.
+
+## How to Open
+
+1. Log in to PRECIA as an admin.
+2. Click **AI Registry** in the left sidebar.
+3. Click the **Open** button on the module you want to check, or click the module name directly, to go to the module detail page.
+4. Look at the **Tenant Permissions** card on the right side of the detail page.
+
+![AI module detail page with the Tenant Permissions card showing permitted organizations and the Manage Permissions button](/screenshots/en/modul-ai/izin-modul-lintas-organisasi/01-kartu-izin-tenant.png)
+
+## Reading the Tenant Permissions Card
+
+The **Tenant Permissions** card (blue box above) lists every organization currently permitted to use this module, each shown as a badge with the organization's name and code, for example `RSUI (Radiografer) (RSUI)`. This list spans across organizations, it shows every permitted tenant, not only your own organization. The number on the **"N tenants enabled"** badge near the top of the page (next to the module status) always matches the number of organization badges on this card.
+
+If no organization has been permitted yet, the card shows "No organizations have been permitted yet." instead of a badge list.
+
+The **Manage Permissions** button (blue box below the card) opens the permission dialog. It only appears for users who can read or change a module's tenant permissions:
+
+- If your account can **change** permissions, the button reads **Manage Permissions** and the dialog it opens can be saved.
+- If your account can only **read** permissions (no change right), the button reads **View Permissions** and the dialog is view-only, with no save button.
+- If your account has neither read nor change rights for tenant permissions, this button does not appear on the page at all.
+
+> [!WARNING]
+> Permissions cannot be changed while the module's lifecycle status is **Inactive**. Clicking **Manage Permissions** on an inactive module shows the error "Permissions cannot be updated while this AI module is inactive." on the card instead, and the dialog will not open. Activate the module first (move it to Pilot or Clinical) before managing tenant permissions.
+
+## Managing Permissions
+
+1. Click **Manage Permissions** on the Tenant Permissions card.
+2. The **Manage Permissions** dialog opens, showing the name of the module being configured and the organization list under **Permitted Organizations** (blue box in the image below).
+
+![Manage Permissions dialog open, showing the permitted organizations list with checkboxes and the Save Changes button](/screenshots/en/modul-ai/izin-modul-lintas-organisasi/02-dialog-kelola-izin.png)
+
+3. Each organization in the list is shown as a row with a checkbox, the organization's name, and its code. A checked row means that organization is currently permitted to use the module.
+4. Click any organization row to check (permit) or uncheck (revoke) it. The change is not saved until you click **Save Changes**.
+5. Click **Save Changes** (blue box in the image) to save. The dialog closes automatically on success, and the Tenant Permissions card and the module's log update to reflect the change.
+6. Click **Cancel** to close the dialog without saving any change.
+
+> [!NOTE]
+> The organization list in this dialog only shows **your own organization**, not the full list of every organization on the platform. This page is scoped to your organization, so from here you can only grant or revoke permission for the organization you belong to. Managing permissions for other organizations is a platform admin capability under the Platform section.
+
+> [!WARNING]
+> Unchecking your organization and saving immediately revokes that organization's access to the module. Every user in that organization loses access to the module right after saving. Make sure no clinical process currently depends on the module before revoking its permission. Access can be restored anytime by checking it again and saving.
+
+## Handling Errors
+
+- If the organization list fails to load when the dialog opens, the error "Failed to load organizations." appears above the list.
+- If saving fails (for example due to a network issue or an access change mid-flow), an error message appears inside the dialog and the dialog stays open so you can try **Save Changes** again.
+
+## Notes
+
+- Tenant permission changes are recorded in the **Full Log** on the module detail page, including who made the change and when.
+- The "tenants enabled" count shown throughout the app (including in the AI Module List table) refers to organizations with active status on this Tenant Permissions card.

@@ -1,0 +1,51 @@
+---
+title: Evaluation Cycle List
+---
+
+# Evaluation Cycle List
+
+The **Evaluation** module reviews AI module performance and adoption on a periodic basis against the standing targets your organization has set. Each review round is called an **evaluation cycle**, and this page lists every cycle that has ever been created.
+
+This page is only accessible to users who hold the permission to read the evaluation dashboard (typically Management or Platform Admin). If your account does not hold this permission, the page shows a message explaining that you have no access to the Evaluation area, rather than an empty list.
+
+## 1. Opening the Evaluation page
+
+Click **Evaluation** in the left sidebar.
+
+![Evaluation cycle list with status/period filters and the cycle table](/screenshots/en/evaluasi-adopsi/index/01-daftar-siklus.png)
+
+At the top is a summary card with the page title, a short description, and the filters and action buttons:
+
+- **Status**: filters cycles by status (All statuses, Draft, In review, Closed).
+- **Period from** / **Period to**: filters cycles by their evaluation period date range.
+- **Reload** button: re-fetches the latest data from the server, useful when a colleague has just created a new cycle.
+- **Standing targets** button: opens the standing targets page, the reference values every cycle is measured against.
+- **New cycle** button (blue box): creates a new evaluation cycle. This button only appears for users who hold the permission to set evaluation scope (typically Platform Admin). See the separate "Creating an Evaluation Cycle" guide for the full steps.
+
+## 2. Reading the cycle table
+
+Each row represents one evaluation cycle, with the following columns:
+
+- **Cycle**: the cycle's title (clickable, boxed in the screenshot) with its short objective underneath. Click the title to open that cycle's detail page, where you can see its metrics, comparison against targets, management review notes, action plans, and attached evidence.
+- **Status**: the cycle's current status.
+  - **Draft**: the cycle was just created and has not entered review yet.
+  - **In review**: the cycle is currently going through management review.
+  - **Closed**: the cycle's review is finished and the cycle has been closed. Once closed, a cycle can no longer be reopened or edited.
+- **Trigger**: why the cycle was created, "Scheduled" (part of the regular evaluation schedule) or "Ad hoc" (created outside the schedule for a specific need).
+- **Period**: the date range of the data being evaluated in this cycle.
+- **Scope**: the number of clinical units and AI modules included in this cycle's scope. "0 unit(s), 0 module(s)" means the cycle covers every unit and every module (unrestricted).
+
+## 3. Filtering and reloading the list
+
+Pick a status from the **Status** dropdown, or fill in **Period from**/**Period to** to narrow the list to a specific date range. The page automatically reloads the list from the server whenever a filter changes, no need to click Reload. Use the **Reload** button when you want to refresh the data without changing any filter, for example after learning a colleague just created a new cycle.
+
+If the list has more than 20 cycles, **Previous**/**Next** navigation buttons appear at the bottom of the table to page through them.
+
+## 4. When the list is empty
+
+If no evaluation cycle exists yet (or none matches the selected filters), the table shows a message that no cycle was found, along with a suggestion to create one. Click **New cycle** to start creating your first cycle.
+
+## Notes
+
+- A standing target must be set first on the **Standing targets** page before creating a new cycle: a cycle cannot be created if there is no indicator with an active target to pick from.
+- A cycle marked **Closed** is final. Make sure all reviews, action plans, and supporting evidence are complete before closing a cycle.

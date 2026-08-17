@@ -1,0 +1,62 @@
+---
+title: Pengguna Lintas Organisasi
+---
+
+# Pengguna Lintas Organisasi
+
+Halaman ini dipakai untuk melihat dan mengelola akun pengguna dari **seluruh organisasi** yang terdaftar di PRECIA sekaligus, termasuk membuat pengguna baru untuk organisasi mana pun. Ruang kerjanya sama persis dengan halaman **Pengguna & Akses** di area organisasi biasa, hanya saja di sini datanya tidak dibatasi pada satu organisasi.
+
+Hanya Super Admin dan Platform Admin yang bisa membuka halaman ini, lewat menu **Pengguna & Akses** di sidebar Mode Platform.
+
+## Membedakan dari daftar pengguna organisasi biasa
+
+Karena tampilannya identik dengan halaman organisasi, PRECIA menambahkan banner **"Menampilkan seluruh organisasi"** di bagian atas untuk menegaskan lingkupnya.
+
+![Daftar pengguna lintas organisasi dengan banner penanda lingkup, tombol Tambah Pengguna, dan grid statistik total/aktif/terkunci/menunggu](/screenshots/id/organisasi-platform/pengguna-lintas-organisasi/01-daftar.png)
+
+Yang tampil di halaman ini:
+
+- **Banner biru** di paling atas, menegaskan data yang ditampilkan mencakup semua organisasi, bukan hanya organisasi tempat kamu login.
+- **Grid statistik** (Total pengguna, Aktif, Terkunci, Menunggu) menghitung seluruh pengguna dari semua organisasi, bukan per organisasi.
+- **Direktori Pengguna** menampilkan setiap baris pengguna lengkap dengan nama, email, status akun, dan peran yang dimiliki. Karena datanya lintas organisasi, kamu akan melihat pengguna dari RS/klinik yang berbeda-beda tercampur dalam satu daftar yang sama, dibedakan hanya dari data pengguna itu sendiri (bukan dari kolom organisasi terpisah).
+
+## Melihat detail dan mengubah status pengguna
+
+Tiap baris punya dua aksi: tombol **Detail** dan menu titik tiga di sebelahnya.
+
+![Menu tindakan (titik tiga) terbuka pada salah satu baris, menampilkan pilihan nonaktifkan dan kunci akun](/screenshots/id/organisasi-platform/pengguna-lintas-organisasi/02-menu-tindakan.png)
+
+- Klik **Detail** untuk membuka profil lengkap pengguna tersebut (riwayat, peran, dan pengaturan lain).
+- Klik ikon titik tiga untuk membuka menu cepat berisi:
+  - **Nonaktifkan** / **Aktifkan** — mengganti status akun tanpa masuk ke halaman detail.
+  - **Kunci Akun** (kalau status pengguna belum terkunci) — meminta konfirmasi sebelum mengunci, dan setelah dikunci pilihan ini berubah jadi **Buka Kunci**.
+
+Perubahan status lewat menu ini langsung berlaku pada organisasi asal pengguna tersebut, sama seperti kalau dilakukan dari halaman organisasi yang bersangkutan.
+
+## Membuat pengguna baru untuk organisasi mana pun
+
+Klik tombol **Tambah Pengguna** di pojok kanan atas daftar untuk membuka formulir pembuatan pengguna. Formulirnya sama dengan formulir pendaftaran di halaman organisasi ([lihat langkah lengkapnya di "Menambah Pengguna Baru"](/manajemen-pengguna/menambah-pengguna)), dengan satu perbedaan penting: **kolom Organisasi bisa dipilih**, bukan terkunci.
+
+![Formulir Buat Pengguna dalam keadaan kosong, dengan kolom Organisasi berupa dropdown pilihan (bukan field terkunci seperti di form organisasi biasa)](/screenshots/id/organisasi-platform/pengguna-lintas-organisasi/03-form-kosong.png)
+
+### Langkah-langkah
+
+1. Isi **Email**, **Nama Pengguna**, dan opsional **Nama Lengkap** seperti biasa.
+2. Pada kolom **Organisasi**, pilih organisasi tujuan dari dropdown. Semua organisasi yang terdaftar di PRECIA muncul di sini, jadi pastikan kamu memilih organisasi yang tepat sebelum melanjutkan — pengguna yang dibuat akan menjadi anggota organisasi yang dipilih, bukan organisasi tempat kamu (admin platform) login.
+3. Isi **Kata Sandi** awal akun.
+4. Atur **Status** akun (biasanya biarkan **Aktif**).
+5. Pada bagian **Peran**, centang satu atau lebih peran yang sesuai. Daftar peran yang tersedia di sini lebih lengkap dibanding form organisasi biasa, karena mencakup juga peran khusus platform seperti **Platform Administrator** dan **Super Administrator**, selain peran organisasi seperti Clinician, Nurse/Technician, Clinical Administrator, dan seterusnya.
+
+![Formulir terisi lengkap dengan organisasi "PRECIA Demo Booth (DEMO)" terpilih dan peran Clinician dicentang](/screenshots/id/organisasi-platform/pengguna-lintas-organisasi/04-organisasi-terpilih.png)
+
+6. Setelah semua kolom wajib terisi, klik tombol **Buat pengguna** di pojok kanan bawah.
+
+Kalau berhasil, muncul pesan konfirmasi **"Pengguna berhasil dibuat."** dan kamu diarahkan kembali ke daftar pengguna lintas organisasi.
+
+![Pesan "Pengguna berhasil dibuat" tampil setelah formulir berhasil disimpan](/screenshots/id/organisasi-platform/pengguna-lintas-organisasi/05-berhasil-dibuat.png)
+
+**Catatan penting:**
+
+- Pembuatan pengguna tidak bisa dibatalkan setelah tombol **Buat pengguna** berhasil diproses. Periksa kembali organisasi yang dipilih sebelum menyimpan — memilih organisasi yang salah berarti akun tersebut akan muncul di daftar pengguna organisasi lain, bukan organisasi yang kamu maksud.
+- Kalau ada kesalahan data (misalnya salah organisasi) setelah akun terlanjur dibuat, perbaiki lewat halaman detail pengguna yang bersangkutan; halaman ini sendiri tidak menyediakan cara memindahkan pengguna antar organisasi setelah dibuat.
+- Klik **Batal** pada formulir, atau **Kembali ke daftar pengguna** di pojok kanan atas, untuk keluar tanpa menyimpan.

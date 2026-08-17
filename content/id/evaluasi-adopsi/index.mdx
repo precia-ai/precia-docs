@@ -1,0 +1,51 @@
+---
+title: Daftar Siklus Evaluasi
+---
+
+# Daftar Siklus Evaluasi
+
+Modul **Evaluasi** dipakai untuk meninjau performa dan adopsi modul AI secara berkala terhadap target baku (standing target) yang sudah ditetapkan organisasi. Setiap putaran tinjauan disebut **siklus evaluasi**, dan halaman ini menampilkan daftar seluruh siklus yang pernah dibuat.
+
+Halaman ini hanya bisa diakses oleh pengguna yang punya izin membaca dashboard evaluasi (misalnya Manajemen atau Admin Platform). Jika akun Anda tidak punya izin ini, halaman akan menampilkan pesan bahwa Anda tidak punya akses ke area Evaluasi, bukan daftar kosong.
+
+## 1. Membuka halaman Evaluasi
+
+Klik menu **Evaluasi** di sidebar kiri.
+
+![Tampilan daftar siklus evaluasi dengan filter status/periode dan tabel siklus](/screenshots/id/evaluasi-adopsi/index/01-daftar-siklus.png)
+
+Di bagian atas ada kartu ringkasan berisi judul halaman, deskripsi singkat, serta filter dan tombol aksi:
+
+- **Status**: menyaring siklus berdasarkan status (Semua status, Draf, Sedang ditinjau, Ditutup).
+- **Periode dari** / **Periode sampai**: menyaring siklus berdasarkan rentang tanggal periode evaluasi.
+- Tombol **Muat ulang**: mengambil ulang data terbaru dari server, berguna kalau ada siklus baru yang dibuat pengguna lain.
+- Tombol **Target baku**: membuka halaman daftar target baku (standing target) yang jadi acuan pembanding tiap siklus.
+- Tombol **Siklus baru** (kotak biru): membuat siklus evaluasi baru. Tombol ini hanya muncul untuk pengguna yang punya izin menetapkan cakupan evaluasi (misalnya Admin Platform). Lihat panduan terpisah "Membuat Siklus Evaluasi" untuk langkah lengkapnya.
+
+## 2. Membaca tabel siklus
+
+Setiap baris pada tabel mewakili satu siklus evaluasi, dengan kolom:
+
+- **Siklus**: judul siklus (bisa diklik, kotak biru pada gambar) beserta deskripsi/tujuan singkatnya di bawah judul. Klik judul untuk membuka halaman detail siklus tersebut, tempat Anda melihat metrik, perbandingan terhadap target, catatan tinjauan manajemen, rencana tindak lanjut, dan lampiran bukti.
+- **Status**: status siklus saat ini.
+  - **Draf**: siklus baru dibuat, belum masuk tahap tinjauan.
+  - **Sedang ditinjau**: siklus sedang dalam proses tinjauan manajemen.
+  - **Ditutup**: siklus sudah selesai ditinjau dan ditutup. Setelah ditutup, siklus tidak bisa dibuka atau diubah lagi.
+- **Pemicu**: alasan siklus ini dibuat, "Terjadwal" (bagian dari jadwal evaluasi rutin) atau "Ad hoc" (dibuat di luar jadwal karena ada kebutuhan khusus).
+- **Periode**: rentang tanggal data yang dievaluasi pada siklus tersebut.
+- **Cakupan**: jumlah unit klinis dan modul AI yang termasuk dalam ruang lingkup siklus ini. Jika tertulis "0 unit, 0 module", artinya siklus tersebut mencakup semua unit dan semua modul (tidak dibatasi).
+
+## 3. Menyaring dan memuat ulang daftar
+
+Pilih status tertentu pada dropdown **Status**, atau isi **Periode dari**/**Periode sampai** untuk mempersempit daftar ke rentang tanggal tertentu. Setiap kali filter diubah, halaman otomatis memuat ulang daftar dari server (tidak perlu klik tombol Muat ulang). Tombol **Muat ulang** dipakai jika Anda ingin menyegarkan data tanpa mengubah filter, misalnya setelah tahu ada siklus baru yang dibuat kolega.
+
+Jika daftar berisi lebih dari 20 siklus, tombol navigasi **Sebelumnya**/**Berikutnya** akan muncul di bagian bawah tabel untuk berpindah halaman.
+
+## 4. Jika daftar kosong
+
+Jika belum ada siklus evaluasi sama sekali (atau tidak ada yang cocok dengan filter yang dipilih), tabel akan menampilkan pesan bahwa belum ada siklus, disertai saran untuk membuat siklus baru. Klik tombol **Siklus baru** untuk mulai membuat siklus pertama.
+
+## Catatan
+
+- Menetapkan target baku (standing target) harus dilakukan lebih dulu di halaman **Target baku** sebelum membuat siklus baru: siklus tidak bisa dibuat kalau belum ada indikator dengan target aktif untuk dipilih.
+- Siklus yang sudah berstatus **Ditutup** bersifat final. Pastikan seluruh tinjauan, rencana tindak lanjut, dan lampiran bukti sudah lengkap sebelum menutup siklus.

@@ -1,0 +1,62 @@
+---
+title: Cross-Organization Users
+---
+
+# Cross-Organization Users
+
+This page lets you view and manage user accounts across **every organization** registered in PRECIA at once, including creating new users for any organization. The workspace is identical to the regular **Users & Access** page in the organization area, except the data here is not limited to a single organization.
+
+Only Super Admin and Platform Admin can open this page, through the **Users & Access** menu in the Platform Mode sidebar.
+
+## Telling it apart from the regular organization user list
+
+Since the layout is identical to the organization page, PRECIA adds a **"Viewing every organization"** banner at the top to make the scope explicit.
+
+![Cross-organization user list with the scope banner, the Add User button, and the total/active/locked/pending stats grid](/screenshots/en/organisasi-platform/pengguna-lintas-organisasi/01-daftar.png)
+
+What you see on this page:
+
+- The **blue banner** at the very top confirms the data shown covers every organization, not only the one you are logged into.
+- The **stats grid** (Total users, Active, Locked, Pending) counts every user across all organizations, not per organization.
+- The **User Directory** lists each user's name, email, account status, and assigned roles. Because the data spans organizations, you will see users from different hospitals/clinics mixed together in the same list, distinguished only by the user data itself (there is no separate organization column).
+
+## Viewing details and changing a user's status
+
+Each row has two actions: the **Detail** button and the three-dot menu next to it.
+
+![Row action menu (three dots) open on one row, showing deactivate and lock account options](/screenshots/en/organisasi-platform/pengguna-lintas-organisasi/02-menu-tindakan.png)
+
+- Click **Detail** to open that user's full profile (history, roles, and other settings).
+- Click the three-dot icon to open a quick menu with:
+  - **Deactivate** / **Activate** — toggles the account status without opening the detail page.
+  - **Lock Account** (if the user isn't already locked) — asks for confirmation before locking; once locked, this option turns into **Unlock**.
+
+Status changes made through this menu take effect immediately on the user's home organization, exactly as if made from that organization's own page.
+
+## Creating a new user for any organization
+
+Click **Add User** at the top right of the list to open the create-user form. The form is the same as the registration form in the organization area ([see the full walkthrough in "Adding a New User"](/manajemen-pengguna/menambah-pengguna)), with one key difference: the **Organization field is a picker**, not locked.
+
+![Empty Create User form, with the Organization field shown as a dropdown picker instead of a locked field like in the regular organization form](/screenshots/en/organisasi-platform/pengguna-lintas-organisasi/03-form-kosong.png)
+
+### Steps
+
+1. Fill in **Email**, **Username**, and optionally **Full Name** as usual.
+2. In the **Organization** field, pick the destination organization from the dropdown. Every organization registered in PRECIA appears here, so double-check you're selecting the right one before continuing — the new user becomes a member of whichever organization you pick, not the organization you (the platform admin) are logged into.
+3. Fill in an initial **Password**.
+4. Set the account **Status** (usually leave it as **Active**).
+5. In the **Roles** section, check one or more roles that fit the user's responsibilities. The role list here is more complete than the organization-scoped form, since it also includes platform-only roles like **Platform Administrator** and **Super Administrator**, alongside organization roles such as Clinician, Nurse/Technician, Clinical Administrator, and so on.
+
+![Fully filled form with "PRECIA Demo Booth (DEMO)" selected as the organization and the Clinician role checked](/screenshots/en/organisasi-platform/pengguna-lintas-organisasi/04-organisasi-terpilih.png)
+
+6. Once every required field is filled in, click **Create user** at the bottom right.
+
+On success, a confirmation message **"User created successfully."** appears and you're redirected back to the cross-organization user list.
+
+![Confirmation message "User created successfully" shown after the form is saved](/screenshots/en/organisasi-platform/pengguna-lintas-organisasi/05-berhasil-dibuat.png)
+
+**Important notes:**
+
+- User creation cannot be undone once **Create user** has been processed successfully. Double-check the selected organization before saving — picking the wrong one means the account will show up under a different organization's user list than you intended.
+- If you make a mistake (e.g. wrong organization) after the account is already created, fix it from that user's detail page; this page itself does not provide a way to move a user between organizations after creation.
+- Click **Cancel** on the form, or **Back to users** at the top right, to leave without saving.

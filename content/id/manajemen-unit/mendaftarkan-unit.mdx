@@ -1,0 +1,67 @@
+---
+title: Mendaftarkan Unit Baru
+---
+
+# Mendaftarkan Unit Baru
+
+Halaman **Daftarkan Unit Klinis** dipakai untuk membuat unit klinis (poli/departemen) baru di organisasi Anda, misalnya Cardiology, Radiology, atau unit baru lainnya. Proses pendaftaran dibagi jadi 3 langkah berurutan: **Identitas Unit**, **Status Awal**, dan **Tinjau & Daftarkan**.
+
+## 1. Membuka halaman pendaftaran
+
+Dari halaman **Unit**, klik tombol **Daftarkan Unit** di pojok kanan atas. Anda akan masuk ke wizard 3 langkah. Nomor langkah di bagian atas menunjukkan posisi Anda saat ini; langkah yang sudah selesai ditandai ikon centang.
+
+## 2. Langkah 1: Identitas Unit
+
+Ini adalah langkah pertama, berisi informasi dasar untuk mengidentifikasi unit.
+
+![Langkah 1 wizard pendaftaran unit, form Identitas Unit dengan field Kode Unit dan Nama Unit terisi, tombol Lanjut di pojok kanan bawah](/screenshots/id/manajemen-unit/mendaftarkan-unit/01-langkah-identitas.png)
+
+Isi field berikut:
+
+- **Kode Unit** (wajib): pengenal unik unit ini di dalam organisasi Anda, misalnya `POLI-JANTUNG`. Kode ini tidak boleh sama dengan kode unit lain yang sudah ada; jika sama, sistem akan menolak saat Anda mengirim data di langkah terakhir.
+- **Nama Unit** (wajib): nama unit yang mudah dibaca, misalnya "Poli Jantung".
+- **Jenis Layanan** (opsional): jenis layanan klinis yang disediakan unit ini, misalnya "Cardiology". Boleh dikosongkan.
+
+Klik tombol **Lanjut** (panah biru) untuk masuk ke langkah berikutnya. Jika Kode Unit atau Nama Unit masih kosong, sistem menampilkan pesan error di bawah field yang bersangkutan dan Anda tidak bisa lanjut sebelum mengisinya.
+
+## 3. Langkah 2: Status Awal
+
+Langkah kedua menentukan status operasional unit ini saat pertama kali dibuat.
+
+![Langkah 2 wizard pendaftaran unit, tiga pilihan status Aktif/Pilot/Nonaktif, opsi Pilot sedang dipilih](/screenshots/id/manajemen-unit/mendaftarkan-unit/02-langkah-status.png)
+
+Pilih salah satu dari tiga opsi status:
+
+- **Aktif**: unit siap untuk operasional klinis penuh, bisa langsung memproses transaksi.
+- **Pilot**: unit dalam tahap penerapan terbatas/uji coba.
+- **Nonaktif**: unit belum menerima transaksi.
+
+Klik kartu status yang diinginkan untuk memilihnya; kartu yang terpilih ditandai dengan garis tepi biru. Secara bawaan, opsi **Aktif** yang terpilih saat wizard pertama kali dibuka. Status ini bisa diubah lagi nanti dari halaman detail unit, jadi tidak perlu khawatir salah pilih di sini.
+
+Tombol **Kembali** (kiri) membawa Anda ke langkah 1 tanpa kehilangan data yang sudah diisi. Tombol **Lanjut** (kanan) membawa Anda ke langkah terakhir.
+
+## 4. Langkah 3: Tinjau & Daftarkan
+
+Langkah terakhir menampilkan ringkasan seluruh data yang sudah Anda isi, untuk dikonfirmasi sebelum benar-benar dikirim ke sistem.
+
+![Langkah 3 wizard pendaftaran unit, ringkasan Unit/Jenis Layanan/Status Awal, tombol Daftarkan Unit di pojok kanan bawah](/screenshots/id/manajemen-unit/mendaftarkan-unit/03-langkah-review.png)
+
+Periksa kembali tiga bagian ringkasan:
+
+- **Unit**: nama unit dan kode unit yang akan didaftarkan.
+- **Jenis Layanan**: jenis layanan yang tadi diisi, atau "Tidak ditentukan" jika dikosongkan.
+- **Status Awal**: badge status yang tadi dipilih di langkah 2.
+
+Jika ada yang perlu diperbaiki, klik tombol **Kembali** untuk kembali ke langkah sebelumnya dan mengubah datanya. Kalau sudah yakin, klik tombol **Daftarkan Unit** (panah biru) untuk mengirim data dan membuat unit baru.
+
+**Penting**: setelah tombol **Daftarkan Unit** diklik dan berhasil, unit langsung tercatat di sistem dan Anda otomatis diarahkan kembali ke halaman **Unit**. Aksi ini tidak bisa dibatalkan dari wizard; jika kode unit ternyata sudah dipakai unit lain, sistem menampilkan pesan error dan Anda tetap berada di langkah ini untuk memperbaiki kodenya.
+
+Tombol **Bersihkan** (di kiri bawah, tersedia di semua langkah) mengosongkan seluruh isian dan mengembalikan wizard ke langkah 1, berguna kalau Anda ingin mulai ulang dari awal.
+
+## 5. Unit baru muncul di daftar
+
+Setelah berhasil didaftarkan, unit baru langsung muncul sebagai kartu di halaman **Unit**, lengkap dengan badge status yang dipilih.
+
+![Unit baru "Unit Contoh Dokumentasi" muncul di daftar unit setelah berhasil didaftarkan, dengan badge status Pilot](/screenshots/id/manajemen-unit/mendaftarkan-unit/04-hasil-akhir.png)
+
+Dari sini Anda bisa klik kartu unit tersebut (atau tautan **Kelola unit**) untuk membuka halaman detail dan melengkapi pengaturan lanjutan, seperti menambahkan anggota unit atau mengaktifkan modul AI. Lihat panduan terpisah "Detail Unit" dan "Mengatur Anggota Unit" untuk langkah selanjutnya.

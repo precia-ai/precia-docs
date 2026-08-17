@@ -1,0 +1,69 @@
+---
+title: Worklist by AI Module
+---
+
+# Worklist by AI Module
+
+The regular transaction worklist (see the **Overview** page) shows one row per case. But a single case can have several AI analysis slots at once if its unit has more than one AI module active (for example, a cardiology unit with three ECG modules enabled). If you need to track progress per analysis slot instead of per case, use the **By AI Module** tab.
+
+This page covers how to open that view, filter slots by module and status, and check analysis results directly from the table.
+
+## When this tab appears
+
+The **By AI Module** tab only shows up once you're scoped to a specific unit (not the combined "General/All units" view). If your account has access to multiple units, pick a unit first via the **Change unit** button — the tab then appears next to the **Transactions** tab.
+
+## 1. Open the By AI Module tab
+
+On the **Clinical** page, with a unit active, click the **By AI Module** tab next to **Transactions**.
+
+![By AI Module tab next to the Transactions tab](/screenshots/en/kasus-klinis/worklist-per-modul/01-tab-modul-ai.png)
+
+## 2. The slot table view
+
+Once the tab is active, the table switches from a list of cases to a list of analysis slots. Each row represents one slot (a case + AI module pair), so a single case with three active modules shows up as three separate rows.
+
+![Slot worklist table with AI Module and Slot Status filters](/screenshots/en/kasus-klinis/worklist-per-modul/02-tabel-slot.png)
+
+Available columns:
+
+- **Code** — the parent case's transaction code.
+- **Patient** — patient name and MRN.
+- **Status** — slot status: Pending, Data Uploaded, Ready, Processing, Completed, or Failed.
+- **Confidence** — the AI result's confidence score (once processing is complete).
+- **Ground Truth** — a manually entered comparison label, if any, usually set during module evaluation.
+- **Match** — whether the AI result matches the ground truth. Shows **N/A** when there's no ground truth to compare against.
+- **Created** — when the case was created.
+
+Above the table there are two filters:
+
+- **AI Module** — narrow the view to a single module. The default "All modules" shows slots from every module active in this unit.
+- **Slot Status** — narrow to a single slot status (Pending, Data Uploaded, Ready, Processing, Completed, or Failed).
+
+## 3. Filtering by AI module
+
+Pick a module from the **AI Module** dropdown to focus on that module's slots only. This is useful when your unit runs several modules and you only need to monitor one type of examination, for example only **ECG EF Screening** slots.
+
+![Slot table filtered to a single AI module](/screenshots/en/kasus-klinis/worklist-per-modul/03-filter-modul.png)
+
+The AI Module and Slot Status filters can be combined. The combination stays applied as long as you don't switch units or reload the page.
+
+**Note**: the **Bulk Import** button next to the filters only becomes active once you've selected a specific AI module (not "All modules"), and it only appears for accounts with import permission. See the **Bulk Importing Cases** page for how to use it.
+
+## 4. Viewing result details from the table
+
+Click the arrow icon in the leftmost column (or double-click the row) to open the slot's details without leaving the page.
+
+- If the slot **hasn't finished processing** (status Pending, Data Uploaded, Ready, or Processing), the detail panel just shows a note that AI processing for this slot isn't done yet.
+- If the slot is **Completed**, the detail panel shows the full AI analysis result: confidence score, classification, and the per-class probability breakdown.
+
+![Expanded Completed slot row showing the AI analysis result](/screenshots/en/kasus-klinis/worklist-per-modul/04-detail-hasil.png)
+
+Click the same arrow icon again (or double-click the row) to collapse the detail.
+
+## How this differs from the Transactions tab
+
+The **Transactions** tab is the right view when you want each case's overall status (one case = one row, combining all of its slots). The **By AI Module** tab is the right view when you want to track workload or progress per AI module — for example, confirming every ECG EF Screening slot this week has finished processing, or finding **Failed** slots for a specific module.
+
+## Next steps
+
+To read an AI analysis result in more detail from the case page itself (rather than from the worklist table), see the **Viewing AI Analysis Results** page.

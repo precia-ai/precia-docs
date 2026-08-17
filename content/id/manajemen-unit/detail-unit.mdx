@@ -1,0 +1,88 @@
+---
+title: Detail Unit
+---
+
+# Detail Unit
+
+Halaman **Detail Unit** adalah tempat Anda mengelola satu unit klinis secara lengkap: mengatur anggota staf, mengaktifkan/menonaktifkan modul AI untuk unit itu, mengubah status operasional, mengubah nama/jenis layanan, dan melihat riwayat perubahan (tata kelola) unit tersebut.
+
+## 1. Membuka detail unit
+
+Dari halaman **Unit**, klik kartu unit yang ingin dikelola. Anda akan masuk ke halaman detail unit tersebut, dengan tautan **Kembali ke Unit** di pojok kiri atas untuk kembali ke daftar.
+
+![Halaman detail unit Cardiology, tab Anggota aktif, sidebar identitas unit dengan tombol Tugaskan Staf, Ubah Status, dan Ubah Unit](/screenshots/id/manajemen-unit/detail-unit/01-tab-members.png)
+
+Halaman ini terbagi dua bagian:
+
+- **Sidebar kiri** (kartu identitas unit): menampilkan nama unit, kode unit, status, jenis layanan, ringkasan angka (jumlah anggota, validator, modul AI aktif), dan tiga tombol aksi utama: **Tugaskan Staf**, **Ubah Status**, **Ubah Unit**. Di bawahnya ada kartu ringkasan kedua yang merinci jumlah staf klinis, validator, AI aktif, dan AI nonaktif.
+- **Panel kanan**: berisi tiga tab: **Anggota**, **Modul AI**, dan **Riwayat Tata Kelola**. Angka kecil di sebelah label tab menunjukkan jumlah data pada tab itu.
+
+Catatan: tab **Modul AI** hanya muncul jika akun Anda punya izin melihat modul AI. Jika Anda tidak punya izin ini, panel akan menampilkan pesan "Anda tidak memiliki izin untuk melihat modul AI pada unit ini" saat mencoba mengaksesnya.
+
+## 2. Tab Anggota: mengelola staf unit
+
+Tab **Anggota** (aktif secara default) menampilkan tabel staf klinis yang ditugaskan ke unit ini: nama, peran (role context), status validator, tanggal ditugaskan, dan kolom aksi.
+
+Untuk setiap baris anggota, tersedia tiga tombol aksi di kolom **Aksi**:
+
+- **Ubah peran** (ikon pensil): membuka dialog untuk mengubah peran operasional anggota tersebut di unit ini (misalnya dari "Clinician" menjadi "Attending Physician").
+- **Jadikan/lepas validator** (ikon toggle): mengubah status validator anggota. Anggota berstatus validator berwenang memvalidasi hasil pemeriksaan AI di unit ini. Ikon berubah warna hijau saat anggota berstatus validator.
+- **Hapus dari unit** (ikon tempat sampah merah): melepas anggota dari unit ini. Aksi ini langsung dieksekusi begitu tombol diklik, tanpa dialog konfirmasi tambahan, jadi pastikan Anda benar-benar ingin menghapus anggota tersebut sebelum mengklik.
+
+Klik tombol **Tugaskan Staf** (di sidebar atau di atas tabel) untuk menambahkan anggota baru ke unit. Lihat panduan terpisah "Mengatur Anggota Unit" untuk langkah lengkap menambah dan mengelola anggota.
+
+Jika unit belum punya anggota, tabel menampilkan pesan `Belum ada anggota yang ditugaskan. Klik "Tugaskan Staf" untuk menambahkan personel klinis.`
+
+## 3. Tab Modul AI: kebijakan AI per unit
+
+Klik tab **Modul AI** untuk melihat modul AI yang terdaftar pada unit ini beserta status aktif/nonaktifnya.
+
+![Tab Modul AI menampilkan tiga modul AI terdaftar pada unit Cardiology beserta domain, versi, dan status](/screenshots/id/manajemen-unit/detail-unit/02-tab-ai-modules.png)
+
+Tabel menampilkan untuk setiap modul: nama dan kode modul, domain klinis, versi model, status (**Aktif**/**Nonaktif**), dan tanggal ditugaskan ke unit.
+
+- Tombol **Daftarkan Modul AI** (jika Anda punya izin) membuka dialog untuk mendaftarkan modul AI baru dari registri ke unit ini.
+- Tombol **Ubah Status** pada setiap baris (jika Anda punya izin) membuka dialog untuk mengaktifkan atau menonaktifkan modul tersebut khusus untuk unit ini. Menonaktifkan modul di sini tidak menghapus modul dari registri AI organisasi, hanya menghentikan penggunaannya di unit tersebut.
+
+Jika Anda tidak punya izin mengelola modul AI, tombol-tombol ini tidak akan muncul dan Anda hanya bisa melihat daftar modul dalam mode baca saja.
+
+## 4. Tab Riwayat Tata Kelola: melihat jejak perubahan
+
+Klik tab **Riwayat Tata Kelola** untuk melihat lini masa (timeline) semua perubahan tata kelola pada unit ini: perubahan info unit, perubahan status, penugasan/pelepasan anggota, perubahan peran, perubahan status validator, dan aktivitas modul AI (registrasi, aktivasi, nonaktivasi).
+
+![Tab Riwayat Tata Kelola menampilkan lini masa perubahan unit dengan filter kategori Semua, Info Unit, Anggota & Validator, dan Modul AI](/screenshots/id/manajemen-unit/detail-unit/03-tab-history.png)
+
+Gunakan pil filter di atas lini masa untuk mempersempit tampilan: **Semua**, **Info Unit**, **Anggota & Validator**, atau **Modul AI**. Setiap entri riwayat menampilkan jenis perubahan, ringkasan detail perubahan (misalnya status lama → status baru), waktu relatif dan waktu lengkap, serta nama pengguna yang melakukan perubahan.
+
+Secara default hanya 5 entri terbaru yang ditampilkan. Klik **Tampilkan lebih banyak** untuk memuat entri berikutnya, atau **Tampilkan lebih sedikit** untuk mengembalikannya ke 5 entri. Klik tombol **Muat Ulang** di pojok kanan atas kapan saja untuk menyegarkan data riwayat terbaru.
+
+## 5. Mengubah nama unit atau jenis layanan
+
+Klik tombol **Ubah Unit** di sidebar untuk membuka dialog **Ubah Informasi Unit**.
+
+![Dialog Ubah Informasi Unit dengan field Nama Unit dan Jenis Layanan, tombol Simpan Perubahan](/screenshots/id/manajemen-unit/detail-unit/04-dialog-edit-unit.png)
+
+Dialog ini berisi dua field:
+
+- **Nama Unit** (wajib diisi): nama unit klinis, misalnya "Cardiology".
+- **Jenis Layanan** (opsional): jenis layanan klinis yang disediakan unit ini.
+
+Ubah field yang diperlukan, lalu klik **Simpan Perubahan**. Jika tidak ada perubahan nilai pada kedua field, dialog akan menutup tanpa mengirim permintaan apa pun ke server. Klik **Batal** untuk menutup dialog tanpa menyimpan.
+
+Catatan: dialog ini tidak mengubah kode unit (misalnya "CARD"), karena kode unit bersifat permanen setelah unit didaftarkan.
+
+## 6. Mengubah status operasional unit
+
+Klik tombol **Ubah Status** di sidebar untuk membuka dialog **Tetapkan Status Operasional**.
+
+![Dialog Tetapkan Status Operasional dengan tiga pilihan status: Aktif, Nonaktif, dan Pilot; status Pilot sedang dipilih](/screenshots/id/manajemen-unit/detail-unit/05-dialog-ubah-status.png)
+
+Ada tiga pilihan status yang bisa dipilih dengan mengklik salah satu kartu:
+
+- **Aktif**: unit dapat menerima transaksi dan pemeriksaan baru. Ini status operasional normal.
+- **Nonaktif**: unit tidak akan menerima transaksi baru. Gunakan status ini saat unit sedang tidak beroperasi atau ditutup sementara.
+- **Pilot**: unit berada pada tahap penerapan terbatas (uji coba terkendali), biasanya dipakai saat unit baru mulai memakai modul AI tertentu secara bertahap.
+
+Status yang sedang berlaku ditandai label **Saat Ini** di sebelah nama status. Pilih status baru, lalu klik **Perbarui Status**. Tombol ini nonaktif (tidak bisa diklik) selama status yang dipilih masih sama dengan status saat ini, jadi Anda harus benar-benar memilih status yang berbeda dulu sebelum tombol aktif. Klik **Batal** untuk menutup dialog tanpa mengubah status.
+
+Perubahan status ini tercatat otomatis di tab **Riwayat Tata Kelola** sebagai entri "Status unit diubah".

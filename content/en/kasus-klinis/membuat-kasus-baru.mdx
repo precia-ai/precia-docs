@@ -1,0 +1,64 @@
+---
+title: Creating a New Case
+---
+
+# Creating a New Case
+
+A clinical case is a single patient examination that will be processed by AI. This page walks through creating a new case from scratch, until it appears in the transaction worklist and is ready for file upload.
+
+## 1. Open the Clinical page
+
+Click **Clinical** in the left menu. If your account has access to more than one unit, you'll be asked to pick a unit first (see the **Getting to Know the Interface** page for how unit selection works). Once a unit is active, you'll see the transaction worklist below.
+
+![Transaction worklist with the New Transaction button](/screenshots/en/kasus-klinis/membuat-kasus-baru/01-worklist.png)
+
+Click **+ New Transaction** in the top right to open the case creation form.
+
+## 2. Fill in the Create Clinical Transaction form
+
+The form opens as a panel on the right side of the screen, split into four sections: **Assignment**, **Patient Information**, **Examination**, and **Notes**.
+
+![Empty Create Clinical Transaction form](/screenshots/en/kasus-klinis/membuat-kasus-baru/02-drawer-kosong.png)
+
+### Assignment
+
+- **Unit** (required) — the clinical unit responsible for this examination. Only units you have access to appear in the list. The case will follow whichever AI modules are currently active for that unit.
+
+### Patient Information
+
+- **Patient MRN** (required) — the patient's medical record number, e.g. `MRN-000123`.
+- **Patient Name** (required) — the patient's full name.
+- **Date of Birth** (optional) — leave blank if not yet known.
+- **Gender** (optional) — choose one: Male, Female, Other, or Unknown.
+
+Patient data entered here is confidential. Only authorized users within the same unit can view it.
+
+### Examination
+
+- **Priority** — choose one: Low, Normal, High, or Urgent. Defaults to Normal. Priority helps the team decide which cases in the worklist need attention first.
+
+### Notes
+
+- **Examination Notes** (optional) — additional clinical context, referral reason, or relevant history for this examination.
+
+Example of a fully filled-in form:
+
+![Fully filled-in Create Clinical Transaction form](/screenshots/en/kasus-klinis/membuat-kasus-baru/03-drawer-terisi.png)
+
+**Important**: this form has no manual AI module picker. The case automatically receives an examination slot for every AI module currently active on the selected unit (for example, a cardiology unit with three active ECG modules will immediately create three analysis slots). If a unit has no active AI modules yet, ask your unit admin or organization admin to enable them first (see the documentation on per-unit AI module settings).
+
+## 3. Click Create Transaction
+
+Once every required field is filled in, click **Create Transaction** at the bottom of the panel. If any field is invalid (e.g. an empty MRN or a badly formatted date of birth), the system shows an error message under the relevant field and the form won't be saved until it's fixed.
+
+On success, you're automatically taken to the detail page of the newly created case. Its status is recorded as **Unprocessed**, with the priority and the list of AI modules automatically assigned based on the unit.
+
+![Case detail page after successful creation](/screenshots/en/kasus-klinis/membuat-kasus-baru/04-hasil-sukses.png)
+
+## What's next
+
+This new case can't be analyzed by AI yet until patient files are uploaded for each module. See the **Uploading Patient Files** page to continue.
+
+## Cancelling a case
+
+If a case was created by mistake, open its detail page and look for the cancel option there. A case that has already been sent to a doctor for review can no longer be cancelled by yourself, contact your unit admin instead. See the **Cancelling a Case** page for full details.

@@ -1,0 +1,140 @@
+---
+title: Frequently Asked Questions
+---
+
+# Frequently Asked Questions
+
+The questions that come up most often in day-to-day use of PRECIA, from login trouble to menus that seem to be missing to cases stuck at a particular status. If the answers here don't solve your problem, see the **Contact Support** page.
+
+## Login and accounts
+
+### Why can't I log in even though my username/email and password are correct?
+
+Likely causes:
+
+- A typo, especially case sensitivity in the password.
+- The account hasn't been created yet, or hasn't been activated by your organization admin/unit admin.
+- The account is currently deactivated by an admin.
+
+PRECIA does not distinguish the error message between "account does not exist" and "wrong password" — both show **"Email or password is incorrect. Please try again."** Contact your organization admin or unit admin to check your account status. Full details are in the **Sign In to Your Account** page.
+
+### How do I sign up for a new account?
+
+PRECIA does not offer self-service registration. Your organization admin or unit admin creates the account first, then gives you a username/email and an initial password for your first login.
+
+### I forgot my password. Can I reset it myself?
+
+Not yet. PRECIA currently has no self-service password reset on the login page. Contact your organization admin or unit admin to have a new password set for you.
+
+### I can reach the Profile page, but I've forgotten what to type in "Current Password" on the Change Password card. What now?
+
+The Profile page can't help here — the Current Password field requires the correct old password. The fix is the same as forgetting your password entirely: contact your organization admin or unit admin.
+
+### Why is my account status "Locked" or "Pending Activation"?
+
+Account status (Active, Locked, Pending Activation, or Inactive) is shown on your Profile page, but only an organization admin or platform admin can change it. If your status isn't Active, contact your organization admin to ask why and request activation.
+
+## Menus and access
+
+### Why don't certain menus (e.g. Users & Access, Audit, or AI Registry) show up in my sidebar?
+
+The menus you see depend on your account's **role**. If a menu you expect isn't there, it's most likely because your role doesn't cover it — not an application error. For example, a doctor who only handles clinical cases typically won't see the Users & Access menu, since managing user accounts isn't part of that role.
+
+Contact your organization admin if you feel you need additional access for your work. See **Understanding User Roles** for the full list of roles and what each one covers.
+
+### I'm a unit admin — why can't I change organization settings or create a new organization?
+
+That's the responsibility of the organization's System Admin (for organization-wide settings) or a Platform Admin (for cross-organization matters, such as creating a new organization/tenant). A unit admin (Clinical Admin) only manages unit membership, per-unit AI module policy, and day-to-day unit operations.
+
+### Why doesn't the "By AI Module" tab appear on my Clinical page?
+
+This tab only appears once you're working within a specific unit's context, not the combined "All units" view. If your account has access to multiple units, pick a unit first via the **Switch Unit** button — the tab then appears next to the **Transactions** tab.
+
+### Why can I see another organization even though I'm not a platform admin?
+
+Unless you're a Platform Admin or Super Admin, you should only see data for the organization your account belongs to. If the account card in the sidebar shows the wrong organization name, check whether your account genuinely has access to more than one organization. If unsure, contact your organization admin.
+
+## Clinical cases stuck at one status
+
+### My case has been stuck at "Unprocessed" — why isn't it moving to AI processing?
+
+New cases aren't processed automatically. Patient files for each AI module must be uploaded first, then marked **Ready for Analysis**. Only after that does the system process the case automatically. See **Uploading Patient Files** for the steps.
+
+### My case is stuck at "Upload Failed" — what should I do?
+
+Check two things: the file size doesn't exceed the limit shown on the upload screen, and the file format matches what the module requires (e.g. `.png` or `.jpg`). If everything checks out but it still fails, try uploading again. If it keeps failing, contact support through the **Help** page.
+
+### Why is the "Send to Validator" button disabled?
+
+Two possible reasons:
+
+- The case's current status isn't one of **Unprocessed**, **Invalid Data**, **Upload Failed**, or **Needs Retake**. Once a case has already been sent once, this button is disabled automatically.
+- No AI module has finished processing a result yet. The system requires at least one completed AI result before a case can be sent to a validator. Wait for the AI analysis to finish, then try sending again.
+
+### What does "Needs Retake" status mean?
+
+It means a validator or doctor reviewed the uploaded files and decided the exam needs to be redone, for example because image quality was insufficient. The case goes back to the clinician handling it to re-upload the correct files, then it can be sent to the validator again once done.
+
+### Why can't I cancel a case that's already been sent to a doctor?
+
+This is intentional. Cancellation is only available while a case's status is **Draft**, **Unprocessed**, **Invalid Data**, or **Upload Failed**. Once a case is **Sent to Doctor**, **Doctor Reviewed**, being processed by AI, or already **Completed**, the cancel button is disabled automatically, so a case another clinician is actively reviewing can't suddenly disappear. If a case at that stage genuinely needs to be cancelled, contact your unit admin or organization admin.
+
+### I cancelled a case by mistake — can I undo it?
+
+No. Cancelling a case is final; there's no button to reactivate a case that's already Cancelled. If the cancellation was a mistake, create a new case and re-enter the data.
+
+### Why doesn't the New Clinical Transaction form let me pick an AI module?
+
+There's no manual module selection by design. A case automatically gets an analysis slot for every AI module currently active on the selected unit. If the unit has no active AI modules at all, contact the unit admin or organization admin to activate one first.
+
+## Clinical validation
+
+### Why doesn't the Validation menu appear in my sidebar?
+
+This menu only appears for accounts with a clinical validator or clinician (doctor) role. If you believe you need this role, contact your organization admin.
+
+### I already published a validation decision — can it be changed?
+
+Not from the Validation page. Once **Publish validation** is clicked, the decision becomes final, the status changes to **Published**, and no further action is available in that panel. Make sure the decision is correct before publishing.
+
+### What's the difference between "Request retake" on the Validation page and "Request Retake" on the case detail page?
+
+Both send a case back for re-examination, but they differ in who triggers it and at what stage. **Request Retake** on the case detail page is used by the clinician before the case is sent to a validator (the case moves to **Needs Retake** status). **Request retake** on the Validation page is used by the validator after reviewing the result, if the validator judges the file quality insufficient to assess; that validation is never published, and the case goes back to the clinician involved.
+
+## User and unit management
+
+### I revoked the only role a user had — what happens now?
+
+That user immediately loses access to every PRECIA feature until a new role is granted, since they have no active role left. Grant a new role right away via the **Manage Roles** page if this happens by accident.
+
+### Why can't I assign a particular user to a unit?
+
+The **Assign Staff** dialog only lists users from the same organization as that unit. If the person you're searching for doesn't show up, they're likely registered under a different organization, or they've already been assigned to this unit before (the system rejects duplicate assignments).
+
+### What's the difference between "removing a member from a unit" and deleting a user account?
+
+Removing a member from a unit's Members tab only removes that person's assignment to the unit you're managing — it does not delete the user account from the system. The same person can be reassigned to this unit later, and their account still works for any other unit they belong to.
+
+## AI modules
+
+### Why can't I change the tenant permissions of an AI module?
+
+Tenant permissions can't be changed while the module's lifecycle status is **Inactive**. Activate the module first (switch it to Pilot or Clinical) before managing tenant permissions. If the module is already active but the **Manage Permissions**/**View Permissions** button still doesn't appear, your account lacks read or write access to that module's tenant permissions — contact a platform admin.
+
+### My unit is active, but no AI module shows up to use — why?
+
+An AI module must first be enabled in that unit's AI policy before it can be used to process cases. If the unit has no active modules yet, contact the unit admin (Clinical Admin) or organization admin to enable one.
+
+## Other
+
+### If I change the language or theme, does it affect other users?
+
+No. The **Language** and **Appearance** controls at the bottom of the sidebar only apply to your own session/device; they don't change settings for anyone else.
+
+### Why does my dashboard only show two shortcut cards, with no charts or statistics?
+
+That's not a display bug. The full dashboard (with statistic cards, throughput chart, and transaction status) only appears for accounts with reporting/analytics access, such as Organization Admin, Platform Admin, or Management. Accounts without that access (some Clinician/Validator accounts, for example) see a simplified dashboard with just two shortcut cards leading to **Clinical** and **Validation**.
+
+### The same case shows up twice in my worklist — is that normal?
+
+If you're viewing the **By AI Module** tab, yes, that's expected. That tab shows one row per analysis slot, so a case with three active AI modules appears as three separate rows. If you want one row per case instead, use the regular **Transactions** tab.

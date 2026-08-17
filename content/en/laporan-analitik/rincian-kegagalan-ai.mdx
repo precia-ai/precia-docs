@@ -1,0 +1,72 @@
+---
+title: AI Failure Breakdown
+---
+
+# AI Failure Breakdown
+
+This page lists every AI job that failed to process within a chosen period, along with the reason, the timestamp, and a direct link to the related case. Use this page whenever you need to drill into the individual failures behind the "Failure reasons" chart on the Analytics Dashboard.
+
+## How to Open the Page
+
+There are two ways to open this page:
+
+1. From the **Analytics Dashboard**, find the "Failure reasons" card and click the "See every failure" link.
+2. Click the **Analytics** menu in the sidebar, then open the failure breakdown section.
+
+This page requires monitoring report access. If your account does not have that access, the system shows a message stating that failure detail is not available for your role.
+
+## Page Layout
+
+![Initial view of the AI failure breakdown page with filters and the failure list table](/screenshots/en/laporan-analitik/rincian-kegagalan-ai/01-tampilan-awal.png)
+
+The page has three parts:
+
+1. The **filter row** at the top (marked with a blue box in the screenshot), used to narrow down the data shown.
+2. A **result count summary**, such as "1 to 6 of 6", along with "Previous" and "Next" pagination buttons.
+3. The **failure list table**, listing every failed AI job, one row per failure.
+
+## Using the Filters
+
+The filter row has five controls:
+
+- **From** and **To**: the date range of failures you want to view. By default the page opens with the last 30 days.
+- **Reason**: narrows the list to a single failure category (for example "Invalid Input" or "Connection"). The option list automatically reflects only the categories that actually exist in the data for the selected date range, so you never see an option with no matching data.
+- **Unit**: narrows the results to a single clinical unit.
+- **AI module**: narrows the results to a single AI module.
+
+Changing any filter automatically reloads the table and resets the page back to the first result. The **Reload** button next to the filters refreshes the data without changing any filter, useful for checking whether new failures have appeared after waiting a while.
+
+> Note: if you arrived here by clicking a bar in the "Failure reasons" chart on the Analytics Dashboard, this page opens with the Reason filter already set to match the bar you clicked.
+
+## Reading the Failure List Table
+
+Each row in the table represents one failed AI job, with the following columns:
+
+| Column | Description |
+|---|---|
+| When | Date and time the job entered the AI processing queue. |
+| Reason | The failure category (gray badge), such as Invalid Input, Connection, Timeout, or Other. |
+| Module | Name of the AI module that processed the job. |
+| Unit | The clinical unit the case originated from. |
+| Error | The original error message returned by the AI service. If nothing was recorded, this column shows "No error detail recorded." |
+| Retries | Number of automatic retries the system attempted before the job ultimately failed. |
+| Case | A link to the related transaction number (e.g. TRX-2026...). Click it to open that case's detail page. |
+
+Click the link in the **Case** column to jump straight to the related transaction's detail page, for example to inspect the clinical data that was submitted or to manually retry the AI process.
+
+## Navigating Large Result Sets
+
+If there are more than 25 failures in the selected date range, use the **Previous** and **Next** buttons in the top-right corner of the table to move between pages. The buttons disable automatically when you are on the first or last page.
+
+## When the Table Is Empty
+
+If there are no failures for the selected date range and filters, the table shows "No failures in this selection" along with a suggestion to widen the date range or clear a filter. This is good news, not a system error: it means no AI jobs failed during that period.
+
+## About the Reason Categories
+
+The category shown in the Reason column is derived by matching the recorded error text against a fixed pattern list in the system. Two special categories are worth knowing:
+
+- **Other**: an error message was recorded, but it did not match any pattern the system recognizes.
+- **Unknown**: no error text was recorded for that job at all.
+
+The Error column always shows the AI service's original output as-is, regardless of what category is assigned in the Reason column. Use the Error column for further technical investigation when needed.

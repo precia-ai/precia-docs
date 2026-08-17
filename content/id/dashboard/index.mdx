@@ -1,0 +1,65 @@
+---
+title: Ringkasan Dashboard
+---
+
+# Ringkasan Dashboard
+
+Dashboard adalah halaman pertama yang muncul setelah Anda login. Halaman ini menampilkan ringkasan aktivitas platform dan metrik operasional utama, sehingga Anda bisa langsung tahu kondisi kerja tanpa harus membuka halaman lain.
+
+Tampilan dashboard berbeda tergantung hak akses (permission) akun Anda:
+
+- **Punya akses laporan/analitik** (misalnya Admin Organisasi, Admin Platform, Manajemen): melihat dashboard lengkap dengan kartu statistik, grafik throughput, status transaksi, dan daftar job AI yang gagal.
+- **Tidak punya akses laporan/analitik** (misalnya beberapa akun Klinisi atau Validator yang hanya fokus pada tugas hariannya): dashboard hanya menampilkan dua kartu pintasan menuju **Klinis** (daftar transaksi) dan **Validasi**, tanpa grafik atau statistik. Dashboard tetap bisa dibuka meski akun tidak punya akses analitik, halaman tidak akan menampilkan pesan error.
+
+Panduan ini menjelaskan tampilan dashboard lengkap (varian dengan statistik dan grafik), karena itulah yang bisa didemonstrasikan dengan akun contoh yang dipakai untuk dokumentasi ini.
+
+## 1. Membuka Dashboard
+
+Setelah login, Anda otomatis diarahkan ke halaman **Dasbor**. Anda juga bisa membukanya kapan saja lewat menu **Dasbor** di sidebar kiri.
+
+![Tampilan ringkasan dashboard dengan kartu statistik, grafik throughput, status transaksi, dan daftar perlu perhatian](/screenshots/id/dashboard/index/01-ringkasan.png)
+
+## 2. Memilih rentang tanggal
+
+Di pojok kanan atas kartu judul, ada tiga tombol pemilih rentang waktu: **7 hari terakhir**, **30 hari terakhir**, dan **90 hari terakhir** (kotak biru pada gambar di atas). Klik salah satu tombol untuk mengubah rentang data yang ditampilkan di semua kartu statistik dan grafik di bawahnya.
+
+Tombol yang sedang aktif ditandai warna biru dan teks tebal. Secara default, dashboard menampilkan data **30 hari terakhir**.
+
+## 3. Membaca kartu statistik utama
+
+Empat kartu di baris kedua meringkas performa periode yang dipilih:
+
+- **Transaksi**: jumlah total transaksi klinis yang dibuat dalam periode tersebut.
+- **Inferensi AI**: jumlah total permintaan analisis AI yang diproses.
+- **Tingkat Keberhasilan**: persentase job AI yang selesai tanpa gagal, dari seluruh job yang sudah selesai (job yang masih dalam antrean tidak dihitung).
+- **Menunggu Tinjauan**: jumlah kasus yang sedang menunggu ditinjau dokter.
+
+Di bawah setiap angka ada keterangan perbandingan terhadap periode sebelumnya (naik/turun), kecuali jika data periode sebelumnya belum tersedia.
+
+## 4. Membaca grafik Throughput Harian
+
+Grafik garis **Throughput Harian** menunjukkan jumlah inferensi AI yang diantrekan per hari sepanjang periode yang dipilih. Gunakan grafik ini untuk melihat pola beban kerja, misalnya hari-hari dengan lonjakan permintaan analisis AI.
+
+Catatan: jika rentang yang dipilih cukup panjang (misalnya 90 hari), data bisa dikelompokkan per minggu, bukan per hari, agar grafik tetap mudah dibaca.
+
+## 5. Membaca Status Transaksi
+
+Kartu **Status Transaksi** menampilkan bar bertumpuk (stacked bar) yang menunjukkan posisi seluruh kasus yang dibuat dalam periode ini, dikelompokkan menurut statusnya saat ini (misalnya Belum Diproses, Ditinjau Dokter, Dibatalkan, Pending, dan status lain sesuai alur transaksi). Setiap warna pada bar mewakili satu status, lengkap dengan jumlah dan persentasenya di daftar bawah bar.
+
+Gunakan kartu ini untuk cepat melihat apakah ada penumpukan kasus di satu status tertentu, misalnya terlalu banyak kasus yang masih "Belum Diproses".
+
+## 6. Membaca Perlu Perhatian
+
+Kartu **Perlu Perhatian** menampilkan daftar job AI yang gagal paling baru, lengkap dengan nama modul AI, pesan error singkat, dan tanggal job tersebut diantrekan.
+
+Setiap baris di daftar ini bisa diklik (panah biru pada gambar di atas) untuk langsung membuka halaman detail transaksi terkait, sehingga Anda bisa menindaklanjuti kegagalan tersebut, misalnya memeriksa data yang diunggah atau meminta pengambilan ulang gambar.
+
+Jika tidak ada job yang gagal dalam periode ini, kartu ini akan menampilkan pesan bahwa tidak ada kegagalan.
+
+## 7. Catatan periode pembanding
+
+Di bagian paling bawah halaman ada catatan kecil yang menjelaskan rentang tanggal periode pembanding yang dipakai untuk menghitung naik/turun pada kartu statistik, serta pengingat bahwa Tingkat Keberhasilan hanya menghitung job yang sudah selesai. Untuk detail median waktu proses dan rincian per modul AI, buka halaman **Analitik** di sidebar.
+
+## Untuk akun tanpa akses analitik
+
+Jika akun Anda tidak memiliki hak akses laporan/analitik, dashboard yang Anda lihat akan lebih sederhana: hanya dua kartu pintasan besar berjudul **Klinis** dan **Validasi**, tanpa kartu statistik atau grafik. Klik salah satu kartu untuk langsung menuju daftar transaksi klinis atau daftar antrean validasi Anda. Ini bukan kesalahan tampilan, melainkan memang dirancang agar dashboard tetap berguna sebagai pintasan kerja harian meski tanpa akses ke data analitik organisasi.

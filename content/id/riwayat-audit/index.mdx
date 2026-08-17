@@ -1,0 +1,157 @@
+---
+title: Riwayat & Audit
+---
+
+# Riwayat & Audit
+
+Halaman **Audit Kepatuhan** adalah pusat pengawasan seluruh aktivitas yang terjadi di PRECIA. Setiap tindakan penting (login, membuka data pasien, mengubah status kasus, mengaktifkan modul AI, dan sebagainya) tercatat otomatis sebagai satu **peristiwa audit** yang tidak bisa diubah atau dihapus. Halaman ini dipakai untuk menelusuri aktivitas tersebut, menyelidiki hal-hal yang mencurigakan, dan menyiapkan bukti kepatuhan untuk kebutuhan regulator atau pemeriksaan internal.
+
+Halaman ini terbagi menjadi lima tab: **Aliran peristiwa**, **Kasus**, **Temuan**, **Bukti**, dan **Tata kelola**.
+
+## Cara Membuka
+
+1. Login ke PRECIA dengan akun yang punya akses audit (admin organisasi, admin platform, atau petugas kepatuhan/auditor).
+2. Klik menu **Audit** di sidebar kiri.
+
+Akses ke halaman ini dan ke masing-masing tombol aksi di dalamnya diatur berdasarkan peran. Jika akun Anda tidak punya izin sama sekali, halaman akan menampilkan pesan bahwa akses ditolak alih-alih menampilkan data.
+
+## Cakupan Data Sesuai Peran
+
+Di pojok kanan atas ringkasan, ada kotak kecil yang menjelaskan **cakupan akses** akun Anda saat ini, misalnya "Akses lintas organisasi" untuk admin platform, atau cakupan unit/organisasi untuk peran lain. Cakupan ini menentukan organisasi/unit mana saja yang datanya bisa Anda lihat di seluruh tab halaman ini — Anda tidak bisa melihat peristiwa di luar cakupan akses Anda.
+
+## Kartu Ringkasan
+
+Di bagian atas halaman ada enam kartu ringkasan yang mengikuti filter yang sedang aktif:
+
+- **Peristiwa dalam rentang** — total peristiwa audit pada rentang tanggal/filter saat ini.
+- **Akses sensitif** — jumlah akses ke data yang tergolong sensitif (misalnya data kesehatan pasien).
+- **Tindakan ditolak** — jumlah percobaan tindakan yang ditolak sistem (gagal login, akses tanpa izin, dan sejenisnya).
+- **Peristiwa kritis** — jumlah peristiwa dengan tingkat keparahan **Kritis**.
+- **Kasus terbuka** — jumlah kasus investigasi yang masih berstatus terbuka.
+- **Temuan terbuka** — jumlah temuan kepatuhan yang belum diselesaikan.
+
+Di bawahnya ada kartu **Integritas ledger** yang menunjukkan apakah rantai pencatatan audit (append-only, tidak bisa diubah) sudah pernah diverifikasi. Lihat bagian [Tata Kelola](#tab-tata-kelola) untuk cara menjalankan verifikasi ini.
+
+![Tampilan awal tab Aliran Peristiwa dengan kartu ringkasan, status integritas ledger, lima tab, tombol Filter, dan tombol buka detail pada baris peristiwa](/screenshots/id/riwayat-audit/index/01-tab-peristiwa.png)
+
+## Tab: Aliran Peristiwa
+
+Tab pertama (dan tampilan awal saat membuka halaman) menampilkan **Aliran peristiwa audit** — daftar seluruh peristiwa terbaru, diurutkan dari yang paling baru. Untuk setiap peristiwa, tabel menampilkan:
+
+- **Waktu** — tanggal dan jam kejadian.
+- **Aktor** — siapa/apa yang melakukan tindakan (nama pengguna atau nama layanan sistem).
+- **Tindakan** — kode tindakan teknis beserta ringkasannya.
+- **Sumber daya** — objek yang terdampak (data pasien ditampilkan sebagai `••••••` demi kerahasiaan, tidak pernah ditampilkan gamblang di tabel).
+- **Hasil** — berhasil, gagal, ditolak, sebagian, atau tidak diketahui.
+- **Keparahan** — info, rendah, sedang, tinggi, atau kritis.
+
+Klik ikon panah `›` di ujung kanan baris mana pun untuk membuka panel **Detail Peristiwa** (dijelaskan di bagian berikutnya).
+
+Klik tombol **Muat ulang peristiwa** untuk menyegarkan daftar dengan data terbaru. Jika daftar sudah menampilkan 50 peristiwa, tombol **Muat lebih banyak** akan muncul di bagian bawah untuk memuat 50 peristiwa berikutnya secara bertahap.
+
+Jika sebagian data pada rentang yang diminta sudah dipindahkan ke penyimpanan arsip dingin (data lama), akan muncul kotak peringatan kuning "Arsip sebagian" di atas tabel — artinya hasil yang ditampilkan mungkin tidak lengkap untuk rentang tersebut.
+
+### Menyaring Peristiwa (Filter)
+
+Klik tombol **Filter** di atas tabel untuk membuka panel filter dari sisi kanan layar.
+
+![Panel filter audit terbuka dari sisi kanan dengan kotak pencarian ditandai kotak biru](/screenshots/id/riwayat-audit/index/02-filter-peristiwa.png)
+
+Panel ini menyediakan banyak kriteria penyaringan sekaligus, di antaranya:
+
+- **Pencarian** — kata kunci bebas terhadap aktor, tindakan, atau identitas sumber daya.
+- **Tanggal mulai / Tanggal akhir** — rentang waktu kejadian.
+- **Organisasi** — hanya bisa diubah jika akun Anda punya cakupan lintas organisasi; peran lain otomatis terkunci ke organisasinya sendiri.
+- **Unit, Aktor, Layanan sumber, Jenis peristiwa, Kategori, Tindakan, Hasil, Keparahan, Jenis sumber daya** — daftar pilihan yang otomatis terisi berdasarkan data yang benar-benar ada (facet), lengkap dengan jumlah kemunculannya.
+- **Identitas sumber daya, Status HTTP, Alamat IP, ID permintaan, ID korelasi, Kasus** — kolom pencarian teks/angka spesifik untuk penelusuran yang lebih presisi, misalnya menelusuri semua peristiwa dengan satu ID korelasi yang sama.
+- **Akses data sensitif** — saring khusus peristiwa yang melibatkan (atau tidak melibatkan) akses ke data sensitif.
+
+Setelah mengisi kriteria yang diinginkan, klik **Terapkan filter** di bagian bawah panel. Jumlah filter yang sedang aktif akan muncul sebagai badge di sebelah tombol Filter pada tab Aliran Peristiwa. Klik **Atur ulang** untuk mengosongkan semua kriteria dan kembali ke tampilan tanpa filter.
+
+> **Catatan:** filter yang diterapkan juga tersimpan di URL halaman, sehingga Anda bisa membagikan tautan pencarian tertentu ke rekan kerja tanpa perlu menjelaskan ulang kriterianya.
+
+### Detail Peristiwa
+
+Klik ikon panah pada baris mana pun untuk membuka panel **Detail Peristiwa** dari sisi kanan layar.
+
+![Panel detail peristiwa menampilkan info aktor, sumber daya, permintaan, ID, tabel sebelum-sesudah, dan jejak korelasi, dengan bagian jejak korelasi ditandai kotak biru](/screenshots/id/riwayat-audit/index/03-detail-peristiwa.png)
+
+Panel ini menampilkan:
+
+- **Ringkasan tindakan** — kode tindakan, deskripsi, dan waktu kejadian lengkap.
+- **Aktor, Sumber daya, Permintaan** — tiga kotak informasi kontekstual, termasuk metode HTTP, jalur permintaan, kode status, dan alamat IP (disamarkan).
+- **ID permintaan** dan **ID korelasi** — pengenal unik yang berguna untuk menelusuri rangkaian peristiwa yang saling berkaitan (misalnya semua langkah dalam satu proses yang sama).
+- **Informasi kesehatan terlindungi** — muncul hanya jika peristiwa melibatkan data sensitif (misalnya data pasien). Kotak ini menampilkan tombol **Ungkap PHI** bagi akun yang berwenang; membuka nilai sensitif ini selalu mewajibkan alasan tertulis (minimal 10 karakter) dan tindakan pengungkapannya sendiri akan tercatat sebagai peristiwa audit baru.
+- **Sebelum dan sesudah** — tabel yang membandingkan nilai suatu bidang sebelum dan sesudah tindakan dilakukan (kosong jika tindakan tersebut tidak mengubah data, misalnya sekadar membaca/melihat).
+- **Jejak korelasi** — daftar peristiwa lain yang berbagi ID korelasi yang sama, ditampilkan sebagai garis waktu. Berguna untuk melihat urutan lengkap suatu proses, misalnya semua panggilan yang terjadi akibat satu klik pengguna.
+
+Jika akun Anda punya izin mengelola kasus investigasi, panel ini juga menampilkan bagian **Tambahkan ke kasus** — pilih kasus investigasi yang sedang berjalan dari daftar lalu klik tombol untuk melampirkan peristiwa ini ke kasus tersebut sebagai bukti pendukung.
+
+## Tab: Kasus
+
+Tab **Kasus** dipakai untuk mengelompokkan beberapa peristiwa yang saling terkait ke dalam satu **kasus investigasi**, menetapkan pemiliknya, dan menahan (legal hold) data tersebut agar tidak terkena penghapusan otomatis selama investigasi berlangsung.
+
+![Tab Kasus menampilkan daftar kasus di sisi kiri dan panel detail kasus terpilih di sisi kanan, dengan dropdown status kasus ditandai kotak biru](/screenshots/id/riwayat-audit/index/04-tab-kasus.png)
+
+Jika akun Anda punya izin mengelola kasus, tombol **Buat kasus** muncul di kanan atas. Klik tombol ini untuk membuka form berisi judul kasus, deskripsi, prioritas, dan (opsional) daftar ID peristiwa yang ingin langsung dilampirkan.
+
+Klik salah satu kasus pada daftar di sisi kiri untuk menampilkan detailnya di panel kanan: pemilik, prioritas, jumlah peristiwa terlampir, jumlah temuan terkait, serta status kasus. Jika Anda punya izin mengelola kasus, dropdown **Status kasus** di panel detail bisa dipakai untuk mengubah status penanganan kasus tersebut.
+
+Untuk kasus yang memerlukan penahanan bukti (misalnya sedang diperiksa auditor eksternal), akun dengan izin **legal hold** dapat mengaktifkan penahanan lengkap dengan alasannya — selama penahanan aktif, data terkait tidak akan terkena kebijakan retensi/penghapusan otomatis.
+
+## Tab: Temuan
+
+Tab **Temuan** dipakai untuk mencatat dan melacak **temuan kepatuhan** — observasi atau masalah yang perlu ditindaklanjuti, mulai dari draf hingga remediasi terverifikasi.
+
+![Tab Temuan menampilkan daftar temuan di sisi kiri dan panel detail di sisi kanan](/screenshots/id/riwayat-audit/index/05-tab-temuan.png)
+
+Jika akun Anda punya izin mengelola temuan, klik tombol **Buat temuan** untuk mencatat temuan baru: judul, deskripsi, tingkat keparahan, kasus terkait (opsional), dan tenggat waktu penyelesaian (opsional).
+
+Klik salah satu temuan pada daftar untuk melihat detailnya di panel kanan. Dari panel detail, akun yang berwenang dapat mengubah **status** temuan (draf → terbuka → diterima/remediasi → terverifikasi → selesai) serta mengisi catatan **rencana remediasi** dan **catatan verifikasi** sebelum menyimpan perubahan.
+
+## Tab: Bukti
+
+Tab **Bukti** dipakai untuk membuat **paket bukti** — kumpulan peristiwa audit pada suatu rentang tanggal yang diekspor menjadi satu berkas dengan checksum, siap diserahkan ke peninjau atau regulator.
+
+![Tab Bukti menampilkan daftar paket bukti yang tersedia](/screenshots/id/riwayat-audit/index/06-tab-bukti.png)
+
+Jika akun Anda punya izin menghasilkan bukti, klik tombol **Buat paket** untuk mengisi nama paket, deskripsi, format berkas (PDF/ZIP/JSON/CSV), rentang tanggal, dan pilihan opsional untuk menyertakan nilai sensitif (hanya tersedia bagi akun yang juga berwenang mengungkap data sensitif).
+
+Setiap paket yang sudah selesai diproses (berstatus **Siap**) menampilkan tombol:
+
+- **Unduh** — mengunduh berkas paket bukti, bagi akun yang berwenang mengunduh.
+- **Verifikasi** — memeriksa ulang checksum paket untuk memastikan isinya belum diubah sejak dibuat, bagi akun yang berwenang memverifikasi.
+
+Paket yang sedang dalam masa **legal hold** ditandai dengan ikon gembok dan tidak akan otomatis kedaluwarsa/terhapus selama penahanan masih aktif.
+
+## Tab: Tata Kelola
+
+Tab **Tata kelola** berisi dua panel: **Kebijakan retensi** dan **Integritas ledger**.
+
+![Tab Tata Kelola menampilkan panel kebijakan retensi di sisi kiri dan panel integritas ledger berstatus Terverifikasi di sisi kanan, keduanya ditandai kotak biru](/screenshots/id/riwayat-audit/index/07-tab-tata-kelola.png)
+
+**Kebijakan retensi** menentukan berapa lama data audit disimpan sebelum diarsipkan atau dihapus:
+
+- **Retensi default (hari)** — lama penyimpanan data audit secara umum, dibatasi minimum dan maksimum sesuai kebijakan organisasi.
+- **Arsipkan setelah (hari)** — setelah berapa hari data dipindahkan ke penyimpanan arsip dingin (opsional).
+- **Penghapusan otomatis aktif** — centang untuk mengizinkan sistem menghapus otomatis data yang sudah melewati masa retensi (tunduk pada legal hold yang sedang berlaku).
+
+Hanya akun dengan izin mengelola retensi yang bisa mengubah nilai-nilai ini; akun lain hanya bisa melihatnya dalam kondisi nonaktif (disabled). Klik **Simpan kebijakan retensi** untuk menerapkan perubahan.
+
+**Integritas ledger** menunjukkan apakah rantai pencatatan audit (yang bersifat append-only, tiap peristiwa terhubung secara kriptografis ke peristiwa sebelumnya) masih utuh dan belum pernah dimanipulasi. Klik tombol **Verifikasi integritas** untuk menjalankan pemeriksaan ini. Setelah selesai, status akan berubah menjadi salah satu dari:
+
+| Status | Arti |
+|---|---|
+| **Terverifikasi** | Rantai peristiwa utuh, tidak ditemukan indikasi perubahan. |
+| **Peringatan** | Ditemukan hal yang perlu ditinjau lebih lanjut, namun belum tentu merupakan pelanggaran. |
+| **Gagal** | Ditemukan ketidaksesuaian pada rantai peristiwa — perlu investigasi segera. |
+| **Belum diperiksa** | Verifikasi belum pernah dijalankan. |
+
+Status dan waktu pemeriksaan terakhir ini juga ditampilkan sebagai kartu ringkasan **Integritas ledger** di bagian atas halaman, terlihat dari tab mana pun.
+
+## Catatan Penting
+
+- Seluruh peristiwa audit bersifat **append-only** — tidak ada cara untuk mengedit atau menghapus catatan yang sudah tercatat, termasuk oleh admin platform.
+- Nilai data sensitif (misalnya identitas pasien) selalu disamarkan secara default di seluruh tampilan. Membuka nilai aslinya lewat tombol **Ungkap PHI** selalu memerlukan alasan tertulis dan tindakan tersebut ikut tercatat sebagai peristiwa audit baru — pengungkapan data sensitif tidak pernah bersifat diam-diam.
+- Data yang berada dalam status **legal hold** (baik pada kasus maupun paket bukti) tidak akan terkena kebijakan retensi/penghapusan otomatis, walau kebijakan retensi organisasi sudah mengizinkan penghapusan.
+- Cakupan data yang bisa Anda lihat di seluruh tab (Peristiwa, Kasus, Temuan, Bukti) selalu mengikuti cakupan akses akun Anda (unit, organisasi, atau lintas organisasi) — bukan sesuatu yang bisa diubah sendiri dari halaman ini.

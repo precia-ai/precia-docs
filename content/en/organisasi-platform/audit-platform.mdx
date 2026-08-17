@@ -1,0 +1,117 @@
+---
+title: Platform Audit
+---
+
+# Platform Audit
+
+The **Platform Audit** page shows the full activity trail across every organization (tenant) in PRECIA at once. It looks exactly like the regular Audit page opened from inside a single organization, because both use the same workspace. What differs is not the layout but the access permission that opens it: from Platform Mode, this page is not restricted to a single organization at all.
+
+Because an identical layout can mean two very different data scopes, this page always shows a scope indicator at the top so you never mistake it for single-organization data.
+
+## Who can access it
+
+Cross-organization access to this page requires a specific permission (held, among others, by the **Super Admin/SUP** role). Other roles that open the Audit menu from inside a single organization (for example an Organization Admin) only see their own organization's data, even though the screen looks the same. If your account has no audit read permission at all, this page shows an "Audit access unavailable" message instead of empty data.
+
+## Opening the page
+
+1. Enter Platform Mode.
+2. Click **Audit** in the Platform Mode sidebar.
+
+## Scope indicator and summary
+
+![The Platform Audit page showing the cross-organization scope banner and summary cards](/screenshots/en/organisasi-platform/audit-platform/01-ringkasan.png)
+
+The two blue boxes in the image mark what to notice first:
+
+- The **"Viewing every organization" banner** at the top — an explicit statement that the page currently covers every tenant, not one organization. This banner only appears when the page is opened from Platform Mode.
+- The **"Cross-organization access" card** next to the title — a reminder that to narrow the view to one specific organization, use the organization filter (see [Filtering results](#filtering-results)) rather than navigating to a different page.
+
+Below that, six number cards summarize activity for the currently active time range:
+
+| Card | Description |
+|---|---|
+| Events in range | Total number of recorded events (any action) matching the active time range and filters. |
+| Sensitive access | Number of recorded accesses to protected health information (PHI). |
+| Denied actions | Number of actions the system rejected because they were not permitted. |
+| Critical events | Number of events with critical severity. |
+| Open cases | Number of investigation cases still open. |
+| Open findings | Number of compliance findings not yet remediated. |
+
+Below the summary cards is a **Ledger integrity** block showing whether the append-only audit chain has been verified. "Not checked" means no verification has run since the page was opened; how to run one is covered in the [Governance](#governance-tab) section below.
+
+Below the integrity block are five tabs: **Event stream**, **Cases**, **Findings**, **Evidence**, and **Governance**. The sections below cover each one.
+
+## Event stream tab
+
+The default tab when the page opens. It shows a chronological table of every event, newest first, with columns for Time, Actor, Action, Resource, Outcome, and Severity. The **Refresh events** button above the table fetches the latest data without changing the active filters. If the list is long, scroll down and use the load-more control to load the next page incrementally.
+
+### Filtering results
+
+![The audit filter panel open, showing the search field and the Apply filters button](/screenshots/en/organisasi-platform/audit-platform/02-filter.png)
+
+Click the **Filters** button above the table to open this panel. The blue boxes mark the **Search** field (first box), where you can type keywords for actor, action, or resource identifier, and the **Apply filters** button (second box) at the bottom right of the panel to run the search.
+
+The filter panel offers many criteria at once, including:
+
+- Date range (from and to)
+- Organization and unit
+- Actor and source service
+- Event kind and category
+- Action, outcome, and severity
+- Resource type and identifier
+- HTTP status, IP address, request ID, correlation ID
+- Related case
+- Sensitive access (yes/no/any)
+
+Fill in the criteria you need, then click **Apply filters**. Active filters are reflected in the page URL, so a link to a specific filtered result can be shared or reopened later. Click **Reset** to clear all criteria.
+
+### Opening event detail
+
+![An event detail panel open from the side, with sensitive values masked and a Reveal PHI button](/screenshots/en/organisasi-platform/audit-platform/03-detail-peristiwa.png)
+
+Click the chevron icon at the right end of a row to open the detail panel from the right side of the screen. It shows:
+
+- Event identity: action type, request path, exact timestamp, actor, resource, request ID, and correlation ID.
+- A **Protected health information** block: fields containing sensitive data are shown masked (for example `••••••`).
+- A **Before and after** table: field values before and after the change, if this event represents a data change.
+- **Correlation trace**: a list of other events sharing the same correlation ID, useful for tracing one chain of related actions.
+
+The **Reveal PHI** button (marked with a blue box) unmasks the hidden values. Because this is access to sensitive data, the system requires you to enter a work-related reason of at least 10 characters before the values are shown. Every reveal itself **creates a new audit event**, so the act of revealing PHI is also recorded and can be reviewed by later audits. Revealed values expire after a set time, after which they mask again.
+
+## Cases tab
+
+![The Cases tab showing the list of investigation cases and the Create case button](/screenshots/en/organisasi-platform/audit-platform/04-tab-kasus.png)
+
+Investigation cases group several related audit events under one investigation, complete with an owner and a status. Click **Create case** (marked with an arrow) to open a new case: enter a short title, a description of scope and reason, a priority, and (optionally) a comma-separated list of initial event IDs to include right away.
+
+Click a case in the left-hand list to see its detail in the right-hand panel, including the case status and the **legal hold** control. A legal hold overrides the retention and auto-deletion schedule for events covered by that case, used when data must be preserved for legal or ongoing-investigation purposes even after its normal retention period has passed.
+
+From the event detail panel (see the previous section), you can also add a single event to an existing case using the **Add to case** button.
+
+## Findings tab
+
+![The Findings tab in its empty state, with no findings recorded yet](/screenshots/en/organisasi-platform/audit-platform/05-tab-temuan.png)
+
+Compliance findings track audit observations from draft through verified remediation, separate from investigation cases. Click **Create finding** to record a new one. If no findings have been recorded under the current scope and filters, this panel shows the empty state pictured above.
+
+## Evidence tab
+
+![The Evidence tab in its empty state, with no evidence package created yet](/screenshots/en/organisasi-platform/audit-platform/06-tab-bukti.png)
+
+Evidence packages are scope-limited exports of audit data with a checksum attached, prepared for internal review or external regulators. Because they include a checksum, recipients can verify the file has not been altered after export. If none has been created yet, this tab shows the empty state pictured above.
+
+## Governance tab
+
+![The Governance tab showing retention policy on the left and the ledger integrity verification control on the right, marked with an arrow](/screenshots/en/organisasi-platform/audit-platform/07-tab-tata-kelola.png)
+
+This tab has two panels:
+
+- **Retention policy** (left) — sets how long audit events are kept (**Default retention**, in days, e.g. 1825 days equals 5 years), when older events move to archive (**Archive after**), and whether **auto-deletion** after the retention period ends is enabled. A legal hold on a case overrides this schedule for events covered by it. Click **Save retention policy** to apply changes.
+- **Ledger integrity** (right, marked with an arrow) — the **Verify integrity** button runs a check that the audit chain has not been modified since it was last verified. The result (Verified, Needs review, or Verification failed) also appears in the Ledger integrity block at the top of the page.
+
+## Important notes
+
+- This page and the Audit page inside a single organization use the exact same component; the only difference is the data scope the backend allows based on your account's permissions. Always check the scope banner at the top before drawing conclusions about the coverage of the data you're viewing.
+- Revealing PHI always requires a written reason and is always recorded as a new audit event. This action cannot be undone once the values are shown, so make sure the reason is genuinely needed.
+- A legal hold on a case prevents events covered by it from being auto-deleted by the retention policy, even after their normal retention period has passed.
+- The time range, organization, and other filter criteria applied in the Event stream tab are reflected in the page URL, so they can be shared as a direct link to a specific filtered result.

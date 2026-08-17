@@ -1,0 +1,91 @@
+---
+title: Analytics Dashboard
+---
+
+# Analytics Dashboard
+
+The Analytics Dashboard shows aggregate metrics on AI usage across your organization, grouped into two tabs: **Operations** (volume, speed, and quality of AI jobs) and **Adoption** (how broadly clinical units and validators are using AI). Every figure on this page is aggregate, with no patient identity attached.
+
+Which charts you see depends on your account's permissions. Some accounts only see the Operations tab, some only Adoption, and some see both. If your account has no access to any analytics chart at all, the page shows a message explaining that instead of an empty page.
+
+## 1. Opening the Analytics Dashboard
+
+Click **Analytics** in the left sidebar.
+
+![Operations tab of the Analytics Dashboard with date, unit, and AI module filters](/screenshots/en/laporan-analitik/index/01-tab-operasional.png)
+
+The blue boxes above mark two elements that are always at the top of the page:
+
+- The **filter row**, which applies to both tabs.
+- The **tab switch** between Operations and Adoption.
+
+## 2. Setting the Date Range, Unit, and AI Module
+
+The filter row on the header card has four controls:
+
+- **From** and **To**: the date range the data is computed over. Defaults to the last 30 days.
+- **Unit**: narrows every chart to a single clinical unit. Defaults to "All units".
+- **AI module**: narrows every chart to a single AI module. Defaults to "All modules".
+
+After changing a filter, click **Reload** to apply it. The date, unit, and module filters apply to both tabs at once, so switching tabs does not clear whatever you set.
+
+## 3. Reading the Operations Tab
+
+The **Operations** tab is active by default if your account has access to it. From top to bottom, it contains:
+
+- **Inference volume**: the number of AI jobs queued per bucket (daily or weekly, depending on how wide the date range is).
+- **Success rate**: the share of finished jobs that succeeded. Jobs still queued or running are excluded, so the rate does not drift downward just because the queue is long right now.
+- **Turnaround time**: the median and 90th-percentile time from queue to completion. A widening gap between the two lines means a slow tail (a small share of jobs taking much longer than usual), not that the whole system has slowed down.
+- **Volume per module**: job counts compared across AI modules.
+- **Volume per unit**: job counts compared across clinical units. A unit with no traffic still stays on the axis as an empty row, because a unit that stopped sending work is itself worth noticing.
+- **Confidence distribution**: how AI confidence scores are spread across buckets (0-10, 10-20, and so on). If you have more than one module selected in the filter, a note explains that scores from different modules are being pooled even though each may measure confidence differently; pick a single module in the filter for a more accurate read.
+- **Failure reasons**: failed AI jobs, grouped by cause. Click a bar in this chart, or the **See every failure** link in the card's top-right corner, to open the full list on the **AI Failure Breakdown** page.
+- **Validation outcomes**: the share of doctor decisions when reviewing AI results (Accepted, Inconclusive, Requires Review, Rejected).
+- **Per unit summary**: a breakdown table by clinical unit. Covered in the next step.
+
+## 4. Reading the Per Unit Summary Table
+
+The table at the bottom of the Operations tab breaks down activity for every clinical unit over the selected date range.
+
+![Per unit summary table with the Cardiology row as an example of real data](/screenshots/en/laporan-analitik/index/02-tabel-ringkasan-unit.png)
+
+The first blue box marks the column header row, the second marks one example row (Cardiology) with real data, and the arrow points at the **Success rate** column on that row. The columns are:
+
+| Column | Meaning |
+|---|---|
+| Unit | Clinical unit name. |
+| Transactions | Number of clinical cases created in that unit during this period. |
+| Inferences | Number of AI analysis requests processed for that unit. |
+| Failed | Number of AI jobs that failed to process. |
+| Success rate | Percentage of jobs that succeeded, out of all jobs that finished processing. A "-" means no job has finished processing in that unit for this period yet. |
+| Avg. confidence | Average AI confidence score for that unit. A "-" means there are no results yet to average. |
+
+The card's subtitle ("N active unit(s) in the selected period") counts units with at least one transaction in this period, so that number can be smaller than the number of rows shown in the table.
+
+## 5. Reading the Adoption Tab
+
+Click the **Adoption** tab to switch from operational metrics to usage metrics.
+
+![Adoption tab with two meter cards (Unit Adoption and Validator Adoption) and the Module Utilization chart](/screenshots/en/laporan-analitik/index/03-tab-adopsi.png)
+
+The two cards marked with blue boxes above:
+
+- **Unit adoption**: the percentage of clinical units actively using AI (at least one AI job in this period) out of all registered clinical units. The number below the meter shows the underlying fraction, e.g. "3 active out of 15 clinical units".
+- **Validator adoption**: the percentage of validators (doctors or staff who review AI results) who actively reviewed something in this period, out of all registered validators.
+
+Below the two meter cards is the **Module utilization** chart: inference counts per AI module, showing which modules see the most use and which barely get touched. Like the Volume per unit chart in the Operations tab, a module that has never been used still stays on the axis with no bar, because an unused module is itself the finding this chart is meant to surface.
+
+## 6. Drilling Down into Failures from the Chart
+
+The **Failure reasons** chart in the Operations tab is clickable. Click one of its bars (for example "Connection"), or click **See every failure**, to jump to the **AI Failure Breakdown** page already filtered to whatever bar you clicked.
+
+![AI Failure Breakdown page reached by drill-down, with filters and links to the related cases](/screenshots/en/laporan-analitik/index/04-drilldown-kegagalan.png)
+
+The blue box marks the filter row (date, reason, unit, AI module), already filled in to match the chart context you clicked from. The arrow points at a case code link (e.g. "TRX-2026...") in the **Case** column; click it to open the transaction detail behind that failure. The full walkthrough of this page, including what every table column means and how to read the failure-reason categories, is covered on the **AI Failure Breakdown** page.
+
+## Important Notes
+
+- The **From** date cannot be later than **To**, and vice versa; the two inputs constrain each other.
+- A chart card with no data shows a "No data" message instead of an empty axis, so it is not mistaken for a loading failure.
+- The Confidence distribution chart cannot always be computed for every module: some AI modules simply do not produce a confidence score. The page will state how many results were excluded when this happens, it does not mean anything is broken.
+- Changing the date, unit, or AI module filter never changes any historical data, these filters are purely for display and can be changed back and forth without side effects.

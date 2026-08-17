@@ -1,0 +1,42 @@
+---
+title: Mengenal Peran Pengguna
+---
+
+# Mengenal Peran Pengguna
+
+PRECIA memberi setiap akun satu atau lebih **peran**. Peran menentukan menu apa yang muncul dan tindakan apa yang boleh Anda lakukan. Kalau ada menu yang menurut Anda seharusnya ada tapi tidak muncul, kemungkinan besar itu karena peran akun Anda belum mencakupnya, bukan karena kesalahan aplikasi.
+
+Peran diatur oleh Admin Organisasi (atau Admin Platform untuk hal lintas organisasi) lewat menu pengelolaan pengguna. Kalau Anda merasa butuh akses tambahan, hubungi admin organisasi Anda untuk mengajukan perubahan akses.
+
+## Peran di tingkat organisasi
+
+Peran-peran ini berlaku di dalam satu organisasi/rumah sakit tempat akun Anda terdaftar.
+
+- **Perawat/Teknisi**: membuat dan mengelola transaksi pemeriksaan pasien, misalnya mengisi data kasus baru dan mengunggah berkas pemeriksaan sebelum diproses AI.
+- **Klinisi (Dokter)**: meninjau hasil analisis AI untuk kasus yang ditangani dan membuat keputusan klinis awal atas hasil tersebut.
+- **Validator Klinis**: melakukan validasi formal terhadap hasil AI. Peran ini terpisah dari Klinisi karena di beberapa unit, validasi akhir memang dilakukan oleh dokter yang berbeda dari dokter yang meninjau pertama kali.
+- **Admin Klinis**: mengatur keanggotaan unit (menambah/menghapus anggota unit), mengatur modul AI apa yang aktif untuk unit tersebut, dan memantau operasional unit sehari-hari.
+- **Manajemen**: melihat laporan dan statistik penggunaan untuk mengevaluasi adopsi dan dampak AI, biasanya tidak menangani kasus pasien secara langsung.
+- **Auditor**: melihat riwayat aktivitas (audit trail) untuk keperluan kepatuhan dan pengawasan. Akses ini bersifat hanya-baca, auditor tidak bisa mengubah data kasus.
+- **Admin Sistem**: mengatur seluruh organisasi, termasuk semua unit, seluruh pengguna, dan pengaturan tingkat organisasi (aktivasi/nonaktivasi akun, penguncian akun, penetapan peran). Ini peran admin tertinggi di dalam satu organisasi.
+- **Admin Integrasi**: mengatur pelaporan interoperabilitas nasional (pertukaran data dengan sistem kesehatan nasional), peran teknis yang jarang dipakai pengguna klinis sehari-hari.
+
+## Peran di tingkat platform
+
+Peran-peran ini mencakup lebih dari satu organisasi sekaligus. Menu untuk peran ini biasanya berada di bagian tersendiri, terpisah dari menu organisasi biasa.
+
+- **Admin Platform**: mengatur hal lintas semua organisasi/tenant yang memakai PRECIA, misalnya membuat organisasi baru, mengelola katalog modul AI, dan mengatur izin di tingkat platform.
+- **AI Engineer**: mendaftarkan dan mengelola modul AI (versi, status siklus hidup pilot/klinis/nonaktif) di katalog modul AI platform.
+
+Selain akun manusia, ada juga akun layanan (service account) yang dipakai oleh konektor sistem rumah sakit (SIMRS) untuk mengirim transaksi ke PRECIA secara otomatis. Akun ini dibuat lewat wizard onboarding, bukan untuk login manual, dan tidak relevan untuk pengguna aplikasi sehari-hari.
+
+## Peran khusus di dalam satu unit
+
+Selain peran organisasi di atas, akun Anda juga bisa punya konteks tambahan saat ditugaskan ke sebuah unit (misalnya unit Kardiologi atau Radiologi):
+
+- **Konteks peran di unit**: keterangan singkat tentang posisi Anda di unit tersebut, ditentukan oleh Admin Klinis saat menambahkan Anda ke unit.
+- **Penanda validator**: sebagian anggota unit ditandai sebagai validator, artinya mereka boleh melakukan validasi akhir atas hasil AI untuk kasus di unit itu. Penanda ini diatur per unit, jadi Anda bisa jadi validator di satu unit tapi bukan di unit lain, tergantung penugasan.
+
+## Kalau akun Anda punya lebih dari satu peran
+
+Sebuah akun bisa memiliki gabungan peran, misalnya dokter yang sekaligus menjadi Admin Klinis untuk unitnya. Kalau begitu, menu yang muncul adalah gabungan dari semua peran yang dimiliki akun tersebut.

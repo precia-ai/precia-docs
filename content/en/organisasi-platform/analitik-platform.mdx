@@ -1,0 +1,84 @@
+---
+title: Platform Analytics
+---
+
+# Platform Analytics
+
+The **Platform Analytics** page shows PRECIA usage statistics across every organization (tenant) at once. Unlike the regular Analytics page, which only looks at one organization, this page helps platform admins monitor adoption and activity for all tenants on a single screen, without opening each organization one by one.
+
+This page only shows counts and rates (transactions, AI inferences, success rate, active module count). No clinical patient data is displayed here.
+
+## Who can access it
+
+Each chart on this page has its own permission, so what you see can differ between accounts:
+
+- The summary (KPI) cards and the per-tenant volume chart require the **monitoring:read_report_all_orgs** permission.
+- The module adoption chart and the tenants-without-activity list require the **evaluation:read_dashboard_all_orgs** permission.
+
+The **Super Admin (SUP)** account holds both permissions and therefore sees the entire page. If your account holds neither, the page shows an "Access denied" message instead of empty data.
+
+## Opening the page
+
+1. Enter Platform Mode (see the "Organization & Platform Overview" page if you don't know how yet).
+2. Click the **Analytics** menu in the Platform Mode sidebar.
+
+## Choosing a time range
+
+![Platform Analytics summary card with time range filter and four main KPIs](/screenshots/en/organisasi-platform/analitik-platform/01-ringkasan.png)
+
+In the top-right corner of the title card (marked by the first blue box in the image), three time range options are available:
+
+- **Last 7 days**
+- **Last 30 days** (the default selection when the page opens)
+- **Last 90 days**
+
+Click any button to switch the range. Every number and chart on the page is immediately recalculated for the selected range. The **Reload** button next to it fetches the latest data without changing the currently active range, useful when you want to make sure the numbers are up to date before reporting them.
+
+The four cards below (marked by the second blue box) are a quick summary for the selected range:
+
+- **Active Tenants** — the number of organizations that had at least one transaction or inference during this period, out of the total registered organizations (a "5 / 6" format means 5 of 6 organizations are active).
+- **Transactions** — total clinical cases created across all tenants during this period.
+- **AI Inferences** — total AI processes run across all tenants.
+- **Success Rate** — the percentage of AI inferences that processed successfully (did not fail) during this period.
+
+Note: these cards do not yet show a comparison to the previous period (they read "No comparison for the previous period"), so treat these numbers as a snapshot of one period rather than a trend.
+
+## Inference volume per tenant
+
+![Bar chart of AI inference volume per organization, sorted from highest to lowest](/screenshots/en/organisasi-platform/analitik-platform/02-volume-tenant.png)
+
+This chart ranks organizations from the one that ran the most AI inferences to the one that ran the fewest, within the currently selected time range. It's useful for quickly spotting which tenants use AI modules the most and which ones still have low volume.
+
+## Module adoption and tenants without activity
+
+![Two side-by-side panels: AI module adoption chart per tenant, and a list of tenants without activity](/screenshots/en/organisasi-platform/analitik-platform/03-adopsi-dormant.png)
+
+These two panels sit side by side:
+
+- **Module adoption per tenant** (left panel) — counts how many *distinct* AI modules each organization actually used during this period, not how many modules are enabled. An organization may have many modules enabled but only use a few; this number reflects real usage.
+- **Tenants without activity** (right panel) — a list of organizations that had no transactions and no inferences at all during the selected period. Each row shows the organization name, organization code, and its account status (e.g. "active" or "inactive"). If every tenant was active during this period, the panel shows a message that there are no dormant tenants.
+
+This panel is useful for spotting organizations that finished onboarding but haven't actually started using the system yet, so your team can follow up (for example with retraining or checking for technical blockers).
+
+## Tenant comparison table
+
+![Full comparison table for every tenant: transactions, inferences, failures, success rate, and module count](/screenshots/en/organisasi-platform/analitik-platform/04-tabel-perbandingan.png)
+
+The table at the very bottom summarizes the same data as the charts above, but as full per-organization figures:
+
+| Column | Description |
+|---|---|
+| Organization | Tenant name. A row that was inactive during this period is marked with an "inactive" label next to the name, and the whole row appears dimmed. |
+| Transactions | Number of clinical cases created during this period. |
+| Inferences | Number of AI processes run during this period. |
+| Failed | Number of inferences that failed to process. |
+| Success rate | Percentage of inferences that processed successfully. A "-" appears when the tenant had no inferences at all during this period, so the rate cannot be calculated. |
+| Modules | Number of distinct AI modules that tenant actually used during this period. |
+
+This table only appears if your account holds the tenant volume permission (the same permission as the "Inference volume per tenant" chart); if your account only holds the module adoption permission, this table will not be visible even though the adoption and dormant-tenant charts still show.
+
+## Important notes
+
+- Changing the time range reloads all data on the page, not just one chart. Watch for the spinning reload icon as a sign that data is being fetched.
+- If the connection to the server fails, the page shows a red error message below the title card, and the previous numbers stay on screen until the next attempt succeeds.
+- All figures on this page are aggregated across organizations. To see transaction or inference detail for one specific organization, open the Analytics page inside that organization instead of from here.

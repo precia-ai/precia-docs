@@ -1,0 +1,63 @@
+---
+title: Daftar Modul AI
+---
+
+# Daftar Modul AI
+
+Halaman **Registri AI** menampilkan katalog seluruh modul kecerdasan buatan (AI) yang terdaftar di platform PRECIA, lengkap dengan status lifecycle dan jumlah organisasi (tenant) yang mengaktifkannya. Halaman ini hanya bisa diakses oleh admin platform.
+
+## Cara Membuka
+
+1. Login ke PRECIA sebagai admin platform.
+2. Klik menu **Registri AI** di sidebar kiri.
+
+![Tampilan daftar modul AI dengan kartu ringkasan dan tabel direktori modul](/screenshots/id/modul-ai/index/01-daftar-modul.png)
+
+## Kartu Ringkasan
+
+Di bagian atas halaman ada empat kartu ringkasan (ditandai kotak biru pada gambar):
+
+- **Total Modul** — jumlah seluruh modul AI yang terdaftar di registri platform.
+- **Siap Klinis** — jumlah modul berstatus `Klinis`, artinya sudah tersedia untuk pertimbangan penggunaan klinis penuh.
+- **Pilot** — jumlah modul berstatus `Pilot`, artinya masih dalam rollout terkendali/uji coba terbatas.
+- **Nonaktif** — jumlah modul berstatus `Nonaktif`, artinya tidak tersedia untuk operasional.
+
+## Status Lifecycle Modul
+
+Setiap modul AI punya salah satu dari tiga status lifecycle, ditampilkan sebagai badge warna pada kolom **Status**:
+
+| Status | Arti |
+|---|---|
+| **Klinis** | Modul sudah matang dan tersedia untuk pertimbangan penggunaan klinis di unit. |
+| **Pilot** | Modul masih dalam tahap rollout terkendali, biasanya dipakai terbatas pada organisasi/unit tertentu untuk evaluasi. |
+| **Nonaktif** | Modul tidak tersedia untuk operasional (misal ditarik dari layanan atau belum dirilis). |
+
+Status ini menentukan apakah sebuah unit klinis boleh mengaktifkan modul tersebut untuk pemrosesan kasus (diatur lebih lanjut di kebijakan AI unit).
+
+## Mencari Modul
+
+Gunakan kotak pencarian di atas tabel untuk menyaring daftar modul berdasarkan **nama modul** atau **kode modul** (misal `AI-ECG-LVEF`). Ketik kata kunci, daftar akan otomatis terfilter secara langsung tanpa perlu menekan tombol apa pun.
+
+![Hasil pencarian modul AI dengan kata kunci "ECG", menampilkan tiga modul cardiology yang cocok](/screenshots/id/modul-ai/index/02-cari-modul.png)
+
+Contoh di atas: mengetik `ECG` menyaring 6 modul menjadi 3 modul yang namanya atau kodenya mengandung kata tersebut. Perhatikan juga counter di kanan kotak pencarian ("3 dari 6 modul ditampilkan") yang selalu menunjukkan jumlah hasil relatif terhadap total modul. Klik ikon **x** di kotak pencarian untuk menghapus filter dan kembali ke daftar penuh.
+
+## Membaca Tabel Direktori Modul
+
+Tabel **Direktori Modul** menampilkan kolom berikut untuk setiap modul:
+
+- **Modul** — nama modul dan kode uniknya (contoh: `AI-ECG-DIGITIZATION-MITRAL`).
+- **Domain** — bidang klinis modul tersebut (contoh: Urology, Cardiology).
+- **Tenant** — jumlah organisasi yang sudah mengaktifkan modul ini, ditampilkan sebagai badge "N aktif".
+- **Status** — badge status lifecycle (Klinis/Pilot/Nonaktif) seperti dijelaskan di atas.
+- **Diperbarui** — tanggal terakhir metadata atau status modul diubah.
+- **Detail** — tombol **Buka** untuk masuk ke halaman detail modul.
+
+## Membuka Detail Modul
+
+Klik tombol **Buka** pada baris modul mana pun untuk membuka halaman detail modul tersebut. Di halaman detail, admin platform dapat mengelola metadata modul, mengubah status lifecycle, dan mengatur izin akses per organisasi. Lihat halaman **Detail Modul AI** untuk panduan lengkapnya.
+
+## Catatan
+
+- Daftar modul di halaman ini bersifat global platform, tidak dibatasi per organisasi. Semua modul yang pernah didaftarkan ke registri akan muncul di sini, terlepas dari organisasi mana yang mengaktifkannya.
+- Perubahan status lifecycle sebuah modul (misal dari Pilot ke Klinis) memengaruhi seluruh organisasi yang mengaktifkannya, jadi lakukan dengan hati-hati dan biasanya melalui proses evaluasi klinis terlebih dahulu.

@@ -1,0 +1,72 @@
+---
+title: Mengelola Organisasi
+---
+
+# Mengelola Organisasi
+
+Halaman **Organisasi** di area Platform menampilkan seluruh organisasi (tenant) yang terdaftar di PRECIA. Dari sini, admin platform (Super Admin atau Platform Admin) bisa melihat daftar lengkap, menambah organisasi baru, mengubah data organisasi, serta mengaktifkan atau menonaktifkannya.
+
+Halaman ini hanya bisa diakses oleh peran Super Admin (SUP) dan Platform Admin (PAD). Lihat halaman "Ringkasan Organisasi & Platform" untuk cara masuk ke area Platform.
+
+## 1. Membuka daftar organisasi
+
+Buka menu **Organisasi** di sidebar Mode Platform. Halaman menampilkan:
+
+- Tiga kartu ringkasan di bagian atas: **Total** organisasi, jumlah **Aktif**, dan jumlah **Tidak Aktif / Ditangguhkan**.
+- Kolom pencarian untuk menyaring daftar berdasarkan nama atau kode organisasi.
+- Tabel berisi kolom Kode, Nama, Tipe, Status, dan Aksi (Ubah / Nonaktifkan atau Aktifkan) untuk tiap organisasi.
+
+Tombol **Organisasi Baru** di pojok kanan atas dipakai untuk mendaftarkan tenant baru.
+
+![Daftar organisasi dengan tombol Organisasi Baru ditandai](/screenshots/id/organisasi-platform/mengelola-organisasi/01-daftar-organisasi.png)
+
+Kolom Aksi (Ubah dan Nonaktifkan/Aktifkan) hanya muncul untuk akun yang punya izin mengelola organisasi. Jika kolom ini tidak terlihat, akun kamu hanya bisa melihat daftar tanpa bisa mengubahnya.
+
+## 2. Menambah organisasi baru
+
+1. Klik tombol **Organisasi Baru**. Modal **Organisasi Baru** akan terbuka.
+2. Isi tiga bidang berikut:
+   - **Kode** — kode unik dan permanen untuk organisasi ini, misalnya `RSUD-01`. Kode ini **tidak bisa diubah lagi setelah organisasi dibuat**, jadi pastikan penulisannya sudah benar sebelum melanjutkan.
+   - **Nama** — nama lengkap organisasi.
+   - **Tipe** — pilih salah satu dari empat tipe yang tersedia: Rumah Sakit, Klinik, Pusat Riset, atau Laboratorium.
+3. Klik **Buat** untuk menyimpan. Modal akan tertutup otomatis dan organisasi baru langsung muncul di baris teratas tabel, berstatus **Aktif**.
+
+![Modal Organisasi Baru dengan bidang Kode, Nama, Tipe, dan tombol Buat ditandai](/screenshots/id/organisasi-platform/mengelola-organisasi/02-modal-tambah-organisasi.png)
+
+Kalau ada kesalahan (misalnya kode sudah dipakai organisasi lain), pesan error akan muncul di bagian atas form dan modal tetap terbuka supaya kamu bisa memperbaikinya. Klik **Batal** kapan saja untuk menutup modal tanpa menyimpan.
+
+## 3. Mengubah data organisasi
+
+1. Pada baris organisasi yang ingin diubah, klik tombol **Ubah**.
+2. Modal **Ubah Organisasi** terbuka dengan data organisasi yang sudah terisi.
+3. Bidang **Kode** ditampilkan tapi tidak bisa diedit (kode bersifat permanen). Kamu hanya bisa mengubah **Nama** dan **Tipe**.
+4. Klik **Simpan** untuk menerapkan perubahan, atau **Batal** untuk menutup modal tanpa menyimpan.
+
+![Modal Ubah Organisasi dengan Kode terkunci, Nama dan Tipe bisa diedit](/screenshots/id/organisasi-platform/mengelola-organisasi/03-modal-edit-organisasi.png)
+
+## 4. Menonaktifkan organisasi
+
+Organisasi yang sedang aktif menampilkan tombol **Nonaktifkan** berwarna merah di kolom Aksi.
+
+![Tombol Nonaktifkan pada baris organisasi yang masih aktif](/screenshots/id/organisasi-platform/mengelola-organisasi/04-tombol-nonaktifkan.png)
+
+Klik tombol tersebut untuk langsung menonaktifkan organisasi. **Tidak ada dialog konfirmasi tambahan** — begitu tombol diklik, status organisasi langsung berubah menjadi **Tidak Aktif** dan tombolnya berubah menjadi **Aktifkan**. Kartu ringkasan **Aktif** dan **Tidak Aktif / Ditangguhkan** di bagian atas halaman juga langsung ter-update.
+
+![Baris organisasi setelah dinonaktifkan, status berubah menjadi Tidak Aktif dengan tombol Aktifkan](/screenshots/id/organisasi-platform/mengelola-organisasi/05-organisasi-nonaktif.png)
+
+Perlu diperhatikan sebelum menonaktifkan organisasi:
+
+- Menonaktifkan organisasi berdampak pada **seluruh pengguna di organisasi tersebut**, bukan hanya sebagian. Pastikan kamu benar-benar bermaksud melakukannya sebelum mengklik tombol.
+- Karena tidak ada dialog konfirmasi, jangan mengklik tombol Nonaktifkan/Aktifkan secara sembarangan saat menjelajahi halaman ini.
+
+## 5. Mengaktifkan kembali organisasi
+
+Untuk organisasi yang berstatus Tidak Aktif, kolom Aksi menampilkan tombol **Aktifkan**. Klik tombol ini untuk mengembalikan status organisasi menjadi **Aktif**. Sama seperti menonaktifkan, tindakan ini langsung berlaku tanpa dialog konfirmasi tambahan.
+
+## Ringkasan status organisasi
+
+| Status | Arti |
+|---|---|
+| Aktif | Organisasi beroperasi normal, seluruh penggunanya bisa mengakses PRECIA sesuai izin masing-masing. |
+| Tidak Aktif | Organisasi dinonaktifkan lewat tombol Nonaktifkan. |
+| Ditangguhkan | Status khusus yang ditampilkan di kartu ringkasan bersama Tidak Aktif; tidak dikelola lewat tombol Nonaktifkan/Aktifkan pada halaman ini. |

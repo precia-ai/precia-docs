@@ -1,0 +1,59 @@
+---
+title: Meninjau dan Validasi
+---
+
+# Meninjau dan Validasi
+
+Setelah seorang klinisi mengirim kasus ke dokter (lihat halaman **Mengunggah Berkas Pasien**), kasus tersebut masuk ke antrean validator di halaman **Validasi**. Halaman ini menjelaskan dua bagian: cara mengirim kasus ke validator dari detail kasus, dan cara validator meninjau lalu mempublikasikan keputusannya.
+
+## 1. Mengirim kasus ke validator (dari detail kasus)
+
+Di halaman detail sebuah kasus klinis, gulir ke bagian **Tinjauan Klinis**. Bagian ini berisi dua aksi: mengirim kasus ke validator, dan meminta pengulangan pemeriksaan.
+
+![Bagian Tinjauan Klinis di halaman detail kasus, dengan tombol Kirim ke Validator dan Ajukan Pengulangan](/screenshots/id/kasus-klinis/meninjau-dan-validasi/04-tinjauan-klinis-detail-transaksi.png)
+
+1. Klik **Kirim ke Validator** untuk menyerahkan kasus ke antrean validasi klinis.
+
+   **Catatan penting**: tombol ini hanya bisa diklik kalau status kasus **Belum Diproses**, **Data Tidak Valid**, **Unggah Gagal**, atau **Perlu Diulang**. Kalau kasus sudah pernah dikirim sebelumnya, statusnya berubah dan tombol ini akan nonaktif.
+
+   Sistem juga mensyaratkan minimal satu modul AI sudah selesai memproses hasil analisisnya sebelum kasus bisa dikirim. Kalau belum ada hasil AI sama sekali, akan muncul pesan kesalahan dan pengiriman dibatalkan. Tunggu sampai analisis AI selesai (lihat halaman **Melihat Hasil Analisis AI**), baru coba kirim lagi.
+
+2. Kalau berkas yang diunggah ternyata bermasalah (misalnya gambar buram atau salah pemeriksaan) dan pemeriksaan perlu diulang dari awal, isi kolom **Alasan pengulangan** dengan penjelasan yang jelas, lalu klik **Ajukan Pengulangan**. Kolom ini wajib diisi, tombol tidak akan berfungsi kalau kosong.
+
+   Meminta pengulangan akan mengembalikan kasus ke status **Perlu Diulang**, memberi tahu klinisi yang menangani kasus untuk mengunggah ulang berkas yang benar.
+
+## 2. Meninjau kasus di halaman Validasi
+
+Buka menu **Validasi** di menu samping (hanya muncul untuk pengguna dengan peran validator/dokter). Halaman ini terbagi dua panel: **Daftar Kerja** di kiri, dan **Detail Validasi** di kanan.
+
+![Halaman Validasi Klinis menampilkan daftar kasus yang menunggu keputusan dan kasus yang sudah punya keputusan](/screenshots/id/kasus-klinis/meninjau-dan-validasi/01-worklist.png)
+
+Daftar Kerja punya dua kelompok:
+
+- **Menunggu keputusan Anda** — kasus yang sudah dikirim klinisi tapi belum ada keputusan validasi sama sekali. Setiap kasus di sini berlabel **Belum dimulai**. Klik salah satu untuk membuka formulir mulai validasi: pilih hasil AI yang akan dinilai (kalau modulnya lebih dari satu), pilih keputusan (**Diterima**, **Ditolak**, **Perlu Ditinjau**, atau **Tidak Konklusif**), isi catatan klinis, lalu klik **Catat Keputusan**.
+- **Keputusan tercatat** — kasus yang sudah punya keputusan validasi, ditandai status **Dipublikasikan** atau **Menunggu** (keputusan sudah dicatat tapi belum dipublikasikan ke rekam kasus).
+
+Klik salah satu baris untuk membuka detailnya di panel kanan.
+
+### Kasus yang sudah dipublikasikan
+
+Kalau kasus yang dipilih statusnya **Dipublikasikan**, panel detail menampilkan ringkasan lengkap: pasien, kode transaksi, keputusan, waktu validasi dan publikasi, catatan klinis, serta hasil AI (skor keyakinan dan catatan bahwa hasil ini bukan diagnosis final).
+
+![Detail validasi kasus yang sudah dipublikasikan, dengan status Dipublikasikan](/screenshots/id/kasus-klinis/meninjau-dan-validasi/02-detail-terpublikasi.png)
+
+Kasus yang sudah dipublikasikan bersifat final. Tidak ada aksi lanjutan yang bisa dilakukan di sini.
+
+### Kasus yang belum dipublikasikan
+
+Kalau keputusan sudah dicatat tapi belum dipublikasikan (status **Menunggu**), panel detail menampilkan dua aksi tambahan di bawah ringkasan hasil AI.
+
+![Detail validasi kasus berstatus Menunggu, dengan tombol Publikasikan validasi dan Minta pengambilan ulang](/screenshots/id/kasus-klinis/meninjau-dan-validasi/03-detail-belum-publikasi.png)
+
+1. Klik **Publikasikan validasi** untuk mengunci keputusan ini sebagai hasil final kasus. Setelah dipublikasikan, status berubah menjadi **Dipublikasikan** dan tidak bisa diubah lagi lewat halaman ini.
+2. Kalau setelah meninjau ternyata pemeriksaan perlu diulang (misalnya kualitas gambar tidak memadai untuk dinilai), isi kolom **Alasan pengambilan ulang**, lalu klik **Minta pengambilan ulang**. Kolom ini wajib diisi. Aksi ini akan mengembalikan kasus ke klinisi terkait untuk pemeriksaan ulang, dan validasi ini tidak akan dipublikasikan.
+
+## Catatan penting
+
+- Hasil AI yang ditampilkan di panel validasi selalu disertai catatan bahwa hasil tersebut mendukung skrining cepat dan bukan diagnosis final — keputusan klinis tetap sepenuhnya berada di tangan dokter yang meninjau.
+- Kirim ke Validator hanya berhasil setelah minimal satu modul AI menyelesaikan analisisnya. Kalau tombol tampak aktif tapi pengiriman gagal dengan pesan terkait pemrosesan AI, berarti hasil AI belum tersedia.
+- Publikasi validasi bersifat final dan tidak bisa dibatalkan dari halaman ini. Pastikan keputusan sudah benar sebelum mengklik **Publikasikan validasi**.

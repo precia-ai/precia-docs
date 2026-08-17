@@ -1,0 +1,64 @@
+---
+title: Membuat Kasus Baru
+---
+
+# Membuat Kasus Baru
+
+Kasus klinis adalah satu pemeriksaan pasien yang akan diproses oleh AI. Halaman ini menjelaskan cara membuat kasus baru dari awal, sampai kasus tersebut muncul di daftar kerja transaksi dan siap diunggah berkasnya.
+
+## 1. Buka halaman Kasus Klinis
+
+Klik menu **Klinis** di sisi kiri. Kalau akun Anda punya akses ke lebih dari satu unit, Anda akan diminta memilih unit dulu (lihat halaman **Mengenal Tampilan** untuk cara memilih unit). Setelah unit aktif, Anda akan melihat daftar kerja transaksi seperti berikut.
+
+![Daftar kerja transaksi dengan tombol Transaksi Baru](/screenshots/id/kasus-klinis/membuat-kasus-baru/01-worklist.png)
+
+Klik tombol **+ Transaksi Baru** di kanan atas untuk membuka formulir pembuatan kasus.
+
+## 2. Isi formulir Buat Transaksi Klinis
+
+Formulir muncul sebagai panel di sisi kanan layar, terbagi menjadi empat bagian: **Penugasan**, **Informasi Pasien**, **Pemeriksaan**, dan **Catatan**.
+
+![Formulir Buat Transaksi Klinis dalam keadaan kosong](/screenshots/id/kasus-klinis/membuat-kasus-baru/02-drawer-kosong.png)
+
+### Penugasan
+
+- **Unit** (wajib) — pilih unit klinis yang bertanggung jawab atas pemeriksaan ini. Daftar unit yang muncul hanya unit yang bisa Anda akses. Kasus akan mengikuti modul AI yang sedang aktif di unit tersebut.
+
+### Informasi Pasien
+
+- **MRN Pasien** (wajib) — nomor rekam medis pasien, contoh `MRN-000123`.
+- **Nama Pasien** (wajib) — nama lengkap pasien.
+- **Tanggal Lahir** (opsional) — format tanggal, boleh dikosongkan kalau belum diketahui.
+- **Jenis Kelamin** (opsional) — pilih salah satu: Laki-laki, Perempuan, Lainnya, atau Tidak diketahui.
+
+Data pasien di sini bersifat rahasia. Hanya pengguna berwenang di unit yang sama yang bisa melihatnya.
+
+### Pemeriksaan
+
+- **Prioritas** — pilih salah satu: Rendah, Normal, Tinggi, atau Mendesak. Default-nya Normal. Prioritas ini membantu tim menentukan kasus mana yang perlu didahulukan di worklist.
+
+### Catatan
+
+- **Catatan Pemeriksaan** (opsional) — konteks klinis tambahan, alasan rujukan, atau riwayat yang relevan untuk pemeriksaan ini.
+
+Contoh formulir yang sudah terisi lengkap:
+
+![Formulir Buat Transaksi Klinis sudah terisi lengkap](/screenshots/id/kasus-klinis/membuat-kasus-baru/03-drawer-terisi.png)
+
+**Catatan penting**: formulir ini tidak punya opsi memilih modul AI secara manual. Kasus akan otomatis mendapat slot pemeriksaan untuk setiap modul AI yang sedang aktif di unit yang dipilih (misalnya sebuah unit kardiologi dengan tiga modul EKG aktif akan langsung membuat tiga slot analisis). Kalau unit belum punya modul AI aktif, hubungi admin unit atau admin organisasi untuk mengaktifkannya lebih dulu (lihat dokumentasi terkait pengaturan modul AI per unit).
+
+## 3. Klik Buat Transaksi
+
+Setelah semua kolom wajib terisi, klik tombol **Buat Transaksi** di bagian bawah panel. Kalau ada kolom yang belum valid (misalnya MRN kosong atau format tanggal lahir salah), sistem akan menampilkan pesan kesalahan di bawah kolom terkait dan formulir tidak akan tersimpan sampai diperbaiki.
+
+Setelah berhasil, Anda akan otomatis diarahkan ke halaman detail kasus yang baru dibuat. Status kasus tercatat **Belum Diproses**, dengan prioritas dan daftar modul AI yang otomatis ditugaskan sesuai unit.
+
+![Halaman detail kasus setelah berhasil dibuat](/screenshots/id/kasus-klinis/membuat-kasus-baru/04-hasil-sukses.png)
+
+## Langkah selanjutnya
+
+Kasus baru ini belum bisa dianalisis AI sampai berkas pasien diunggah untuk tiap modul. Lihat halaman **Mengunggah Berkas Pasien** untuk melanjutkan.
+
+## Membatalkan kasus
+
+Kalau kasus dibuat karena kesalahan, buka detail kasus tersebut lalu cari opsi pembatalan di halaman detail. Kasus yang sudah dikirim ke dokter untuk ditinjau tidak bisa dibatalkan sendiri, hubungi admin unit Anda. Lihat halaman **Membatalkan Kasus** untuk detail lengkap.

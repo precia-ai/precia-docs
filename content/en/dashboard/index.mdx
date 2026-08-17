@@ -1,0 +1,65 @@
+---
+title: Dashboard Overview
+---
+
+# Dashboard Overview
+
+The dashboard is the first page you see after logging in. It shows an overview of platform activity and key operational metrics, so you can gauge the current state of work without opening any other page.
+
+What the dashboard shows depends on your account's permissions:
+
+- **With report/analytics access** (for example Organization Admin, Platform Admin, Management): you see the full dashboard, with stat cards, a throughput chart, transaction status, and a list of failed AI jobs.
+- **Without report/analytics access** (for example some Clinician or Validator accounts focused only on their own daily queue): the dashboard only shows two shortcut cards leading to **Clinical** (transaction list) and **Validation**, without any charts or statistics. The dashboard still opens normally even without analytics access; it does not show an error.
+
+This guide covers the full dashboard (the variant with statistics and charts), since that is what the demo account used for this documentation can show.
+
+## 1. Opening the dashboard
+
+After logging in, you are automatically taken to the **Dashboard** page. You can also open it any time from the **Dashboard** item in the left sidebar.
+
+![Dashboard overview with stat cards, throughput chart, transaction status, and needs-attention list](/screenshots/en/dashboard/index/01-ringkasan.png)
+
+## 2. Choosing a date range
+
+In the top-right corner of the title card, there are three date-range buttons: **Last 7 days**, **Last 30 days**, and **Last 90 days** (blue box in the image above). Click any button to change the range used by every stat card and chart below it.
+
+The active button is highlighted in blue with bold text. By default, the dashboard shows the **last 30 days**.
+
+## 3. Reading the main stat cards
+
+The four cards in the second row summarize performance for the selected period:
+
+- **Transactions**: total number of clinical transactions created in that period.
+- **AI Inferences**: total number of AI analysis requests processed.
+- **Success Rate**: percentage of AI jobs that finished without failing, out of jobs that have actually finished (jobs still in the queue are not counted).
+- **Awaiting Review**: number of cases currently waiting for a doctor's review.
+
+Below each number is a note comparing it to the previous period (up/down), unless data for the previous period is not yet available.
+
+## 4. Reading the Daily Throughput chart
+
+The **Daily Throughput** line chart shows how many AI inferences were queued per day across the selected period. Use it to spot workload patterns, for example days with a spike in AI analysis requests.
+
+Note: for longer ranges (such as 90 days), data may be grouped by week instead of by day so the chart stays readable.
+
+## 5. Reading Transaction Status
+
+The **Transaction Status** card shows a stacked bar that breaks down where every case created in this period currently sits, grouped by its current status (for example Unprocessed, Doctor Reviewed, Cancelled, Pending, and other statuses in the transaction flow). Each color on the bar represents one status, with its count and percentage listed below the bar.
+
+Use this card to quickly spot whether cases are piling up in one particular status, for example too many still sitting in "Unprocessed".
+
+## 6. Reading Needs Attention
+
+The **Needs Attention** card lists the most recent failed AI jobs, including the AI module name, a short error message, and the date the job was queued.
+
+Each row in this list is clickable (blue arrow in the image above) and takes you straight to that transaction's detail page, so you can follow up on the failure, for example checking the uploaded data or requesting a re-capture.
+
+If no jobs failed in this period, the card shows a message stating there are no failures.
+
+## 7. Comparison period note
+
+At the very bottom of the page is a small note explaining the comparison period used to calculate the up/down figures on the stat cards, plus a reminder that Success Rate only counts jobs that have finished. For median turnaround time and a breakdown per AI module, open the **Analytics** page in the sidebar.
+
+## For accounts without analytics access
+
+If your account does not have report/analytics permissions, the dashboard you see is simpler: just two large shortcut cards labeled **Clinical** and **Validation**, with no stat cards or charts. Click either card to go straight to the clinical transaction list or your validation queue. This is not a display error, it is by design, so the dashboard still works as a useful daily shortcut even without access to organization-wide analytics data.

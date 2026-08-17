@@ -1,0 +1,145 @@
+---
+title: Onboarding SIMRS Baru
+---
+
+# Onboarding SIMRS Baru
+
+Halaman **Onboarding SIMRS** menyambungkan sistem informasi rumah sakit (SIMRS) milik sebuah organisasi ke PRECIA. Prosesnya berbentuk wizard 7 langkah: pilih organisasi, pilih adapter SIMRS, isi field koneksi, petakan unit, buat service account, ambil blok konfigurasi untuk tim RS, lalu uji konektivitas.
+
+Halaman ini hanya bisa diakses oleh peran Super Admin (SUP) dan Platform Admin (PAD), dari menu **Onboarding SIMRS** di sidebar Mode Platform. Lihat halaman "Ringkasan Organisasi & Platform" untuk cara masuk ke area Platform.
+
+## Tiga SIMRS yang didukung
+
+PRECIA saat ini mendukung tiga adapter:
+
+- **Open Hospital** dan **MEDICCA**, PRECIA mengirim hasil AI ke endpoint callback yang disediakan rumah sakit (pola *push*).
+- **SIMRS Khanza**, Khanza yang menarik hasil AI dari PRECIA sendiri (pola *poll*), jadi tidak butuh Callback URL.
+
+Adapter yang dipilih di langkah 2 menentukan field apa saja yang muncul di langkah 3 dan isi blok konfigurasi di langkah 6.
+
+## Sebelum mulai
+
+- Organisasi tujuan harus sudah terdaftar di PRECIA (lihat halaman "Mengelola Organisasi"), atau buat baru langsung dari langkah 1.
+- Organisasi tujuan sebaiknya sudah punya minimal satu Unit klinis, karena langkah 4 (pemetaan unit) tidak bisa dilanjutkan kalau organisasi belum punya Unit sama sekali.
+- Saat kamu masuk ke langkah 1 dan menekan **Lanjut**, PRECIA mengunci organisasi tersebut ke akunmu selama 15 menit supaya admin lain tidak menimpa perubahan yang sedang kamu kerjakan. Kalau organisasi sudah dikunci admin lain, sebuah banner kuning muncul di atas wizard dan seluruh form dinonaktifkan sampai kunci itu lepas (kedaluwarsa otomatis, atau tekan **Reload** untuk cek ulang).
+- Kalau organisasi yang dipilih sudah pernah dionboarding sebelumnya, seluruh field di langkah 2-4 otomatis terisi dari konfigurasi tersimpan. Kamu hanya perlu mengubah bagian yang memang berbeda, lalu jalankan ulang wizard sampai selesai.
+
+## Langkah 1: Organisasi
+
+Buka menu **Onboarding SIMRS**. Kamu akan mendarat di langkah pertama wizard.
+
+![Langkah Organisasi: dropdown pilih organisasi existing dan panel buat organisasi baru](/screenshots/id/organisasi-platform/onboarding-simrs-baru/01-organisasi.png)
+
+Ada dua cara memilih organisasi:
+
+1. **Pilih organisasi existing**, pilih dari dropdown berisi seluruh organisasi yang terdaftar di platform.
+2. **Buat organisasi baru**, isi Kode, Nama, dan Tipe di panel "Buat organisasi baru", lalu klik **Buat organisasi**. Organisasi baru langsung terpilih otomatis begitu berhasil dibuat, dan kamu lanjut memakainya di langkah-langkah berikutnya.
+
+Kalau organisasi yang dipilih sudah punya konfigurasi SIMRS sebelumnya, sebuah catatan info muncul di bawah dropdown menyebutkan adapter yang sudah aktif.
+
+Klik **Lanjut** tanpa memilih atau membuat organisasi akan diblokir dengan pesan error:
+
+![Validasi: pesan error "Pilih atau buat organisasi dulu"](/screenshots/id/organisasi-platform/onboarding-simrs-baru/02-organisasi-validasi.png)
+
+## Langkah 2: Adapter
+
+Pilih salah satu dari tiga kartu SIMRS: **Open Hospital**, **MEDICCA**, atau **SIMRS Khanza**. Label **Callback** atau **Polling** di tiap kartu menandai pola integrasinya.
+
+![Langkah Adapter: tiga kartu pilihan SIMRS](/screenshots/id/organisasi-platform/onboarding-simrs-baru/03-adapter.png)
+
+Klik **Lanjut** tanpa memilih adapter apa pun akan diblokir:
+
+![Validasi: pesan error "Pilih salah satu adapter SIMRS"](/screenshots/id/organisasi-platform/onboarding-simrs-baru/04-adapter-validasi.png)
+
+Kalau kamu sebelumnya sudah mengisi Callback URL dan token di langkah 3, lalu balik ke langkah ini dan ganti pilihan ke **SIMRS Khanza**, field-field tersebut otomatis dikosongkan karena Khanza tidak memakainya.
+
+## Langkah 3: Koneksi
+
+Isi field yang berbeda tergantung adapter yang dipilih.
+
+Untuk **Open Hospital** dan **MEDICCA**, field yang muncul:
+
+- **Callback URL** (wajib), alamat HTTPS di server rumah sakit yang menerima hasil AI dari PRECIA. Harus diawali `https://`.
+- **JWT token** (untuk Open Hospital) atau **Shared secret** (wajib untuk MEDICCA), dipakai memverifikasi callback ke server RS. Untuk Open Hospital field ini opsional kalau username dan password service account di bawahnya sudah diisi.
+- **Source type** (khusus Open Hospital), pilih `laboratory` atau `opd`, menentukan jenis record yang dirujuk hasil AI.
+- **Kredensial untuk self-test** (Username SIMRS, Password SIMRS), opsional, dipakai kalau nanti kamu menjalankan self-test di langkah 7.
+- **Batas self-test per jam**, default `10`, turunkan kalau firewall rumah sakit ketat terhadap permintaan beruntun.
+
+Untuk **SIMRS Khanza**, bagian di atas diganti sebuah catatan info bahwa Khanza tidak butuh callback. Yang tetap muncul hanya Batas self-test per jam.
+
+Klik **Lanjut** tanpa mengisi Callback URL (atau tanpa mengisi Shared secret untuk MEDICCA) akan diblokir:
+
+![Validasi: pesan error "Callback URL wajib berupa alamat HTTPS"](/screenshots/id/organisasi-platform/onboarding-simrs-baru/05-koneksi-validasi.png)
+
+Setelah semua field wajib terisi, form siap dilanjutkan:
+
+![Langkah Koneksi dengan semua field terisi](/screenshots/id/organisasi-platform/onboarding-simrs-baru/06-koneksi-terisi.png)
+
+## Langkah 4: Unit
+
+Petakan kode ward atau poliklinik di sisi SIMRS ke Unit PRECIA yang sesuai. Kode di kolom **Kode di SIMRS** harus persis sama dengan kode yang nanti dikirim SIMRS ke PRECIA (perhatikan huruf besar/kecil).
+
+Klik **Tambah baris** untuk memetakan lebih dari satu ward. Tombol hapus (ikon tempat sampah) di ujung kanan tiap baris dinonaktifkan kalau baris itu satu-satunya yang tersisa, karena minimal satu pemetaan wajib ada.
+
+Klik **Lanjut** tanpa mengisi satu baris pun akan diblokir:
+
+![Validasi: pesan error "Petakan minimal satu ward atau poliklinik"](/screenshots/id/organisasi-platform/onboarding-simrs-baru/07-unit-validasi.png)
+
+Isi kode ward dan pilih Unit PRECIA tujuannya dari dropdown:
+
+![Baris pemetaan unit terisi: kode RAD dipetakan ke unit Cardiology](/screenshots/id/organisasi-platform/onboarding-simrs-baru/08-unit-terisi.png)
+
+Kalau organisasi belum punya Unit sama sekali, langkah ini menampilkan peringatan dengan tautan langsung ke halaman Units untuk membuat unit klinis dulu, karena tanpa Unit tidak ada yang bisa dipetakan.
+
+**Penting:** menekan **Lanjut** di langkah ini benar-benar menyimpan seluruh konfigurasi (adapter, field koneksi, dan pemetaan unit) ke organisasi. Kalau kamu menutup wizard setelah titik ini, konfigurasi yang sudah masuk tidak hilang; kamu tinggal membuka lagi halaman ini dan melanjutkan dari langkah credential.
+
+## Langkah 5: Credential
+
+Buat service account (akun teknis) yang dipakai konektor SIMRS untuk login ke PRECIA. Akun ini terpisah dari akun pengguna manusia di organisasi yang sama, jadi bisa dicabut sendiri kapan saja tanpa mengganggu pengguna lain.
+
+Isi **Label** (opsional, membantu mengenali akun ini nanti di daftar pengguna), lalu klik **Generate credential**.
+
+![Langkah Credential sebelum digenerate: field Label dan tombol Generate credential](/screenshots/id/organisasi-platform/onboarding-simrs-baru/09-credential.png)
+
+Email dan password service account muncul satu kali:
+
+![Hasil generate credential: email dan password ditampilkan dengan peringatan hanya tampil sekali](/screenshots/id/organisasi-platform/onboarding-simrs-baru/10-credential-hasil.png)
+
+**Password ini hanya ditampilkan sekali di layar ini.** PRECIA menyimpannya sebagai hash, jadi tidak bisa ditampilkan ulang kapan pun setelah kamu meninggalkan halaman ini. Salin email dan password sekarang (tombol salin di sebelah kanan tiap kolom), lalu simpan sementara di tempat aman sampai ditempelkan ke blok konfigurasi di langkah berikutnya. Kalau password terlanjur hilang, satu-satunya cara adalah generate service account baru dari langkah ini lagi, lalu nonaktifkan akun lama lewat halaman Pengguna & Akses.
+
+## Langkah 6: Config
+
+Halaman ini menyusun blok konfigurasi siap salin, berisi URL PRECIA, email dan password service account dari langkah sebelumnya, kode modul AI, serta pemetaan unit dari langkah 4.
+
+![Langkah Config: blok konfigurasi rsc/application.properties siap disalin](/screenshots/id/organisasi-platform/onboarding-simrs-baru/11-config.png)
+
+Klik **Salin** di pojok kanan atas blok untuk menyalin seluruh isinya. Kirim isi blok ini ke tim IT rumah sakit; **PRECIA tidak men-deploy file ini secara otomatis**, penempatan filenya tetap dilakukan manual di server SIMRS rumah sakit, lalu service backend SIMRS di sisi mereka perlu di-restart supaya konfigurasi baru terbaca.
+
+Kalau kamu melompat ke langkah ini tanpa menggenerate credential dulu di langkah 5, sebuah catatan peringatan muncul karena blok konfigurasi belum punya email dan password yang valid.
+
+## Langkah 7: Self-test
+
+Langkah terakhir menguji apakah konfigurasi yang baru dibuat sudah bisa dipakai.
+
+![Langkah Self-test sebelum dijalankan: tombol Jalankan self-test](/screenshots/id/organisasi-platform/onboarding-simrs-baru/12-selftest.png)
+
+Klik **Jalankan self-test**. PRECIA memeriksa empat hal secara berurutan, berhenti di pemeriksaan pertama yang gagal:
+
+1. **Konektivitas**, PRECIA bisa menjangkau Callback URL yang diisi di langkah 3.
+2. **Sertifikat TLS**, sertifikat HTTPS di alamat tersebut valid.
+3. **Autentikasi**, kredensial SIMRS di langkah 3 (kalau diisi) berhasil dipakai login.
+4. **Pemetaan unit**, pemetaan yang dibuat di langkah 4 ditemukan dan konsisten.
+
+Pemeriksaan yang tidak sempat dijalankan karena pemeriksaan sebelumnya gagal ditandai **Dilewati**, bukan gagal.
+
+![Hasil self-test: pemeriksaan Konektivitas gagal, Sertifikat TLS dan Autentikasi dilewati, Pemetaan unit lolos](/screenshots/id/organisasi-platform/onboarding-simrs-baru/13-selftest-hasil.png)
+
+Pada contoh di atas, pemeriksaan Konektivitas gagal karena Callback URL yang dipakai adalah alamat contoh yang memang tidak menunjuk ke server sungguhan. Di rumah sakit asli, kalau Callback URL menunjuk ke server yang benar-benar aktif dan bisa diakses dari internet, seluruh pemeriksaan seharusnya **Lolos**.
+
+Self-test hanya menguji konektivitas, TLS, autentikasi, dan pemetaan unit. Uji bisnis nyata (mengirim satu kasus sungguhan dari SIMRS ke PRECIA) tetap harus dilakukan manual bersama tim RS, karena mengirim kasus lewat self-test otomatis akan membuat data semu di sistem produksi rumah sakit.
+
+Klik **Selesai** untuk keluar dari wizard dan kembali ke daftar Organisasi. Tombol ini hanya melepas kunci organisasi dan tidak mengirim apa pun; seluruh konfigurasi memang sudah tersimpan sejak kamu menekan Lanjut di langkah Unit.
+
+## Kalau butuh mengubah konfigurasi lagi
+
+Buka kembali menu **Onboarding SIMRS**, pilih organisasi yang sama di langkah 1. Seluruh field akan terisi otomatis dari konfigurasi tersimpan, tinggal ubah bagian yang perlu diperbarui lalu jalankan ulang wizard sampai langkah terakhir supaya perubahan tersimpan.

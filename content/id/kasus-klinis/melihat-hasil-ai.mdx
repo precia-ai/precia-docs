@@ -1,0 +1,72 @@
+---
+title: Melihat Hasil Analisis AI
+---
+
+# Melihat Hasil Analisis AI
+
+Setiap modul AI yang dipakai pada sebuah kasus punya tab sendiri di halaman detail kasus. Begitu status modul berubah menjadi **Selesai**, hasil analisisnya bisa dibuka langsung di tab tersebut, lengkap dengan tingkat keyakinan (confidence), klasifikasi, dan penjelasan cara membacanya.
+
+Halaman ini menjelaskan cara membuka dan membaca hasil itu. Untuk arti tiap status modul (Menunggu, Diproses, Selesai, Gagal), lihat halaman **Kasus Klinis** di bagian Ringkasan.
+
+## 1. Buka detail kasus
+
+Dari worklist, klik baris kasus yang ingin dilihat. Anda akan masuk ke halaman detail kasus.
+
+Di panel kanan halaman detail, ada satu tab **Info Pasien** dan satu tab tambahan untuk setiap modul AI yang dipakai kasus ini. Jumlah tab mengikuti jumlah slot modul AI yang tercatat di kartu **Modul AI** pada panel kiri.
+
+![Tab info pasien dan tab per modul AI di halaman detail kasus](/screenshots/id/kasus-klinis/melihat-hasil-ai/01-tab-info-pasien.png)
+
+Titik kecil di sebelah nama tiap modul menandakan status modul itu:
+
+- Titik abu-abu: modul masih **Menunggu** data.
+- Titik biru: data sudah **Terunggah**, belum ditandai siap.
+- Titik hijau muda (emerald): modul **Siap** diproses.
+- Titik kuning: modul sedang **Diproses**.
+- Titik hijau tua: modul **Selesai**, hasil sudah tersedia.
+- Titik merah: modul **Gagal** diproses.
+
+## 2. Modul yang belum punya hasil
+
+Kalau Anda membuka tab modul yang statusnya masih **Menunggu**, **Data Terunggah**, atau **Siap**, yang tampil hanyalah data masukan untuk modul itu (berkas yang diunggah, dan/atau bidang data klinis terstruktur kalau modul ini memakainya). Belum ada panel hasil AI karena analisisnya belum dijalankan.
+
+![Tab modul dengan status Menunggu, belum ada hasil AI](/screenshots/id/kasus-klinis/melihat-hasil-ai/02-tab-modul-menunggu.png)
+
+Contoh di atas adalah modul dengan input berupa bidang data klinis terstruktur (bukan berkas). Selama status modul belum **Selesai**, bidang-bidang ini masih bisa diisi atau diubah oleh pengguna yang berhak. Begitu modul berstatus **Selesai**, seluruh bidang ini terkunci (read-only) sebagai data yang dipakai AI untuk analisis tersebut.
+
+## 3. Membaca panel hasil AI
+
+Setelah modul berstatus **Selesai**, panel hasil AI muncul di bagian bawah tab modul tersebut, di bawah bidang data klinis dan bagian Ground Truth.
+
+![Panel hasil AI untuk modul BOO Clinical Screening, lengkap dengan skor keyakinan dan klasifikasi](/screenshots/id/kasus-klinis/melihat-hasil-ai/03-hasil-boo-screening.png)
+
+Bagian-bagian panel hasil, dari atas ke bawah:
+
+1. **Nama modul dan skor keyakinan** — pojok kanan atas kartu menampilkan persentase keyakinan (confidence) model AI untuk hasil ini, misalnya `84.1%`. Warna badge berubah mengikuti tingkat keyakinan: hijau untuk sangat tinggi, biru untuk tinggi, kuning untuk sedang, merah untuk rendah.
+2. **Deskripsi modul** — kalimat singkat penjelasan fungsi modul ini, ditampilkan di bawah nama modul.
+3. **Nilai probabilitas** — batang progres berlabel sesuai keluaran modul (misalnya "Probabilitas Obstruksi"), menunjukkan angka probabilitas dalam persen.
+4. **Klasifikasi** — label hasil klasifikasi AI dalam bentuk badge kecil (misalnya `BOO`), ini kesimpulan kategori dari model untuk kasus ini.
+5. **Panduan pembacaan hasil** — kotak berisi penjelasan cara menafsirkan angka dan klasifikasi di atas, ditulis khusus untuk modul tersebut.
+6. **Interpretasi AI** — ringkasan otomatis dari sistem berdasarkan skor dan klasifikasi.
+7. **Catatan skrining** — di bagian paling bawah panel, ada pengingat bahwa hasil ini adalah alat bantu skrining, bukan diagnosis final.
+
+Isi dan label persisnya (nama probabilitas, pilihan klasifikasi) berbeda-beda antar modul AI, tergantung apa yang dianalisis modul itu. Strukturnya tetap sama: skor keyakinan, nilai/probabilitas utama, klasifikasi, lalu penjelasan.
+
+## 4. Tiap modul punya hasil masing-masing
+
+Kalau sebuah kasus memakai lebih dari satu modul AI, tiap modul dianalisis dan menghasilkan kesimpulan sendiri-sendiri, bisa saja berbeda satu sama lain. Berpindah tab menampilkan hasil modul yang berbeda pula.
+
+![Panel hasil AI untuk modul Detrusor Underactivity Screening pada kasus yang sama, dengan klasifikasi berbeda dari modul sebelumnya](/screenshots/id/kasus-klinis/melihat-hasil-ai/04-hasil-detrusor.png)
+
+Pada contoh di atas, kasus yang sama punya tiga modul AI (BOO Multimodal, BOO Clinical Screening, dan Detrusor Underactivity Screening). Modul BOO Clinical Screening pada langkah sebelumnya mengklasifikasikan kasus ini sebagai `BOO` dengan keyakinan 84.1%, sedangkan modul Detrusor Underactivity Screening mengklasifikasikannya sebagai `Non-DU` dengan keyakinan 68.8%. Kedua hasil ini berdiri sendiri dan perlu dibaca sesuai konteks modulnya masing-masing.
+
+## Catatan penting
+
+- **Hasil AI bukan diagnosis.** Setiap panel hasil selalu menyertakan catatan bahwa hasil ini adalah alat bantu skrining untuk mempercepat peninjauan dokter, bukan keputusan klinis final. Keputusan tetap ada di tangan dokter yang menangani kasus.
+- **Kalau modul pernah gagal lalu berhasil diproses ulang**, panel hasil AI hanya menampilkan hasil dari proses terbaru. Riwayat proses yang gagal sebelumnya tidak ditampilkan berdampingan dengan hasil yang berhasil, supaya tidak membingungkan.
+- **Kalau modul gagal diproses dan belum ada proses ulang yang berhasil**, panel menampilkan kartu peringatan berwarna merah muda berisi pesan kesalahan, bukan panel hasil biasa.
+- **Nomor versi model AI sengaja tidak ditampilkan** di panel ini karena bukan informasi yang bisa ditindaklanjuti oleh dokter/perawat. Informasi versi model tetap tercatat di log sistem untuk keperluan dukungan teknis.
+- Kalau kasus punya modul yang input-nya berkas (gambar/video), hasil AI untuk modul tersebut ditampilkan berdampingan dengan berkas yang diunggah pada tab yang sama.
+
+## Langkah selanjutnya
+
+Setelah membaca hasil AI dari semua modul yang relevan, langkah berikutnya biasanya mengirim kasus ke dokter/validator untuk ditinjau. Lihat halaman **Meninjau dan Validasi** untuk detailnya.

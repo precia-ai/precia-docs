@@ -1,0 +1,142 @@
+---
+title: Mengimpor Banyak Kasus Sekaligus
+---
+
+# Mengimpor Banyak Kasus Sekaligus
+
+Kalau Anda punya banyak kasus pasien sekaligus (misalnya hasil kunjungan lapangan atau migrasi data lama), Anda tidak perlu membuatnya satu per satu lewat form. Gunakan fitur **Impor Massal** untuk mengunggah banyak kasus dalam satu file ZIP.
+
+Fitur ini khusus untuk satu unit dan satu modul AI dalam satu kali impor. Kalau Anda punya kasus untuk beberapa unit atau modul berbeda, siapkan ZIP terpisah untuk masing-masing.
+
+## Siapa yang bisa mengakses
+
+Tombol **Impor Massal** hanya muncul untuk peran yang punya izin impor massal (misalnya admin unit atau admin organisasi). Kalau Anda tidak melihat tombol ini di halaman Kasus Klinis, berarti peran Anda belum diberi akses; hubungi admin organisasi Anda.
+
+## Langkah 1: Buka halaman Impor Massal
+
+1. Buka menu **Klinis**.
+2. Pilih **unit** yang kasusnya akan Anda impor (misalnya Cardiology).
+3. Di halaman worklist unit tersebut, klik tab **By AI Module** (Berdasarkan Modul AI).
+4. Pada dropdown **AI Module**, pilih modul AI tujuan (misalnya ECG EF Screening). Tombol **Bulk Import** (Impor Massal) baru bisa diklik setelah modul dipilih.
+5. Klik **Bulk Import**.
+
+Anda akan masuk ke halaman impor massal khusus untuk kombinasi unit dan modul yang dipilih. Header halaman menampilkan nama unit dan tipe masukan modul tersebut (berbasis berkas, isian terstruktur, atau campuran keduanya).
+
+## Menyiapkan berkas ZIP
+
+Sebelum mengunggah, siapkan dulu berkas ZIP yang berisi:
+
+1. **Manifest Excel** — satu baris untuk satu kasus, berisi data pasien dan (kalau modulnya butuh berkas) lokasi berkas untuk kasus tersebut.
+2. **Folder berkas kasus** — kumpulan gambar/dokumen pemeriksaan, hanya diperlukan kalau modul AI-nya berbasis berkas atau campuran.
+
+Kolom manifest yang wajib diisi tergantung modul AI yang dipilih, tapi selalu ada minimal:
+
+| Kolom | Wajib | Keterangan |
+|---|---|---|
+| `case_id` | Ya | ID unik per kasus. Baris dengan `case_id` yang sama dianggap berkas tambahan untuk kasus itu. |
+| `patient_mrn` | Ya | Nomor rekam medis pasien. |
+| `patient_name` | Ya | Nama pasien. |
+| `patient_dob` | Tidak | Tanggal lahir pasien. |
+| `patient_gender` | Tidak | Jenis kelamin pasien. |
+| `file_path` | Ya, kalau modul butuh berkas | Lokasi berkas di dalam ZIP, harus sama persis termasuk foldernya. |
+| `ground_truth` | Tidak | Label pembanding untuk validasi hasil AI, kalau ada. |
+
+Modul AI dengan isian klinis tambahan (misalnya nilai lab atau parameter khusus) akan menambah kolom lain di tabel ini secara otomatis, lengkap dengan keterangan wajib/opsional dan tipe datanya. Cek tabel **Kolom Manifest Excel** di halaman untuk daftar kolom lengkap sesuai modul yang Anda pilih, jangan mengandalkan daftar di atas saja.
+
+Contoh struktur ZIP yang benar (untuk modul berbasis berkas):
+
+```
+import.zip
+├── manifest.xlsx
+└── files/
+    ├── case-001.png
+    ├── case-002.png
+    └── case-003.png
+```
+
+Kalau modulnya tidak butuh berkas (isian terstruktur murni), cukup masukkan `manifest.xlsx` saja ke dalam ZIP, tanpa folder berkas.
+
+### Cara membungkus ZIP yang benar
+
+Ini bagian yang paling sering salah. Pastikan saat Anda membuka file ZIP, Anda langsung melihat `manifest.xlsx` (dan folder `files/` kalau ada), **bukan** satu folder pembungkus lagi di paling luar.
+
+Contoh yang salah (folder pembungkus tambahan di luar):
+
+```
+import.zip
+└── data_pasien/
+    ├── manifest.xlsx
+    └── files/
+        ├── case-001.png
+        └── case-002.png
+```
+
+Ini biasanya terjadi kalau Anda memilih **folder-nya** saat membuat ZIP, bukan memilih **isi folder-nya**. Kalau ragu, buka dulu ZIP yang sudah dibuat sebelum mengunggah, pastikan `manifest.xlsx` langsung terlihat begitu ZIP dibuka.
+
+### Pakai templat yang disediakan
+
+Supaya tidak perlu menyusun manifest dari nol, halaman impor massal punya dua tombol unduhan di bagian bawah kartu **Cara menyiapkan berkas impor**:
+
+- **Templat Excel** — file `.xlsx` kosong dengan kolom yang sudah sesuai modul AI yang Anda pilih. Isi satu baris untuk satu kasus.
+- **Contoh ZIP** — contoh lengkap berisi manifest terisi contoh data dan berkas kasus contoh, dengan struktur folder yang sudah benar. Bisa dipakai sebagai referensi struktur, atau diedit langsung isinya.
+
+## Langkah 2: Unggah ZIP
+
+![Halaman impor massal dengan berkas ZIP terpilih dan tombol Mulai Impor](/screenshots/id/kasus-klinis/impor-banyak-kasus/01-unggah-zip.png)
+
+1. Di kartu **Impor** (sisi kanan), seret berkas ZIP ke area unggah, atau klik area tersebut untuk memilih file dari komputer Anda.
+2. Setelah berkas ZIP terpilih, namanya dan ukurannya akan tampil menggantikan area unggah.
+3. Klik **Mulai Impor**.
+
+Sistem akan mengunggah ZIP dan langsung memvalidasinya di server (mengecek format manifest, kecocokan `file_path`, dan data wajib per kasus).
+
+## Langkah 3: Periksa pratinjau
+
+![Pratinjau hasil validasi: jumlah kasus siap diimpor dan yang akan dilewati, dengan tombol Konfirmasi Impor](/screenshots/id/kasus-klinis/impor-banyak-kasus/02-pratinjau.png)
+
+Setelah validasi selesai, halaman menampilkan ringkasan:
+
+- **Siap diimpor** — jumlah kasus yang datanya valid dan akan benar-benar masuk ke sistem.
+- **Akan dilewati** — jumlah kasus yang gagal validasi beserta alasannya (misalnya berkas tidak ditemukan di ZIP, data wajib kosong, atau format tanggal tidak dikenali).
+
+Di bawah ringkasan ada dua tabel:
+
+- **Kasus yang akan ditambahkan** — daftar kasus valid berikut nama pasien, jumlah berkas, dan ground truth (kalau diisi).
+- **Akan dilewati** — daftar kasus yang gagal beserta pesan errornya, kalau ada yang gagal.
+
+Kalau ada kasus yang dilewati dan Anda ingin memperbaikinya, klik **Kembali**, perbaiki data di manifest Excel atau nama berkasnya, kompres ulang jadi ZIP, lalu ulangi dari Langkah 2.
+
+Kalau pratinjau sudah sesuai harapan, klik **Konfirmasi Impor** (tombol ini menampilkan jumlah kasus yang akan diimpor, misalnya "Konfirmasi Impor (2)"). Konfirmasi ini hanya bisa diklik kalau minimal ada satu kasus valid.
+
+## Langkah 4: Tunggu proses di server
+
+![Progress bar proses impor di server](/screenshots/id/kasus-klinis/impor-banyak-kasus/03-memproses.png)
+
+Setelah dikonfirmasi, sistem memproses kasus satu per satu di server (membuat transaksi klinis untuk tiap kasus valid). Halaman menampilkan progress bar dan jumlah kasus yang sudah diproses dari total kasus.
+
+Anda tidak perlu menunggu di halaman ini, tapi jangan menutup tab sebelum proses ini dimulai (setelah klik Konfirmasi Impor, proses sudah berjalan di server, tapi tunggu sampai statusnya berubah dulu sebelum pindah halaman).
+
+## Langkah 5: Lihat hasil akhir
+
+![Hasil impor: status completed, jumlah berhasil dan gagal, serta tombol Kembali ke Transaksi](/screenshots/id/kasus-klinis/impor-banyak-kasus/04-hasil.png)
+
+Ketika proses selesai, halaman menampilkan status akhir:
+
+- **completed** — semua kasus berhasil diimpor.
+- **completed with errors** — sebagian kasus berhasil, sebagian gagal saat diproses di server (beda dengan yang dilewati saat pratinjau).
+- **failed** — proses impor gagal total; halaman menampilkan alasan kegagalannya.
+
+Di bawah status, ada ringkasan jumlah kasus **berhasil** dan **gagal**. Kalau ada kasus yang gagal dan tersedia laporan detail, akan muncul tautan **Unduh laporan galat** untuk melihat alasan tiap kegagalan.
+
+Dari sini Anda bisa:
+
+- Klik **Impor ZIP Lain** untuk mengulang proses dari awal dengan berkas ZIP baru.
+- Klik **Kembali ke Transaksi** untuk kembali ke worklist Kasus Klinis.
+
+Kasus yang berhasil diimpor langsung masuk ke worklist **Kasus Klinis** untuk unit dan modul yang dipilih, dan bisa dilanjutkan seperti kasus biasa (unggah berkas tambahan kalau perlu, jalankan AI, validasi dokter, dan seterusnya).
+
+## Catatan penting
+
+- Proses impor yang sudah dikonfirmasi (Langkah 4) **tidak bisa dibatalkan di tengah jalan**. Kasus yang sudah berhasil diimpor tetap ada di worklist meski sebagian kasus lain gagal.
+- Kasus yang dilewati di tahap pratinjau (Langkah 3) belum masuk sistem sama sekali, jadi aman diperbaiki dan diimpor ulang tanpa duplikasi.
+- Kalau modul AI membutuhkan lebih dari satu berkas per kasus, tambahkan baris manifest baru dengan `case_id` yang sama, lalu isi `file_path` untuk berkas tambahannya di baris tersebut.

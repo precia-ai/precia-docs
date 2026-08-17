@@ -1,0 +1,88 @@
+---
+title: Unit Detail
+---
+
+# Unit Detail
+
+The **Unit Detail** page is where you fully manage a single clinical unit: assign staff, enable or disable AI modules for that unit, change its operational status, edit its name/service type, and review the unit's change (governance) history.
+
+## 1. Opening a unit's detail page
+
+From the **Units** page, click any unit card you want to manage. You'll land on that unit's detail page, with a **Back to Units** link in the top-left corner to return to the list.
+
+![Cardiology unit detail page, Members tab active, unit identity sidebar with Assign Staff, Change Status, and Edit Unit buttons](/screenshots/en/manajemen-unit/detail-unit/01-tab-members.png)
+
+The page is split into two parts:
+
+- **Left sidebar** (unit identity card): shows the unit name, unit code, status, service type, a summary of key numbers (members, validators, active AI modules), and three main action buttons: **Assign Staff**, **Change Status**, **Edit Unit**. Below it, a second summary card breaks down clinical staff, validators, enabled AI, and disabled AI counts.
+- **Right panel**: contains three tabs: **Members**, **AI Modules**, and **Governance History**. The small number next to each tab label shows how many records are on that tab.
+
+Note: the **AI Modules** tab only appears if your account has permission to view AI modules. Without this permission, the panel shows "You do not have permission to view AI modules for this unit" if you try to access it.
+
+## 2. Members tab: managing unit staff
+
+The **Members** tab (active by default) shows a table of clinical staff assigned to this unit: name, role (role context), validator status, date assigned, and an actions column.
+
+Each member row has three action buttons in the **Actions** column:
+
+- **Edit role** (pencil icon): opens a dialog to change that member's operational role in this unit (for example, from "Clinician" to "Attending Physician").
+- **Set/remove validator** (toggle icon): changes the member's validator status. Members with validator status are authorized to validate AI examination results in this unit. The icon turns green when the member is a validator.
+- **Remove from unit** (red trash icon): removes the member from this unit. This action runs immediately on click, with no confirmation dialog, so make sure you really want to remove the member before clicking.
+
+Click **Assign Staff** (in the sidebar or above the table) to add a new member to the unit. See the separate "Managing Unit Members" guide for the full steps to add and manage members.
+
+If the unit has no members yet, the table shows the message `No members assigned yet. Click "Assign Staff" to add clinical personnel.`
+
+## 3. AI Modules tab: unit-level AI policy
+
+Click the **AI Modules** tab to see the AI modules registered to this unit and their enabled/disabled status.
+
+![AI Modules tab showing three AI modules registered to the Cardiology unit, with domain, version, and status](/screenshots/en/manajemen-unit/detail-unit/02-tab-ai-modules.png)
+
+For each module the table shows: module name and code, clinical domain, model version, status (**Enabled**/**Disabled**), and the date it was assigned to the unit.
+
+- The **Register AI Module** button (if you have permission) opens a dialog to register a new AI module from the registry to this unit.
+- The **Change Status** button on each row (if you have permission) opens a dialog to enable or disable that module specifically for this unit. Disabling a module here does not remove it from the organization's AI registry, it only stops it being used in this unit.
+
+If you don't have permission to manage AI modules, these buttons won't appear and you can only view the module list in read-only mode.
+
+## 4. Governance History tab: reviewing the change trail
+
+Click the **Governance History** tab to see a timeline of every governance change on this unit: unit info edits, status changes, member assignments/removals, role changes, validator status changes, and AI module activity (registration, enabling, disabling).
+
+![Governance History tab showing a timeline of unit changes with filter categories All, Unit Info, Members & Validators, and AI Modules](/screenshots/en/manajemen-unit/detail-unit/03-tab-history.png)
+
+Use the filter pills above the timeline to narrow the view: **All**, **Unit Info**, **Members & Validators**, or **AI Modules**. Each history entry shows the type of change, a summary of the change details (for example old status → new status), a relative and full timestamp, and the name of the user who made the change.
+
+By default only the 5 most recent entries are shown. Click **Show more** to load the next batch, or **Show less** to collapse back to 5 entries. Click **Refresh** in the top-right corner at any time to pull the latest history data.
+
+## 5. Changing the unit's name or service type
+
+Click **Edit Unit** in the sidebar to open the **Edit Unit Information** dialog.
+
+![Edit Unit Information dialog with Unit Name and Service Type fields, Save Changes button](/screenshots/en/manajemen-unit/detail-unit/04-dialog-edit-unit.png)
+
+The dialog has two fields:
+
+- **Unit Name** (required): the clinical unit's name, e.g. "Cardiology".
+- **Service Type** (optional): the type of clinical service this unit provides.
+
+Update the fields you need, then click **Save Changes**. If neither field's value has changed, the dialog closes without sending any request to the server. Click **Cancel** to close the dialog without saving.
+
+Note: this dialog does not change the unit code (e.g. "CARD"), since the unit code is permanent once a unit is registered.
+
+## 6. Changing the unit's operational status
+
+Click **Change Status** in the sidebar to open the **Set Operational Status** dialog.
+
+![Set Operational Status dialog with three status options: Active, Inactive, and Pilot; Pilot is currently selected](/screenshots/en/manajemen-unit/detail-unit/05-dialog-ubah-status.png)
+
+There are three status options you can pick by clicking a card:
+
+- **Active**: the unit can receive new transactions and examinations. This is the normal operating status.
+- **Inactive**: the unit will not accept new transactions. Use this status when a unit is temporarily out of service or closed.
+- **Pilot**: the unit is in a controlled rollout phase, typically used when a unit is starting to use a given AI module gradually.
+
+The status currently in effect is marked with a **Current** label next to its name. Select the new status, then click **Update Status**. This button stays disabled as long as the selected status matches the current one, so you must actually choose a different status before the button becomes active. Click **Cancel** to close the dialog without changing the status.
+
+This status change is automatically logged in the **Governance History** tab as an "Unit status changed" entry.

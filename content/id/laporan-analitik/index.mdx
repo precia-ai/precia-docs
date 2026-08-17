@@ -1,0 +1,91 @@
+---
+title: Dashboard Analitik
+---
+
+# Dashboard Analitik
+
+Dashboard Analitik menyajikan metrik agregat penggunaan AI di organisasi Anda, dikelompokkan dalam dua tab: **Operasional** (volume, kecepatan, dan kualitas pekerjaan AI) dan **Adopsi** (seberapa luas unit klinis dan validator memakai AI). Semua angka di halaman ini bersifat agregat, tanpa identitas pasien.
+
+Grafik yang tampil di halaman ini mengikuti hak akses (permission) akun Anda. Sebagian akun hanya melihat tab Operasional, sebagian lain hanya tab Adopsi, dan sebagian melihat keduanya. Kalau akun Anda tidak punya akses ke satu pun grafik analitik, halaman ini akan menampilkan pesan bahwa Anda tidak punya akses, bukan halaman kosong.
+
+## 1. Membuka Dashboard Analitik
+
+Klik menu **Analitik** di sidebar kiri.
+
+![Tab Operasional pada Dashboard Analitik dengan filter tanggal, unit, dan modul AI](/screenshots/id/laporan-analitik/index/01-tab-operasional.png)
+
+Kotak biru pada gambar di atas menandai dua bagian penting yang selalu ada di bagian atas halaman:
+
+- **Baris filter**, berlaku untuk kedua tab.
+- **Saklar tab** Operasional / Adopsi.
+
+## 2. Mengatur Rentang Tanggal, Unit, dan Modul AI
+
+Baris filter di kartu judul berisi empat kontrol:
+
+- **Dari** dan **Sampai**: rentang tanggal data yang dihitung. Defaultnya adalah 30 hari terakhir.
+- **Unit**: mempersempit semua grafik ke satu unit klinis saja. Defaultnya "Semua unit".
+- **Modul AI**: mempersempit semua grafik ke satu modul AI saja. Defaultnya "Semua modul".
+
+Setelah mengubah salah satu filter, klik tombol **Muat ulang** untuk menerapkan perubahan. Filter tanggal, unit, dan modul berlaku untuk kedua tab sekaligus, jadi berpindah tab tidak menghapus filter yang sudah diatur.
+
+## 3. Membaca Tab Operasional
+
+Tab **Operasional** aktif secara default kalau akun Anda punya aksesnya. Tab ini berisi, dari atas ke bawah:
+
+- **Volume inferensi**: jumlah pekerjaan AI yang diantrekan per periode (harian atau mingguan, tergantung panjang rentang tanggal).
+- **Tingkat keberhasilan**: proporsi pekerjaan yang selesai berhasil dari seluruh pekerjaan yang sudah selesai diproses. Pekerjaan yang masih dalam antrean tidak dihitung, sehingga angka ini tidak melorot semata-mata karena antrean sedang panjang.
+- **Waktu penyelesaian**: median dan persentil ke-90 waktu dari antrean sampai selesai. Jarak yang melebar antara dua garis berarti ada ekor lambat (sebagian kecil pekerjaan jauh lebih lama dari biasanya), bukan berarti sistem melambat secara keseluruhan.
+- **Volume per modul**: perbandingan jumlah pekerjaan antar modul AI.
+- **Volume per unit**: perbandingan jumlah pekerjaan antar unit klinis. Unit yang tidak mengirim pekerjaan sama sekali tetap ditampilkan di sumbu (baris kosong tanpa batang), karena unit yang berhenti memakai AI justru layak diperhatikan.
+- **Distribusi keyakinan**: sebaran skor keyakinan hasil AI dalam beberapa rentang (0-10, 10-20, dan seterusnya). Kalau Anda menyaring ke lebih dari satu modul sekaligus, ada catatan bahwa skor beberapa modul digabung meski cara mengukurnya bisa berbeda-beda; pilih satu modul di filter untuk melihat gambaran yang lebih akurat.
+- **Alasan kegagalan**: pekerjaan AI yang gagal, dikelompokkan menurut penyebabnya. Klik batang grafik ini, atau tautan **Lihat seluruh kegagalan** di pojok kanan atas kartu, untuk membuka daftar lengkap kegagalan pada halaman **Rincian Kegagalan AI**.
+- **Hasil validasi**: proporsi keputusan dokter saat meninjau hasil AI (Diterima, Tidak Konklusif, Perlu Ditinjau, Ditolak).
+- **Ringkasan per unit**: tabel rincian per unit klinis. Lihat langkah berikutnya.
+
+## 4. Membaca Tabel Ringkasan per Unit
+
+Tabel di bagian paling bawah tab Operasional merinci aktivitas tiap unit klinis untuk rentang tanggal yang dipilih.
+
+![Tabel Ringkasan per unit dengan baris Cardiology sebagai contoh data nyata](/screenshots/id/laporan-analitik/index/02-tabel-ringkasan-unit.png)
+
+Kotak biru pertama menandai baris header kolom, kotak biru kedua menandai satu baris contoh (Cardiology) dengan data nyata, dan panah menunjuk kolom **Tingkat keberhasilan** pada baris tersebut. Kolomnya:
+
+| Kolom | Keterangan |
+|---|---|
+| Unit | Nama unit klinis. |
+| Transaksi | Jumlah kasus klinis yang dibuat di unit tersebut pada periode ini. |
+| Inferensi | Jumlah permintaan analisis AI yang diproses untuk unit tersebut. |
+| Gagal | Jumlah pekerjaan AI yang gagal diproses. |
+| Tingkat keberhasilan | Persentase pekerjaan yang berhasil dari seluruh pekerjaan yang sudah selesai. Tanda "-" berarti belum ada pekerjaan yang selesai diproses di unit itu pada periode ini. |
+| Rerata keyakinan | Rata-rata skor keyakinan hasil AI di unit tersebut. Tanda "-" berarti belum ada hasil untuk dihitung rata-ratanya. |
+
+Subjudul kartu ("N unit aktif pada periode yang dipilih") menghitung unit yang punya minimal satu transaksi pada periode ini, jadi angka itu bisa lebih kecil dari jumlah baris yang tampil di tabel.
+
+## 5. Membaca Tab Adopsi
+
+Klik tab **Adopsi** untuk beralih dari metrik operasional ke metrik pemakaian.
+
+![Tab Adopsi dengan dua kartu meter (Adopsi Unit dan Adopsi Validator) serta grafik Utilisasi modul](/screenshots/id/laporan-analitik/index/03-tab-adopsi.png)
+
+Dua kartu yang ditandai kotak biru pada gambar di atas:
+
+- **Adopsi Unit**: persentase unit klinis yang aktif memakai AI (punya minimal satu pekerjaan AI pada periode ini) dibanding total unit klinis yang terdaftar. Angka di bawah meter menunjukkan pecahannya, misalnya "3 aktif dari 15 unit klinis".
+- **Adopsi Validator**: persentase validator (dokter/petugas yang meninjau hasil AI) yang aktif meninjau pada periode ini dibanding total validator yang terdaftar.
+
+Di bawah kedua kartu meter ada grafik **Utilisasi modul**: jumlah inferensi per modul AI, memberi gambaran modul mana yang paling sering dipakai dan mana yang jarang tersentuh. Sama seperti grafik Volume per unit di tab Operasional, modul yang belum pernah dipakai tetap ditampilkan pada sumbu tanpa batang, karena modul yang tidak terpakai justru menjadi temuan yang ingin diungkap grafik ini.
+
+## 6. Menelusuri Kegagalan dari Grafik (Drill-Down)
+
+Grafik **Alasan kegagalan** di tab Operasional bisa diklik untuk berpindah ke halaman rincian. Klik salah satu batang (misalnya "Connection"), atau klik tautan **Lihat seluruh kegagalan**, untuk membuka halaman **Rincian Kegagalan AI** yang sudah tersaring sesuai batang yang Anda klik.
+
+![Halaman Rincian Kegagalan AI hasil drill-down, dengan filter dan tautan ke kasus terkait](/screenshots/id/laporan-analitik/index/04-drilldown-kegagalan.png)
+
+Kotak biru menandai baris filter (tanggal, alasan, unit, modul AI) yang sudah otomatis terisi sesuai konteks grafik yang Anda klik. Panah menunjuk tautan kode kasus (misalnya "TRX-2026...") pada kolom **Kasus**; klik tautan itu untuk langsung membuka detail transaksi yang menyebabkan kegagalan tersebut. Cara memakai halaman ini secara lengkap, termasuk arti tiap kolom tabel dan cara membaca kategori alasan kegagalan, dijelaskan di halaman **Rincian Kegagalan AI**.
+
+## Catatan Penting
+
+- Tanggal **Dari** tidak bisa melewati tanggal **Sampai**, dan sebaliknya; kedua input saling membatasi.
+- Kartu grafik yang datanya kosong menampilkan pesan "Tidak ada data" alih-alih sumbu kosong, supaya tidak disalahartikan sebagai kegagalan memuat.
+- Grafik Distribusi keyakinan tidak selalu bisa dihitung untuk semua modul: sebagian modul AI memang tidak menghasilkan skor keyakinan. Halaman akan menyebutkan berapa hasil yang dikecualikan kalau ini terjadi, itu bukan berarti ada yang rusak.
+- Mengubah filter tanggal, unit, atau modul AI tidak mengubah data historis apa pun, filter ini murni untuk tampilan dan bisa diubah bolak-balik tanpa efek samping.

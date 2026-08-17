@@ -1,0 +1,66 @@
+---
+title: Managing User Roles
+---
+
+# Managing User Roles
+
+This page is used to change the roles a user holds after their account has been created: adding a new role, removing a role that no longer applies, or swapping one role for another. Roles determine which menus and features that user can access in PRECIA.
+
+Only organization administrators (and platform administrators) have access to this page.
+
+## Opening this page
+
+1. Open **Users & Access** from the left sidebar.
+2. Click **Detail** on the row of the user whose roles you want to manage, or open the [User Detail](/manajemen-pengguna/detail-pengguna) page directly.
+3. On the detail page, click the **Manage Roles** button in the Quick Actions panel.
+
+You'll land on the **Manage Roles** page below, with that user's name shown in the page title.
+
+![Manage Roles page showing the Current Roles card with badges for the roles the user currently holds](/screenshots/en/manajemen-pengguna/mengatur-peran-pengguna/01-tampilan-awal.png)
+
+The page is split into three sections:
+
+- **Current Roles** — every role the user currently holds, shown as badges.
+- **Bulk Assign or Remove** — checkboxes to add or remove one or more roles at once.
+- **Swap Role** — a form to replace one existing role with a new one in a single step.
+
+## Assigning a new role to the user
+
+1. In the **Bulk Assign or Remove** section, check one or more roles you want to add to this user. Roles the user already has can still be checked, but doing so has no effect since the user already holds them.
+2. Click **Assign Selected**. This button is only clickable once at least one checkbox is selected.
+
+![Admin and Clinician checkboxes checked, ready to click Assign Selected](/screenshots/en/manajemen-pengguna/mengatur-peran-pengguna/02-pilih-peran-diberikan.png)
+
+If it succeeds, a confirmation message appears above the **Current Roles** card and the new role badge shows up immediately. The checkboxes are automatically cleared once the action completes.
+
+## Removing a role from the user
+
+1. In the same section, check one or more roles you want to remove. These are usually roles already shown in the **Current Roles** card.
+2. Click **Remove Selected**.
+
+![Nurse checkbox checked for removal, Remove Selected button ready to click](/screenshots/en/manajemen-pengguna/mengatur-peran-pengguna/03-pilih-peran-dicabut.png)
+
+If it succeeds, the removed role's badge disappears immediately from the **Current Roles** card.
+
+**Note:** if a user only has one role and that role gets removed, the user won't have access to any feature until a new role is assigned. Make sure every user always keeps at least one active role.
+
+## Swapping a role
+
+Use this section when you want to replace one existing role with a new one in a single step, instead of removing and assigning separately.
+
+1. In the **Old Role** field, pick one of the roles the user currently holds. The options in this dropdown automatically follow the roles listed in the **Current Roles** card.
+2. In the **New Role** field, pick the replacement role you want.
+
+![Old Role dropdown already set to Nurse / Technician](/screenshots/en/manajemen-pengguna/mengatur-peran-pengguna/04-tukar-peran-lama.png)
+
+![Both Old Role and New Role dropdowns selected, Change Role button ready to click](/screenshots/en/manajemen-pengguna/mengatur-peran-pengguna/05-tukar-peran-baru.png)
+
+3. Click **Change Role**. This button only becomes active once both dropdowns have a value selected.
+
+If it succeeds, the **Current Roles** card shows the new role in place of the old one that was replaced.
+
+## Important notes
+
+- Every role change (assign, remove, or swap) takes effect immediately once it's processed successfully — there's no extra confirmation step, and it can't be undone from this page. If you picked the wrong role, repeat the steps above to correct it.
+- All role changes made on this page are recorded in the user's activity history, viewable on the [User Detail](/manajemen-pengguna/detail-pengguna) page.
+- If clicking one of the buttons on this page shows an error message (for example, about a role code the system doesn't recognize), don't keep retrying. Note down the role change you intended and contact your platform administrator or the technical team to complete it manually.

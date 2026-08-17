@@ -1,0 +1,142 @@
+---
+title: Bulk Importing Cases
+---
+
+# Bulk Importing Cases
+
+If you have many patient cases to add at once (for example, results from a field visit or migrating old records), you don't have to create them one by one through the form. Use **Bulk Import** to upload many cases in a single ZIP file.
+
+This feature is scoped to one unit and one AI module per import. If you have cases for different units or different AI modules, prepare a separate ZIP for each.
+
+## Who can access this
+
+The **Bulk Import** button only appears for roles with bulk-import permission (typically a unit admin or organization admin). If you don't see this button on the Clinical page, your role doesn't have access; contact your organization admin.
+
+## Step 1: Open the Bulk Import page
+
+1. Open the **Clinical** menu.
+2. Select the **unit** whose cases you want to import (e.g. Cardiology).
+3. On that unit's worklist page, click the **By AI Module** tab.
+4. In the **AI Module** dropdown, select the target module (e.g. ECG EF Screening). The **Bulk Import** button only becomes clickable once a module is selected.
+5. Click **Bulk Import**.
+
+You'll land on an import page scoped to the selected unit and module. The page header shows the unit name and the module's input type (file-based, structured fields, or a mix of both).
+
+## Preparing the ZIP file
+
+Before uploading, prepare a ZIP file containing:
+
+1. **An Excel manifest** — one row per case, with patient data and (if the module needs files) the file location for that case.
+2. **A folder of case files** — the exam images/documents, only needed if the AI module is file-based or mixed.
+
+The manifest columns required depend on the AI module you picked, but at minimum you'll always see:
+
+| Column | Required | Notes |
+|---|---|---|
+| `case_id` | Yes | Unique ID per case. Rows sharing the same `case_id` are treated as extra files for that case. |
+| `patient_mrn` | Yes | Patient medical record number. |
+| `patient_name` | Yes | Patient name. |
+| `patient_dob` | No | Patient date of birth. |
+| `patient_gender` | No | Patient gender. |
+| `file_path` | Yes, if the module needs files | Path of the file inside the ZIP, must match exactly (including folder). |
+| `ground_truth` | No | A reference label for validating the AI result, if available. |
+
+AI modules with extra clinical fields (e.g. lab values or module-specific parameters) automatically add more columns to this table, each marked required/optional with its data type. Check the **Excel manifest columns** table on the page itself for the full, module-specific column list; don't rely on the table above alone.
+
+Example of a correct ZIP structure (for a file-based module):
+
+```
+import.zip
+├── manifest.xlsx
+└── files/
+    ├── case-001.png
+    ├── case-002.png
+    └── case-003.png
+```
+
+If the module doesn't need files (pure structured input), just put `manifest.xlsx` in the ZIP, no files folder needed.
+
+### Getting the ZIP structure right
+
+This is the most common mistake. Make sure that when you open the ZIP file, you see `manifest.xlsx` (and the `files/` folder, if applicable) right away, **not** an extra wrapper folder around everything.
+
+Wrong (extra wrapper folder around the contents):
+
+```
+import.zip
+└── patient_data/
+    ├── manifest.xlsx
+    └── files/
+        ├── case-001.png
+        └── case-002.png
+```
+
+This usually happens when you select the **folder itself** while creating the ZIP, instead of selecting its **contents**. If you're not sure, open the ZIP you just created before uploading and confirm `manifest.xlsx` is visible immediately.
+
+### Use the provided templates
+
+So you don't have to build the manifest from scratch, the import page has two download buttons at the bottom of the **How to format the import** card:
+
+- **Excel template** — a blank `.xlsx` file with columns already matching the AI module you selected. Fill in one row per case.
+- **ZIP example** — a complete example with a filled-in manifest and sample case files, already structured correctly. Use it as a reference or edit its contents directly.
+
+## Step 2: Upload the ZIP
+
+![Bulk import page with a ZIP file selected and the Start Import button](/screenshots/en/kasus-klinis/impor-banyak-kasus/01-unggah-zip.png)
+
+1. In the **Import** card (right side), drag your ZIP file onto the upload area, or click it to browse for a file on your computer.
+2. Once a ZIP file is selected, its name and size replace the upload area.
+3. Click **Start Import**.
+
+The system uploads the ZIP and validates it on the server right away (checking the manifest format, whether `file_path` values match actual files, and whether required data is present per case).
+
+## Step 3: Review the preview
+
+![Validation preview: how many cases are ready to import versus will be skipped, with the Confirm Import button](/screenshots/en/kasus-klinis/impor-banyak-kasus/02-pratinjau.png)
+
+Once validation finishes, the page shows a summary:
+
+- **Ready to import** — the number of cases with valid data that will actually be created.
+- **Will be skipped** — the number of cases that failed validation, with the reason (e.g. file not found in the ZIP, a required field is empty, or an unrecognized date format).
+
+Below the summary are two tables:
+
+- **Cases to be added** — the list of valid cases with patient name, file count, and ground truth (if provided).
+- **Will be skipped** — the list of failed cases with their error message, if any failed.
+
+If some cases were skipped and you want to fix them, click **Back**, correct the Excel manifest or file names, re-zip everything, and repeat from Step 2.
+
+If the preview looks correct, click **Confirm Import** (the button shows how many cases will be imported, e.g. "Confirm Import (2)"). This button is only clickable if at least one case is valid.
+
+## Step 4: Wait for server processing
+
+![Progress bar while the import is being processed on the server](/screenshots/en/kasus-klinis/impor-banyak-kasus/03-memproses.png)
+
+After confirming, the system processes the cases one by one on the server (creating a clinical case for each valid entry). The page shows a progress bar and how many cases have been processed out of the total.
+
+You don't have to stay on this page, but avoid closing the tab right after clicking Confirm Import; wait until the status starts updating before you navigate away.
+
+## Step 5: Check the final result
+
+![Import result: completed status, succeeded/failed counts, and the Back to Transactions button](/screenshots/en/kasus-klinis/impor-banyak-kasus/04-hasil.png)
+
+When processing finishes, the page shows the final status:
+
+- **completed** — every case imported successfully.
+- **completed with errors** — some cases succeeded, some failed during server processing (this is different from cases skipped during preview).
+- **failed** — the import failed entirely; the page shows the failure reason.
+
+Below the status is a summary of **succeeded** and **failed** case counts. If any cases failed and a detailed report is available, a **Download error report** link appears explaining each failure.
+
+From here you can:
+
+- Click **Import another ZIP** to restart the process with a new ZIP file.
+- Click **Back to Transactions** to return to the Clinical worklist.
+
+Successfully imported cases go straight into the **Clinical** worklist for the selected unit and module, and can be continued like any other case (upload additional files if needed, run the AI module, doctor validation, and so on).
+
+## Important notes
+
+- A confirmed import (Step 4) **cannot be cancelled midway**. Cases that already succeeded stay in the worklist even if other cases in the same batch fail.
+- Cases skipped at the preview stage (Step 3) were never created in the system, so it's safe to fix and re-upload them without creating duplicates.
+- If an AI module needs more than one file per case, add another manifest row with the same `case_id` and fill in `file_path` for the additional file on that row.

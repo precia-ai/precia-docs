@@ -1,0 +1,145 @@
+---
+title: Onboarding a New SIMRS
+---
+
+# Onboarding a New SIMRS
+
+The **SIMRS Onboarding** page connects an organization's hospital information system (SIMRS) to PRECIA. The process is a 7-step wizard: pick an organization, pick a SIMRS adapter, fill in connection fields, map units, create a service account, grab the configuration block for the hospital's team, then test connectivity.
+
+This page is only accessible to Super Admin (SUP) and Platform Admin (PAD) roles, from the **SIMRS Onboarding** menu in the Platform Mode sidebar. See the "Organization & Platform Overview" page for how to enter Platform Mode.
+
+## Three supported SIMRS
+
+PRECIA currently supports three adapters:
+
+- **Open Hospital** and **MEDICCA**, PRECIA sends AI results to a callback endpoint provided by the hospital (a *push* pattern).
+- **SIMRS Khanza**, Khanza pulls AI results from PRECIA itself (a *poll* pattern), so it does not need a Callback URL.
+
+The adapter chosen in step 2 determines which fields appear in step 3 and what the configuration block in step 6 contains.
+
+## Before you start
+
+- The target organization must already be registered in PRECIA (see the "Managing Organizations" page), or you can create one directly from step 1.
+- The target organization should already have at least one clinical Unit, because step 4 (unit mapping) cannot proceed if the organization has no Unit at all.
+- The moment you reach step 1 and press **Next**, PRECIA locks that organization to your account for 15 minutes so another admin cannot overwrite the changes you are working on. If the organization is already locked by another admin, a yellow banner appears above the wizard and the whole form is disabled until the lock clears (it expires automatically, or press **Reload** to check again).
+- If the organization you pick has already been onboarded before, every field in steps 2-4 is automatically pre-filled from the saved configuration. You only need to change whatever is actually different, then run through the wizard again to the end.
+
+## Step 1: Organization
+
+Open the **SIMRS Onboarding** menu. You land on the first step of the wizard.
+
+![Organization step: dropdown to pick an existing organization and a panel to create a new one](/screenshots/en/organisasi-platform/onboarding-simrs-baru/01-organisasi.png)
+
+There are two ways to choose an organization:
+
+1. **Select an existing organization**, pick from a dropdown listing every organization registered on the platform.
+2. **Create a new organization**, fill in Code, Name, and Type in the "Create a new organization" panel, then click **Create organization**. The new organization is selected automatically as soon as it is created, and you continue using it for the rest of the wizard.
+
+If the selected organization already has a prior SIMRS configuration, an info note appears below the dropdown naming the adapter that is currently active.
+
+Clicking **Next** without selecting or creating an organization is blocked with an error message:
+
+![Validation: "Select or create an organization first" error message](/screenshots/en/organisasi-platform/onboarding-simrs-baru/02-organisasi-validasi.png)
+
+## Step 2: Adapter
+
+Pick one of the three SIMRS cards: **Open Hospital**, **MEDICCA**, or **SIMRS Khanza**. The **Callback** or **Polling** label on each card marks its integration pattern.
+
+![Adapter step: three SIMRS option cards](/screenshots/en/organisasi-platform/onboarding-simrs-baru/03-adapter.png)
+
+Clicking **Next** without picking any adapter is blocked:
+
+![Validation: "Select one of the SIMRS adapters" error message](/screenshots/en/organisasi-platform/onboarding-simrs-baru/04-adapter-validasi.png)
+
+If you had already filled in the Callback URL and token in step 3, then come back to this step and switch the choice to **SIMRS Khanza**, those fields are cleared automatically since Khanza does not use them.
+
+## Step 3: Connection
+
+The fields shown depend on which adapter you picked.
+
+For **Open Hospital** and **MEDICCA**, the following fields appear:
+
+- **Callback URL** (required), the HTTPS address on the hospital server that receives AI results from PRECIA. Must start with `https://`.
+- **JWT token** (for Open Hospital) or **Shared secret** (required for MEDICCA), used to verify the callback to the hospital server. For Open Hospital this field is optional if the service account username and password below are filled in.
+- **Source type** (Open Hospital only), choose `laboratory` or `opd`, determining the record type the AI results refer to.
+- **Credentials for the self-test** (SIMRS username, SIMRS password), optional, used later if you run the self-test in step 7.
+- **Self-test limit per hour**, defaults to `10`, lower it if the hospital's firewall is strict about consecutive requests.
+
+For **SIMRS Khanza**, the section above is replaced with an info note that Khanza does not need a callback. Only the self-test limit per hour still appears.
+
+Clicking **Next** without filling in the Callback URL (or without a Shared secret for MEDICCA) is blocked:
+
+![Validation: "The callback URL must be an HTTPS address" error message](/screenshots/en/organisasi-platform/onboarding-simrs-baru/05-koneksi-validasi.png)
+
+Once every required field is filled in, the form is ready to continue:
+
+![Connection step with every field filled in](/screenshots/en/organisasi-platform/onboarding-simrs-baru/06-koneksi-terisi.png)
+
+## Step 4: Unit
+
+Map each ward or clinic code on the SIMRS side to the matching PRECIA Unit. The code in the **Code in SIMRS** column must match exactly what the SIMRS will later send to PRECIA (case-sensitive).
+
+Click **Add row** to map more than one ward. The delete button (trash icon) at the end of each row is disabled when it is the only row left, since at least one mapping is required.
+
+Clicking **Next** without filling in a single row is blocked:
+
+![Validation: "Map at least one ward or clinic" error message](/screenshots/en/organisasi-platform/onboarding-simrs-baru/07-unit-validasi.png)
+
+Fill in the ward code and pick its target PRECIA Unit from the dropdown:
+
+![A filled unit mapping row: code RAD mapped to the Cardiology unit](/screenshots/en/organisasi-platform/onboarding-simrs-baru/08-unit-terisi.png)
+
+If the organization has no Unit at all, this step shows a warning with a direct link to the Units page to create a clinical unit first, since there is nothing to map without one.
+
+**Important:** pressing **Next** on this step actually saves the entire configuration (adapter, connection fields, and unit mapping) to the organization. If you close the wizard after this point, the configuration already entered is not lost; you can simply reopen this page and continue from the credential step.
+
+## Step 5: Credential
+
+Create a service account (a technical account) used by the SIMRS connector to log in to PRECIA. This account is separate from the human user accounts in the same organization, so it can be revoked on its own at any time without affecting other users.
+
+Fill in a **Label** (optional, helps identify this account later in the user list), then click **Generate credential**.
+
+![Credential step before generating: Label field and the Generate credential button](/screenshots/en/organisasi-platform/onboarding-simrs-baru/09-credential.png)
+
+The service account's email and password appear once:
+
+![Generated credential result: email and password shown with a warning that they are displayed only once](/screenshots/en/organisasi-platform/onboarding-simrs-baru/10-credential-hasil.png)
+
+**This password is shown only once, on this screen.** PRECIA stores it as a hash, so it can never be displayed again after you leave this page. Copy the email and password now (the copy button next to each field), keep them somewhere safe temporarily until you paste them into the configuration block in the next step. If the password gets lost, the only recovery is to generate a new service account from this step again, then deactivate the old one from the Users & Access page.
+
+## Step 6: Config
+
+This page assembles a ready-to-copy configuration block containing PRECIA's URL, the service account's email and password from the previous step, the AI module code, and the unit mapping from step 4.
+
+![Config step: the rsc/application.properties configuration block, ready to copy](/screenshots/en/organisasi-platform/onboarding-simrs-baru/11-config.png)
+
+Click **Copy** at the top right of the block to copy its entire contents. Send the block's content to the hospital's IT team; **PRECIA does not deploy this file automatically**, placing the file is still done manually on the hospital's SIMRS server, and the SIMRS backend service on their side then needs to be restarted so the new configuration is picked up.
+
+If you skip ahead to this step without generating a credential in step 5 first, a warning note appears since the configuration block does not yet have a valid email and password.
+
+## Step 7: Self-test
+
+The final step tests whether the newly created configuration actually works.
+
+![Self-test step before running: the Run self-test button](/screenshots/en/organisasi-platform/onboarding-simrs-baru/12-selftest.png)
+
+Click **Run self-test**. PRECIA checks four things in order, stopping at the first check that fails:
+
+1. **Connectivity**, PRECIA can reach the Callback URL filled in step 3.
+2. **TLS certificate**, the HTTPS certificate at that address is valid.
+3. **Authentication**, the SIMRS credentials from step 3 (if filled in) successfully log in.
+4. **Unit mapping**, the mapping created in step 4 is found and consistent.
+
+Checks that could not run because an earlier check failed are marked **Skipped**, not failed.
+
+![Self-test result: the Connectivity check failed, TLS certificate and Authentication were skipped, Unit mapping passed](/screenshots/en/organisasi-platform/onboarding-simrs-baru/13-selftest-hasil.png)
+
+In the example above, the Connectivity check fails because the Callback URL used is an example address that does not actually point to a real server. At a real hospital, if the Callback URL points to a server that is genuinely active and reachable from the internet, every check should come back **Passed**.
+
+The self-test only checks connectivity, TLS, authentication, and unit mapping. Real business testing (sending one genuine case from the SIMRS to PRECIA) must still be done manually together with the hospital's team, because sending a case through an automated self-test would create dummy data in the hospital's production system.
+
+Click **Finish** to leave the wizard and return to the Organizations list. This button only releases the organization lock and does not submit anything; the entire configuration was already saved the moment you pressed Next on the Unit step.
+
+## If you need to change the configuration again
+
+Reopen the **SIMRS Onboarding** menu and select the same organization in step 1. Every field will be pre-filled automatically from the saved configuration; just change whatever needs updating, then run through the wizard again to the last step so the changes are saved.

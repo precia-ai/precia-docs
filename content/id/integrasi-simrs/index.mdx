@@ -1,0 +1,64 @@
+---
+title: Integrasi SIMRS
+---
+
+# Integrasi SIMRS
+
+Halaman **Integrasi SIMRS** dipakai untuk mengatur koneksi antara PRECIA dan Sistem Informasi Manajemen Rumah Sakit (SIMRS) organisasi Anda. Di sini Anda memilih konektor (adapter) SIMRS yang dipakai, mengatur URL endpoint tujuan, dan menyimpan kredensial (shared secret atau API key) yang dipakai konektor untuk berkomunikasi dengan sistem SIMRS.
+
+Pengaturan ini berlaku untuk **satu organisasi** dan biasanya hanya diisi sekali oleh admin organisasi saat awal penyiapan integrasi, lalu diperbarui kalau ada perubahan pada sisi SIMRS (misalnya ganti server, ganti kredensial, atau pindah ke adapter lain).
+
+## Cara membuka halaman
+
+1. Buka menu **Pengaturan** di menu samping.
+2. Pilih **Integrasi SIMRS**.
+
+Anda akan melihat kartu **Pengaturan koneksi** di sisi kiri dan kartu **Percobaan callback terbaru** di sisi kanan.
+
+![Halaman Integrasi SIMRS, kartu Pengaturan koneksi berisi field Adapter dan URL Endpoint yang sudah tersimpan ditandai kotak biru](/screenshots/id/integrasi-simrs/index/01-tampilan-form.png)
+
+Kalau organisasi Anda belum pernah mengatur integrasi SIMRS, field **Adapter** akan menampilkan pilihan default (Khanza), dan field **URL Endpoint** serta **Shared secret atau API key** akan kosong. Kalau organisasi sudah pernah menyimpan pengaturan sebelumnya, field akan terisi otomatis dengan nilai yang tersimpan, seperti pada contoh gambar di atas.
+
+## Mengisi pengaturan koneksi
+
+Kartu **Pengaturan koneksi** berisi tiga bagian:
+
+1. **Adapter**: pilih jenis konektor SIMRS yang dipakai rumah sakit Anda. Pilihan yang tersedia:
+   - **Khanza**: konektor polling untuk data dan hasil klinis Khanza.
+   - **MEDICCA**: konektor callback untuk peristiwa integrasi MEDICCA.
+   - **Open Hospital**: konektor callback untuk peristiwa integrasi Open Hospital.
+
+   Keterangan singkat tentang cara kerja adapter yang dipilih akan muncul di bawah kolom pilihan.
+
+2. **URL Endpoint**: alamat endpoint konektor yang dipakai organisasi Anda untuk bertukar data dengan SIMRS. Isi sesuai alamat yang diberikan tim teknis SIMRS atau tim implementasi PRECIA.
+
+3. **Shared secret atau API key**: kredensial rahasia yang dipakai konektor untuk otentikasi. Bidang ini selalu tersamar (ditampilkan sebagai titik-titik) demi keamanan.
+
+   - Kalau organisasi **belum pernah** menyimpan kredensial, bidang ini wajib diisi.
+   - Kalau organisasi **sudah pernah** menyimpan kredensial, bidang ini boleh dikosongkan. Kredensial lama akan tetap dipakai selama Anda tidak mengisi nilai baru. Placeholder akan menampilkan keterangan "Kosongkan untuk mempertahankan nilai saat ini".
+
+Contoh tampilan saat mengganti adapter dan mengisi URL endpoint serta shared secret baru:
+
+![Form Integrasi SIMRS terisi contoh data baru, field Shared secret dan tombol Simpan pengaturan koneksi ditandai kotak biru](/screenshots/id/integrasi-simrs/index/02-isi-form.png)
+
+## Menyimpan pengaturan
+
+Setelah semua field terisi sesuai kebutuhan, klik tombol **Simpan pengaturan koneksi** di bagian bawah kartu.
+
+Catatan penting sebelum menyimpan:
+
+- **URL Endpoint wajib diisi.** Kalau kosong, sistem menampilkan pesan "URL endpoint wajib diisi." dan pengaturan tidak tersimpan.
+- **Shared secret wajib diisi untuk pengaturan baru.** Kalau organisasi belum pernah punya kredensial tersimpan dan bidang ini dikosongkan, sistem menampilkan pesan "Shared secret atau API key wajib diisi." dan pengaturan tidak tersimpan.
+- Selama proses penyimpanan berlangsung, tombol berubah menjadi **Menyimpan...** dan semua field dinonaktifkan sementara.
+- Kalau berhasil, muncul pesan konfirmasi "Pengaturan koneksi SIMRS tersimpan." dan field kredensial kembali kosong (karena nilai tersimpan tetap disamarkan, tidak pernah ditampilkan ulang di layar).
+- Kalau gagal (misalnya masalah jaringan atau server), muncul pesan error dan pengaturan yang sudah tersimpan sebelumnya tidak berubah.
+
+Perubahan yang berhasil disimpan langsung berlaku untuk seluruh organisasi. Pastikan URL endpoint dan kredensial yang dimasukkan sudah benar sebelum menyimpan, karena kesalahan pengaturan bisa menghentikan pertukaran data dengan SIMRS.
+
+## Kartu Percobaan callback terbaru
+
+Kartu di sisi kanan halaman menampilkan status pengiriman data (callback) tingkat transaksi dari konektor SIMRS. Saat ini kartu ini masih menampilkan keterangan "Riwayat percobaan callback belum tersedia" dengan label status **Endpoint belum tersedia**, karena backend konektor belum menyediakan endpoint untuk menampilkan riwayat percobaan callback. Riwayat akan otomatis muncul di kartu ini setelah endpoint tersebut tersedia, tanpa perlu tindakan tambahan dari Anda.
+
+## Kontrak konektor
+
+Di bagian bawah halaman terdapat kartu **Kontrak konektor** yang menjelaskan bahwa pengaturan integrasi disimpan per organisasi dalam konfigurasi SIMRS, dan otorisasi di sisi backend tetap menentukan siapa yang boleh membaca atau memperbarui pengaturan organisasi Anda. Artinya, meskipun Anda bisa membuka halaman ini, kemampuan menyimpan perubahan tetap bergantung pada hak akses akun Anda di organisasi tersebut.

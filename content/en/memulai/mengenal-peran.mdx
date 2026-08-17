@@ -1,0 +1,42 @@
+---
+title: Understanding User Roles
+---
+
+# Understanding User Roles
+
+Every PRECIA account has one or more **roles**. A role determines which menus appear and which actions you are allowed to perform. If a menu you expect to see is missing, it is most likely because your account's role does not cover it yet, not an application error.
+
+Roles are managed by an Organization Administrator (or a Platform Administrator for cross-organization matters) through the user management menu. If you feel you need additional access, contact your organization administrator to request an access change.
+
+## Organization-level roles
+
+These roles apply within the single organization/hospital your account belongs to.
+
+- **Nurse/Technician**: creates and manages examination transactions, for example filling in new case data and uploading examination files before they are processed by AI.
+- **Clinician (Doctor)**: reviews AI analysis results for assigned cases and makes the initial clinical decision on those results.
+- **Clinical Validator**: performs formal validation of AI results. This role is separate from Clinician because in some units, the final validation is done by a different doctor than the one who reviewed the case first.
+- **Clinical Administrator**: manages unit membership (adding/removing unit members), sets which AI modules are enabled for a unit, and oversees day-to-day unit operations.
+- **Management**: views usage reports and statistics to evaluate AI adoption and impact, usually without handling patient cases directly.
+- **Auditor**: views the activity history (audit trail) for compliance and oversight purposes. This access is read-only, auditors cannot change case data.
+- **System Administrator**: manages the entire organization, including all units, all users, and organization-level settings (activating/deactivating accounts, locking accounts, assigning roles). This is the highest admin role within a single organization.
+- **Integration Administrator**: manages national interoperability reporting (data exchange with national health systems), a technical role rarely used by day-to-day clinical users.
+
+## Platform-level roles
+
+These roles span more than one organization at once. The menus for these roles are usually kept in a separate section, apart from the regular organization menus.
+
+- **Platform Administrator**: manages matters across all organizations/tenants using PRECIA, such as creating new organizations, managing the AI module catalog, and configuring platform-level permissions.
+- **AI Engineer**: registers and manages AI modules (versions, lifecycle status such as pilot/clinical/inactive) in the platform's AI module catalog.
+
+Besides human accounts, there are also service accounts used by hospital information system (SIMRS) connectors to automatically send transactions into PRECIA. These accounts are created through the onboarding wizard, are not meant for manual login, and are not relevant to everyday application users.
+
+## Unit-specific role context
+
+Beyond the organization-level roles above, your account can also carry extra context when assigned to a unit (for example the Cardiology or Radiology unit):
+
+- **Role context in the unit**: a short note about your position within that unit, set by the Clinical Administrator when adding you to the unit.
+- **Validator flag**: some unit members are flagged as validators, meaning they are allowed to perform the final validation of AI results for cases in that unit. This flag is set per unit, so you can be a validator in one unit but not in another, depending on your assignment.
+
+## If your account has more than one role
+
+An account can hold a combination of roles, for example a doctor who is also the Clinical Administrator for their unit. In that case, the menus shown are the combination of all roles the account holds.

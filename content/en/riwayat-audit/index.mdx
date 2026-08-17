@@ -1,0 +1,157 @@
+---
+title: History & Audit
+---
+
+# History & Audit
+
+The **Compliance Audit** page is the central place for overseeing everything that happens in PRECIA. Every significant action (logging in, opening patient data, changing a case status, activating an AI module, and so on) is automatically recorded as an **audit event** that can never be edited or deleted. This page is where you trace that activity, investigate anything suspicious, and prepare compliance evidence for regulators or internal reviews.
+
+The page is organized into five tabs: **Event stream**, **Cases**, **Findings**, **Evidence**, and **Governance**.
+
+## Opening the Page
+
+1. Log in to PRECIA with an account that has audit access (organization admin, platform admin, or a compliance/audit officer).
+2. Click **Audit** in the left sidebar.
+
+Access to this page, and to each action button on it, is controlled by role. If your account has no audit access at all, the page shows an access-denied message instead of any data.
+
+## Data Scope Based on Your Role
+
+In the top-right corner of the summary area, a small box explains your account's current **access scope** — for example "Cross-organization access" for platform admins, or a unit/organization scope for other roles. This scope determines which organizations/units' data you can see across every tab on this page; you cannot see events outside your access scope.
+
+## Summary Cards
+
+At the top of the page are six summary cards that follow whatever filter is currently active:
+
+- **Events in range** — total audit events for the current date range/filter.
+- **Sensitive access** — number of accesses to data classified as sensitive (e.g. patient health data).
+- **Denied actions** — number of attempted actions the system rejected (failed logins, unauthorized access attempts, and similar).
+- **Critical events** — number of events with **Critical** severity.
+- **Open cases** — number of investigation cases still open.
+- **Open findings** — number of compliance findings not yet resolved.
+
+Below that is a **Ledger integrity** card showing whether the append-only, tamper-evident audit chain has ever been verified. See the [Governance](#tab-governance) section below for how to run this check.
+
+![Initial view of the Event Stream tab with summary cards, ledger integrity status, five tabs, the Filters button, and a row's detail button](/screenshots/en/riwayat-audit/index/01-tab-peristiwa.png)
+
+## Tab: Event Stream
+
+The first tab (and the default view when you open the page) shows the **Audit event stream** — a list of the most recent events, newest first. For each event, the table shows:
+
+- **Time** — the date and time of the event.
+- **Actor** — who or what performed the action (a user's name or a system service name).
+- **Action** — the technical action code plus a human-readable summary.
+- **Resource** — the object affected (patient data is shown as `••••••` for confidentiality — it is never shown in plain text in the table).
+- **Outcome** — success, failure, denied, partial, or unknown.
+- **Severity** — info, low, medium, high, or critical.
+
+Click the `›` arrow icon at the right end of any row to open the **Event Detail** panel (covered in the next section).
+
+Click **Refresh events** to reload the list with the latest data. Once the list reaches 50 events, a **Load more** button appears at the bottom to load the next 50 incrementally.
+
+If part of the requested range has already moved to cold archive storage (older data), a yellow "Partial archive" warning box appears above the table — meaning the results shown may be incomplete for that range.
+
+### Filtering Events
+
+Click the **Filters** button above the table to open the filter panel from the right side of the screen.
+
+![Audit filter panel open from the right side of the screen, with the search field marked with a blue box](/screenshots/en/riwayat-audit/index/02-filter-peristiwa.png)
+
+This panel offers many filtering criteria at once, including:
+
+- **Search** — free-text search across actor, action, or resource identifier.
+- **Start date / End date** — the event's time range.
+- **Organization** — only editable if your account has cross-organization scope; other roles are automatically locked to their own organization.
+- **Unit, Actor, Source service, Event kind, Category, Action, Outcome, Severity, Resource type** — dropdowns automatically populated from data that actually exists (facets), including how many events match each option.
+- **Resource identifier, HTTP status, IP address, Request ID, Correlation ID, Case** — specific text/number search fields for precise lookups, for example finding every event that shares one correlation ID.
+- **Sensitive data access** — filter specifically for events that do (or don't) involve access to sensitive data.
+
+After filling in the criteria you want, click **Apply filters** at the bottom of the panel. The number of active filters appears as a badge next to the Filters button on the Event Stream tab. Click **Reset** to clear all criteria and return to the unfiltered view.
+
+> **Note:** applied filters are also saved in the page URL, so you can share a specific search link with a colleague without having to re-explain the criteria.
+
+### Event Detail
+
+Click the arrow icon on any row to open the **Event Detail** panel from the right side of the screen.
+
+![Event detail panel showing actor, resource, and request info, IDs, a before/after table, and correlation trace, with the correlation trace section marked with a blue box](/screenshots/en/riwayat-audit/index/03-detail-peristiwa.png)
+
+This panel shows:
+
+- **Action summary** — the action code, description, and full event timestamp.
+- **Actor, Resource, Request** — three contextual info boxes, including HTTP method, request path, status code, and (masked) IP address.
+- **Request ID** and **Correlation ID** — unique identifiers useful for tracing a chain of related events (for example, every step within the same underlying process).
+- **Protected health information** — appears only when the event involves sensitive data (e.g. patient data). This box shows a **Reveal PHI** button for authorized accounts; revealing sensitive values always requires a written reason (at least 10 characters), and the act of revealing itself is recorded as a new audit event.
+- **Before and after** — a table comparing a field's value before and after the action (empty if the action didn't change any data, e.g. a plain read/view).
+- **Correlation trace** — a timeline of other events sharing the same correlation ID. Useful for seeing the full sequence of a process, such as everything triggered by a single user click.
+
+If your account has permission to manage investigation cases, this panel also shows an **Add to case** section — pick an open investigation case from the list and click the button to attach this event to that case as supporting evidence.
+
+## Tab: Cases
+
+The **Cases** tab is used to group related events into a single **investigation case**, assign an owner, and place a legal hold on the data so it's protected from automatic deletion while the investigation is underway.
+
+![Cases tab showing the case list on the left and the detail panel for the selected case on the right, with the case status dropdown marked with a blue box](/screenshots/en/riwayat-audit/index/04-tab-kasus.png)
+
+If your account has permission to manage cases, a **Create case** button appears in the top right. Click it to open a form for the case title, description, priority, and (optionally) a list of event IDs to attach right away.
+
+Click any case in the list on the left to show its details on the right panel: owner, priority, number of attached events, number of related findings, and case status. If you have permission to manage cases, the **Case status** dropdown in the detail panel lets you update how the case is being handled.
+
+For cases that need evidence to be preserved (for example, under review by an external auditor), accounts with **legal hold** permission can place a full hold along with a reason — while the hold is active, related data will not be affected by retention/auto-deletion policies.
+
+## Tab: Findings
+
+The **Findings** tab is used to record and track **compliance findings** — observations or issues that need follow-up, from draft through to verified remediation.
+
+![Findings tab showing the findings list on the left and the detail panel on the right](/screenshots/en/riwayat-audit/index/05-tab-temuan.png)
+
+If your account has permission to manage findings, click **Create finding** to log a new one: title, description, severity, related case (optional), and a due date (optional).
+
+Click any finding in the list to view its details on the right panel. From the detail panel, an authorized account can change the finding's **status** (draft → open → accepted/remediation → verified → closed) and fill in **remediation plan** and **verification notes** before saving.
+
+## Tab: Evidence
+
+The **Evidence** tab is used to build **evidence packages** — a collection of audit events over a date range, exported as a single file with a checksum, ready to hand to a reviewer or regulator.
+
+![Evidence tab showing the list of available evidence packages](/screenshots/en/riwayat-audit/index/06-tab-bukti.png)
+
+If your account has permission to generate evidence, click **Generate package** to fill in a package name, description, file format (PDF/ZIP/JSON/CSV), date range, and an optional switch to include sensitive values (only available to accounts also authorized to reveal sensitive data).
+
+Every package that has finished processing (status **Ready**) shows these buttons:
+
+- **Download** — download the evidence package file, for accounts authorized to download.
+- **Verify** — re-check the package's checksum to confirm its contents haven't changed since creation, for accounts authorized to verify.
+
+A package under **legal hold** is marked with a lock icon and won't automatically expire or be deleted while the hold remains active.
+
+## Tab: Governance
+
+The **Governance** tab contains two panels: **Retention policy** and **Ledger integrity**.
+
+![Governance tab showing the retention policy panel on the left and the ledger integrity panel showing Verified status on the right, both marked with blue boxes](/screenshots/en/riwayat-audit/index/07-tab-tata-kelola.png)
+
+**Retention policy** controls how long audit data is kept before being archived or deleted:
+
+- **Default retention (days)** — how long audit data is kept in general, bounded by a minimum and maximum set by organizational policy.
+- **Archive after (days)** — after how many days data moves to cold archive storage (optional).
+- **Auto-purge enabled** — check this to let the system automatically delete data that has passed its retention period (still subject to any active legal hold).
+
+Only accounts with retention-management permission can change these values; other accounts see them in a disabled state. Click **Save retention policy** to apply changes.
+
+**Ledger integrity** shows whether the audit chain (append-only, with every event cryptographically linked to the one before it) is still intact and has never been tampered with. Click **Verify integrity** to run this check. Once complete, the status becomes one of:
+
+| Status | Meaning |
+|---|---|
+| **Verified** | The event chain is intact; no signs of tampering were found. |
+| **Warning** | Something was found that needs further review, though not necessarily a violation. |
+| **Failed** | An inconsistency was found in the event chain — needs immediate investigation. |
+| **Not checked** | Verification has never been run. |
+
+This status and the time of the last check are also shown as the **Ledger integrity** summary card at the top of the page, visible from any tab.
+
+## Important Notes
+
+- All audit events are **append-only** — there is no way to edit or delete a recorded entry, not even for a platform admin.
+- Sensitive data values (e.g. patient identity) are always masked by default across every view. Revealing the original value via the **Reveal PHI** button always requires a written reason, and doing so is itself recorded as a new audit event — sensitive data is never revealed silently.
+- Data under **legal hold** (on either a case or an evidence package) is protected from retention/auto-deletion policies, even if the organization's retention policy would otherwise allow deletion.
+- The data you can see across every tab (Events, Cases, Findings, Evidence) always follows your account's access scope (unit, organization, or cross-organization) — it is not something you can change from this page.

@@ -1,0 +1,64 @@
+---
+title: SIMRS Integration
+---
+
+# SIMRS Integration
+
+The **SIMRS Integration** page is used to set up the connection between PRECIA and your organization's Hospital Management Information System (SIMRS). Here you choose which SIMRS connector (adapter) to use, set the destination endpoint URL, and save the credential (shared secret or API key) the connector uses to communicate with the SIMRS system.
+
+This setting applies to **one organization** at a time and is usually filled in once by an organization admin during initial integration setup, then updated whenever something changes on the SIMRS side (for example a server change, a credential rotation, or switching to a different adapter).
+
+## Opening the page
+
+1. Open the **Settings** menu in the sidebar.
+2. Select **SIMRS Integration**.
+
+You'll see the **Connection settings** card on the left and the **Latest callback attempts** card on the right.
+
+![SIMRS Integration page, the Connection settings card with the saved Adapter and Endpoint URL fields marked with a blue box](/screenshots/en/integrasi-simrs/index/01-tampilan-form.png)
+
+If your organization has never set up SIMRS integration before, the **Adapter** field shows the default option (Khanza), and the **Endpoint URL** and **Shared secret or API key** fields are empty. If your organization already has saved settings, the fields are pre-filled with the stored values, as shown in the screenshot above.
+
+## Filling in the connection settings
+
+The **Connection settings** card has three parts:
+
+1. **Adapter**: choose the type of SIMRS connector your hospital uses. Available options:
+   - **Khanza**: polling connector for Khanza clinical data and results.
+   - **MEDICCA**: callback connector for MEDICCA integration events.
+   - **Open Hospital**: callback connector for Open Hospital integration events.
+
+   A short description of how the selected adapter works appears below the dropdown.
+
+2. **Endpoint URL**: the connector endpoint address your organization uses to exchange data with SIMRS. Fill this in with the address provided by your SIMRS technical team or the PRECIA implementation team.
+
+3. **Shared secret or API key**: the credential the connector uses for authentication. This field is always masked (shown as dots) for security.
+
+   - If your organization has **never** saved a credential before, this field is required.
+   - If your organization **already has** a saved credential, you can leave this field blank. The existing credential stays in effect as long as you don't enter a new value. The placeholder shows "Leave blank to keep the current value".
+
+Example of the form after switching the adapter and filling in a new endpoint URL and shared secret:
+
+![SIMRS Integration form filled with example data, the Shared secret field and Save connection settings button marked with a blue box](/screenshots/en/integrasi-simrs/index/02-isi-form.png)
+
+## Saving the settings
+
+Once all the fields are filled in as needed, click the **Save connection settings** button at the bottom of the card.
+
+Important notes before saving:
+
+- **Endpoint URL is required.** If left blank, the system shows the message "Endpoint URL is required." and the settings are not saved.
+- **Shared secret is required for a new setup.** If your organization has no saved credential yet and this field is left blank, the system shows the message "Shared secret or API key is required." and the settings are not saved.
+- While saving is in progress, the button changes to **Saving...** and all fields are temporarily disabled.
+- On success, a confirmation message appears: "SIMRS connection settings saved." The credential field is cleared afterward (the stored value stays masked and is never redisplayed on screen).
+- On failure (for example a network or server issue), an error message appears and any previously saved settings remain unchanged.
+
+Changes take effect for the entire organization as soon as they're saved. Make sure the endpoint URL and credential you enter are correct before saving, since a misconfiguration can interrupt data exchange with SIMRS.
+
+## Latest callback attempts card
+
+The card on the right side of the page shows transaction-level delivery status (callback) from the SIMRS connector. At the moment, this card shows "Callback attempt history is not available yet" with an **Endpoint pending** status badge, because the connector backend does not yet expose an endpoint for callback attempt history. This card will automatically populate once that endpoint becomes available, no action needed on your part.
+
+## Connector contract
+
+At the bottom of the page is a **Connector contract** card explaining that integration settings are stored per organization under the SIMRS configuration, and backend authorization still controls who can read or update your organization's settings. In other words, even if you can open this page, your ability to save changes still depends on your account's access rights within that organization.

@@ -1,0 +1,66 @@
+---
+title: Mengatur Peran Pengguna
+---
+
+# Mengatur Peran Pengguna
+
+Halaman ini dipakai untuk mengubah peran (role) yang dimiliki seorang pengguna setelah akunnya dibuat: menambah peran baru, mencabut peran yang sudah tidak relevan, atau menukar satu peran dengan peran lain. Peran menentukan menu dan fitur apa saja yang bisa diakses pengguna tersebut di PRECIA.
+
+Hanya administrator organisasi (dan administrator platform) yang punya akses ke halaman ini.
+
+## Cara membuka halaman ini
+
+1. Buka halaman **Pengguna & Akses** dari sidebar kiri.
+2. Klik **Detail** pada baris pengguna yang ingin diatur perannya, atau buka langsung halaman [Detail Pengguna](/manajemen-pengguna/detail-pengguna).
+3. Di halaman detail, klik tombol **Kelola Peran** pada panel Aksi Cepat.
+
+Anda akan masuk ke halaman **Kelola Peran** berikut, dengan nama pengguna yang bersangkutan tampil di judul halaman.
+
+![Halaman Kelola Peran menampilkan kartu Peran Saat Ini berisi badge peran yang sedang dimiliki pengguna](/screenshots/id/manajemen-pengguna/mengatur-peran-pengguna/01-tampilan-awal.png)
+
+Halaman ini terbagi jadi tiga bagian:
+
+- **Peran Saat Ini** — daftar semua peran yang sedang dimiliki pengguna, ditampilkan sebagai badge.
+- **Pemberian atau Pencabutan Massal** — kotak centang untuk menambah atau mencabut satu atau beberapa peran sekaligus.
+- **Tukar Peran** — form untuk mengganti satu peran lama dengan satu peran baru dalam satu langkah.
+
+## Memberikan peran baru ke pengguna
+
+1. Pada bagian **Pemberian atau Pencabutan Massal**, centang satu atau lebih peran yang ingin ditambahkan ke pengguna ini. Peran yang sudah dimiliki pengguna tetap bisa dicentang, tapi tidak akan berpengaruh karena pengguna sudah memilikinya.
+2. Klik tombol **Berikan yang Dipilih**. Tombol ini hanya bisa diklik kalau minimal satu kotak centang sudah dipilih.
+
+![Kotak centang Admin dan Klinisi dicentang, siap diklik tombol Berikan yang Dipilih](/screenshots/id/manajemen-pengguna/mengatur-peran-pengguna/02-pilih-peran-diberikan.png)
+
+Jika berhasil, muncul pesan konfirmasi di atas kartu **Peran Saat Ini** dan badge peran baru langsung muncul di kartu tersebut. Kotak centang otomatis dikosongkan kembali setelah proses selesai.
+
+## Mencabut peran dari pengguna
+
+1. Pada bagian yang sama, centang satu atau lebih peran yang ingin dicabut. Biasanya ini peran yang sudah tampil di kartu **Peran Saat Ini**.
+2. Klik tombol **Cabut yang Dipilih**.
+
+![Kotak centang Perawat dicentang untuk dicabut, tombol Cabut yang Dipilih siap diklik](/screenshots/id/manajemen-pengguna/mengatur-peran-pengguna/03-pilih-peran-dicabut.png)
+
+Jika berhasil, badge peran yang dicabut langsung hilang dari kartu **Peran Saat Ini**.
+
+**Catatan:** kalau pengguna hanya punya satu peran lalu peran itu dicabut, pengguna tidak akan punya akses ke fitur apa pun sampai diberikan peran baru. Pastikan pengguna selalu punya minimal satu peran aktif.
+
+## Menukar peran (Tukar Peran)
+
+Gunakan bagian ini kalau Anda ingin mengganti satu peran lama menjadi satu peran baru sekaligus, tanpa harus mencabut lalu memberikan peran secara terpisah.
+
+1. Pada kolom **Peran Lama**, pilih salah satu peran yang saat ini dimiliki pengguna. Pilihan pada dropdown ini otomatis mengikuti peran yang tercantum di kartu **Peran Saat Ini**.
+2. Pada kolom **Peran Baru**, pilih peran pengganti yang diinginkan.
+
+![Dropdown Peran Lama sudah dipilih ke Nurse / Technician](/screenshots/id/manajemen-pengguna/mengatur-peran-pengguna/04-tukar-peran-lama.png)
+
+![Dropdown Peran Lama dan Peran Baru sudah dipilih keduanya, tombol Ubah Peran siap diklik](/screenshots/id/manajemen-pengguna/mengatur-peran-pengguna/05-tukar-peran-baru.png)
+
+3. Klik tombol **Ubah Peran**. Tombol ini hanya aktif kalau kedua dropdown sudah dipilih.
+
+Jika berhasil, kartu **Peran Saat Ini** akan menampilkan peran baru, menggantikan peran lama yang dipilih.
+
+## Catatan penting
+
+- Setiap perubahan peran (pemberian, pencabutan, maupun tukar peran) langsung berlaku begitu berhasil diproses — tidak ada langkah konfirmasi tambahan dan tidak bisa dibatalkan dari halaman ini. Kalau salah pilih peran, ulangi langkah di atas untuk mengembalikannya.
+- Semua perubahan peran di halaman ini tercatat di riwayat aktivitas pengguna, bisa dilihat di halaman [Detail Pengguna](/manajemen-pengguna/detail-pengguna).
+- Kalau saat mengklik salah satu tombol di halaman ini muncul pesan galat (misalnya terkait kode peran yang tidak dikenali sistem), jangan ulangi berkali-kali. Catat peran yang ingin diubah lalu hubungi administrator platform atau tim teknis untuk menindaklanjuti secara manual.

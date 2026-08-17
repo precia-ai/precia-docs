@@ -1,0 +1,59 @@
+---
+title: Ringkasan Organisasi & Platform
+---
+
+# Ringkasan Organisasi & Platform
+
+Area **Platform** adalah ruang kerja khusus untuk admin platform (peran Super Admin dan Platform Admin). Berbeda dengan area organisasi biasa yang hanya menampilkan data satu organisasi, area ini melihat **seluruh organisasi** yang terdaftar di PRECIA sekaligus.
+
+Halaman ini menjelaskan cara masuk ke area Platform, apa saja isinya, dan bagaimana membedakan tampilan lintas organisasi dari tampilan organisasi biasa.
+
+## Siapa yang bisa mengakses
+
+Hanya pengguna dengan peran berikut yang melihat menu Platform di sidebar:
+
+- **Super Admin (SUP)** — akses penuh, dipakai untuk pengembangan dan demo.
+- **Platform Admin (PAD)** — administrator resmi di lingkup platform, memegang manajemen akun lintas organisasi dan tenant.
+
+Admin organisasi (SAD) dan peran lain di bawahnya tidak melihat menu ini sama sekali. Kalau akun kamu tidak punya akses, mencoba membuka `/platform/...` langsung akan mengarahkan kembali ke dashboard biasa.
+
+## Masuk ke Mode Platform
+
+1. Login seperti biasa dengan akun yang punya peran Super Admin atau Platform Admin.
+2. Buka salah satu tautan area Platform, misalnya menu Organisasi di sidebar (jika akun kamu punya akses, tautan ini muncul otomatis).
+3. Setelah masuk, sidebar berubah menjadi **sidebar mode Platform**. Ini tandanya kamu sedang bekerja lintas organisasi, bukan di satu organisasi tertentu.
+
+![Sidebar mode Platform dengan badge "Mode Platform" dan tautan kembali ke organisasi](/screenshots/id/organisasi-platform/index/01-sidebar-mode-platform.png)
+
+Perhatikan bagian atas sidebar yang ditandai kotak biru pada gambar di atas:
+
+- Label **Mode Platform** menegaskan kamu sedang berada di area lintas organisasi.
+- Tautan **Kembali ke Organisasi** membawa kamu balik ke dashboard organisasi biasa (lingkup satu organisasi saja) kapan saja.
+
+## Menu di area Platform
+
+Di bawah label Mode Platform, sidebar menampilkan menu berikut:
+
+- **Organisasi** — daftar seluruh organisasi (tenant) yang terdaftar di PRECIA: kode, nama, tipe, status aktif/tidak aktif, dan aksi ubah/nonaktifkan. Detail langkahnya ada di halaman "Mengelola Organisasi".
+- **Onboarding SIMRS** — wizard untuk menyambungkan sistem informasi rumah sakit (SIMRS) organisasi baru ke PRECIA.
+- **Analitik** — statistik penggunaan lintas seluruh organisasi.
+- **Pengguna & Akses** — manajemen akun pengguna lintas organisasi. Menu ini sengaja ditaruh di Platform (bukan di organisasi) karena mengelola akun bisa mencakup lebih dari satu organisasi sekaligus.
+- **Audit** — log aktivitas dan kepatuhan. Ruang kerjanya sama persis dengan halaman Audit di organisasi biasa, tapi lingkup datanya ditentukan izin akun kamu di sisi server, bisa satu organisasi, bisa seluruhnya.
+
+## Penanda "Menampilkan seluruh organisasi"
+
+Beberapa halaman di area Platform memakai komponen yang persis sama dengan versi organisasinya, misalnya halaman Audit. Karena tampilannya identik, kamu tidak bisa membedakan dari layout saja apakah data yang sedang dilihat mencakup satu organisasi atau seluruhnya. Untuk mengatasi ini, PRECIA menambahkan **banner penanda lingkup** di bagian atas halaman-halaman tersebut.
+
+![Banner "Menampilkan seluruh organisasi" di atas halaman Audit Platform](/screenshots/id/organisasi-platform/index/02-banner-lintas-organisasi.png)
+
+Banner biru bertuliskan **"Menampilkan seluruh organisasi"** ini muncul di halaman-halaman seperti Audit dan Pengguna & Akses saat dibuka dari area Platform. Isinya menjelaskan:
+
+> Halaman ini tidak dibatasi pada satu organisasi. Ruang kerja yang sama hanya menampilkan satu organisasi bila dibuka dari menu organisasi.
+
+Kalau kamu tidak melihat banner ini pada suatu halaman, berarti data yang ditampilkan sudah otomatis dibatasi pada satu organisasi saja (misalnya karena izin akun kamu terbatas pada satu organisasi, atau halamannya memang selalu lintas organisasi tanpa perlu penanda tambahan seperti daftar Organisasi itu sendiri).
+
+## Catatan penting
+
+- Aksi apa pun yang dilakukan di area Platform (menonaktifkan organisasi, mengubah akun pengguna lintas organisasi, dll) berdampak ke organisasi yang bersangkutan, bukan hanya organisasi tempat kamu login. Pastikan kamu benar-benar bermaksud melakukannya sebelum konfirmasi.
+- Tautan **Kembali ke Organisasi** di sidebar selalu tersedia untuk keluar dari Mode Platform kapan saja tanpa perlu logout.
+- Untuk langkah detail tiap menu, lihat halaman terpisah: "Mengelola Organisasi", "Pengguna Lintas Organisasi", "Analitik Platform", "Audit Platform", dan "Onboarding SIMRS Baru".

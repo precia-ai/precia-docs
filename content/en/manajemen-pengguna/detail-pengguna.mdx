@@ -1,0 +1,61 @@
+---
+title: User Detail
+---
+
+# User Detail
+
+The user detail page shows a single account's full profile: identity information, organization, assigned roles, account status, and the history of changes made to that account. From here you can also activate/deactivate the account, lock/unlock it, and jump to the role management page.
+
+Only organization administrators and platform administrators can open this page.
+
+## How to open this page
+
+1. Log in to PRECIA.
+2. Click **Users & Access** in the left sidebar to open the [User List](/manajemen-pengguna).
+3. Click the **Detail** button on the row of the user you want to view.
+
+![User detail page with account information, roles, and quick actions](/screenshots/en/manajemen-pengguna/detail-pengguna/01-profil-pengguna.png)
+
+## Reading the profile information
+
+The top of the page shows the user's full name and email address, along with an account status badge in the top-right corner (Active, Inactive, Locked, or Pending Activation).
+
+The **Account Information** card shows:
+
+- **Username** — the login username for this account.
+- **Organization** — the organization the user belongs to.
+- **Created At** — the date this account was first registered.
+- **Last Login** — the user's most recent login time, or "Never" if the account has never logged in.
+- **User Roles** — one or more badges for the roles currently assigned to the user. If no role has been assigned yet, this field shows "No roles assigned".
+
+## Quick Actions
+
+The **Quick Actions** card on the right side has three buttons for managing the account:
+
+- **Deactivate User / Activate User** — toggles the account between active and inactive. The button label follows the account's current status: if the account is active, it reads "Deactivate User"; if inactive, it reads "Activate User".
+- **Lock Account / Unlock** — locks the account so the user can't log in at all. Before the account is actually locked, the system shows a confirmation dialog with the user's email address. Once the account is Locked, this button becomes "Unlock" to restore login access.
+- **Manage Roles** — opens the [Managing User Roles](/manajemen-pengguna/mengatur-peran-pengguna) page to add, remove, or swap roles for this user.
+
+**Note:** while an activation/deactivation or lock/unlock action is in progress, the action buttons can't be clicked again until the process finishes and the page refreshes automatically.
+
+## Identity and Role History
+
+Below the Account Information card is an **Identity and Role History** card that logs every change made to this account, sorted from newest to oldest.
+
+![Identity and role history card showing a log of account changes](/screenshots/en/manajemen-pengguna/detail-pengguna/02-riwayat-perubahan.png)
+
+Each history entry shows the type of change, the name of the staff member who made it (or "System" for automated changes), and when it happened. The types of changes that can appear here include:
+
+- **Account created** — when the account was first registered.
+- **Roles assigned / removed** — when an administrator adds or removes roles through the Manage Roles page.
+- **Role replaced** — when an administrator swaps one role for another using the Swap Role feature.
+- **Account information updated** — changes to profile data, such as name or other account fields.
+- **Password updated** — when the account's password is changed.
+- **Status changed** — changes to the account's status, for example from Active to Inactive or vice versa.
+
+If the account has never changed since it was created, this list contains just one entry. If the history fails to load (for example due to a connection issue), the card shows a message saying the history is unavailable.
+
+## Special conditions
+
+- If the user ID in the URL is invalid or the user has been deleted, this page shows a "not found" state instead of the account detail.
+- If the data fails to load for another reason, the page shows an error message with a **Try Again** button.

@@ -1,0 +1,45 @@
+---
+title: Riwayat Perubahan Kasus
+---
+
+# Riwayat Perubahan Kasus
+
+Setiap kasus klinis di PRECIA punya catatan riwayat lengkap: kapan kasus dibuat, siapa yang membuat, berkas apa saja yang diunggah atau dihapus, kapan status kasus berubah, sampai kapan hasil AI selesai diproses. Riwayat ini tidak bisa diedit atau dihapus oleh siapa pun, jadi bisa dijadikan pegangan kalau ada pertanyaan soal apa yang terjadi pada suatu kasus.
+
+## Cara membuka riwayat kasus
+
+1. Buka menu **Klinis** di menu samping, lalu buka detail kasus yang ingin dicek riwayatnya.
+2. Gulir ke bagian bawah halaman detail kasus, cari kartu **Riwayat Transaksi**.
+3. Klik tombol **Lihat Riwayat**.
+
+   ![Halaman detail kasus, tombol Lihat Riwayat di kartu Riwayat Transaksi bagian bawah ditandai kotak biru](/screenshots/id/kasus-klinis/riwayat-perubahan-kasus/01-tombol-lihat-riwayat.png)
+
+Anda akan diarahkan ke halaman **Riwayat Perubahan Transaksi** khusus untuk kasus tersebut.
+
+## Membaca halaman riwayat
+
+Halaman riwayat terdiri dari dua bagian:
+
+- **Ringkasan Riwayat**: menampilkan kode transaksi, unit yang menangani kasus, dan jumlah total perubahan yang tercatat.
+- **Lini Masa Riwayat**: daftar setiap kejadian yang tercatat pada kasus ini, diurutkan dari yang **terbaru ke terlama**.
+
+![Halaman riwayat perubahan transaksi, kartu Lini Masa Riwayat berisi daftar kejadian ditandai kotak biru](/screenshots/id/kasus-klinis/riwayat-perubahan-kasus/02-linimasa-riwayat.png)
+
+Setiap baris pada lini masa menampilkan:
+
+- **Jenis kejadian**, misalnya "Transaksi dibuat", "File Uploaded" (berkas diunggah), atau "AI Processing Completed" (proses AI selesai).
+- **Perubahan status**, kalau kejadian tersebut mengubah status kasus (contoh: status berubah dari Belum Diproses menjadi Siap Dianalisis). Kalau status tidak berubah pada kejadian itu, keterangan "Status tetap ..." akan ditampilkan.
+- **Waktu kejadian**, tanggal dan jam persis kejadian tercatat.
+- **Dilakukan oleh**, nama pengguna yang melakukan aksi tersebut. Kalau kejadian dilakukan otomatis oleh sistem (misalnya proses AI selesai), kolom ini menampilkan **Sistem**.
+- **Catatan**, alasan atau keterangan tambahan yang diisi saat aksi dilakukan (misalnya alasan pembatalan atau alasan pengulangan pemeriksaan). Kalau tidak ada catatan, kolom ini menampilkan tanda "-".
+
+## Kapan riwayat berguna
+
+Gunakan halaman ini kalau Anda perlu:
+
+- Memeriksa siapa yang terakhir mengubah data pasien pada suatu kasus.
+- Melacak kapan tepatnya berkas pemeriksaan diunggah atau dihapus.
+- Memastikan alasan yang tercatat saat kasus dibatalkan atau saat pengulangan pemeriksaan diminta.
+- Menelusuri urutan lengkap suatu kasus, dari dibuat sampai selesai ditinjau dokter, untuk keperluan audit internal.
+
+Kalau kasus belum punya perubahan apa pun selain saat dibuat, lini masa hanya akan menampilkan satu kejadian "Transaksi dibuat".

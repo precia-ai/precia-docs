@@ -1,0 +1,59 @@
+---
+title: Organizations & Platform Overview
+---
+
+# Organizations & Platform Overview
+
+The **Platform** area is a dedicated workspace for platform administrators (Super Admin and Platform Admin roles). Unlike the regular organization area, which only shows data for a single organization, this area sees **every organization** registered in PRECIA at once.
+
+This page explains how to enter the Platform area, what it contains, and how to tell a cross-organization view apart from a regular single-organization view.
+
+## Who can access it
+
+Only accounts with the following roles see the Platform menu in the sidebar:
+
+- **Super Admin (SUP)** — full access, used for development and demos.
+- **Platform Admin (PAD)** — the official administrator at platform scope, holding cross-organization account and tenant management.
+
+Organization admins (SAD) and roles below them never see this menu. If your account lacks access, navigating directly to `/platform/...` redirects you back to the regular dashboard.
+
+## Entering Platform Mode
+
+1. Log in as usual with an account holding the Super Admin or Platform Admin role.
+2. Open any Platform area link, for example the Organizations menu in the sidebar (it appears automatically if your account has access).
+3. Once inside, the sidebar switches to the **Platform Mode sidebar**. This is your signal that you are working across organizations, not inside a single one.
+
+![Platform Mode sidebar with the "Platform Mode" badge and a link back to the organization](/screenshots/en/organisasi-platform/index/01-sidebar-mode-platform.png)
+
+Note the top section of the sidebar highlighted with a blue box above:
+
+- The **Platform Mode** label confirms you are in the cross-organization area.
+- The **Back to Organization** link takes you back to the regular single-organization dashboard at any time.
+
+## Menu inside the Platform area
+
+Below the Platform Mode label, the sidebar lists:
+
+- **Organizations** — a list of every organization (tenant) registered in PRECIA: code, name, type, active/inactive status, and edit/deactivate actions. See the "Managing Organizations" page for the step-by-step.
+- **SIMRS Onboarding** — a wizard for connecting a new organization's hospital information system (SIMRS) to PRECIA.
+- **Analytics** — usage statistics across every organization.
+- **Users & Access** — cross-organization user account management. This menu deliberately lives under Platform rather than under a single organization, since managing accounts can span more than one organization at once.
+- **Audit** — activity and compliance logs. This workspace is exactly the same component as the Audit page inside a regular organization, but its data scope is determined server-side by your account's permissions, it may cover one organization or all of them.
+
+## The "Viewing every organization" notice
+
+Some pages in the Platform area reuse the exact same component as their organization-scoped counterpart, the Audit page being one example. Because the layout is identical, you cannot tell from the screen alone whether the data shown covers a single organization or all of them. To solve this, PRECIA adds a **scope notice banner** at the top of those pages.
+
+![The "Viewing every organization" banner above the Platform Audit page](/screenshots/en/organisasi-platform/index/02-banner-lintas-organisasi.png)
+
+This blue banner reading **"Viewing every organization"** appears on pages such as Audit and Users & Access when opened from the Platform area. It reads:
+
+> This page is not limited to a single organization. The same workspace shows only one organization when opened from the organization menu.
+
+If you don't see this banner on a given page, the data shown is already automatically limited to a single organization (for example because your account's permissions are restricted to one organization, or because the page is always cross-organization by nature and needs no extra notice, like the Organizations list itself).
+
+## Important notes
+
+- Any action taken in the Platform area (deactivating an organization, editing a cross-organization user account, etc.) affects the organization it belongs to, not just the organization you logged in from. Make sure you really intend to do it before confirming.
+- The **Back to Organization** link in the sidebar is always available to leave Platform Mode at any time, no need to log out.
+- For detailed steps on each menu, see the separate pages: "Managing Organizations", "Cross-Organization Users", "Platform Analytics", "Platform Audit", and "New SIMRS Onboarding".

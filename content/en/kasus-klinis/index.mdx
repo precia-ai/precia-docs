@@ -1,0 +1,62 @@
+---
+title: Clinical Cases
+---
+
+# Clinical Cases
+
+A clinical case is a single working file for one patient: from patient data and examination files being uploaded, through analysis by one or more AI modules, to the results being reviewed and validated by a doctor.
+
+Every case carries two separate layers of status:
+
+- **Case status**: where the case sits overall (still a draft, sent to a doctor, already reviewed, and so on).
+- **AI module status**: where AI processing stands for each module used on that case (pending, processing, completed, failed). A single case can use more than one AI module at once, and each module tracks its own status.
+
+## Case status
+
+Case status shows where the case sits in the unit's workflow, from creation to closure.
+
+| Status | Meaning |
+|---|---|
+| **Draft** | Case just created. Patient data can still be freely edited. |
+| **Unprocessed** | Case data is complete. This is the main working status: files are uploaded and AI modules are run while the case stays in this status. |
+| **Invalid Data** | Something is wrong with the uploaded data (for example, an unreadable file). Needs fixing before moving on. |
+| **Upload Failed** | The file upload process failed partway through. Retry the upload. |
+| **Sent to Doctor** | The case has been handed off to the unit's doctor/validator review queue. |
+| **Retake Required** | A doctor or validator has requested that the examination be redone, usually because of poor data quality. A reason is always required. |
+| **Doctor Reviewed** | The doctor has validated the results. This is a final status; no further changes are possible. |
+| **Cancelled** | The case was cancelled and will not be processed further. This is a final status. |
+
+Important notes on how case status behaves:
+
+- A case does **not** automatically change status just because AI starts or finishes processing. While an AI module is working, the case status stays **Unprocessed**. What changes is the module's own status (see the next section).
+- A case can only be sent to a doctor (**Sent to Doctor**) once at least one AI module on that case has reached **Completed**, and the unit has at least one member with the validator role. If either condition isn't met, the send-to-doctor action won't work.
+- **Doctor Reviewed** and **Cancelled** are final statuses. There is no way to transition out of them through the application.
+- A case can only be cancelled as long as no AI module has started processing yet (not yet **Processing** or **Completed**). Once AI has started, cancelling through the application is no longer available; contact your unit admin if the case still needs to be stopped.
+
+## AI module status
+
+Each AI module used on a case (for example, running both ECG analysis and uroflow on the same case) has its own processing status, separate from the case status:
+
+| Status | Meaning |
+|---|---|
+| **Pending** | The module has been selected for this case, but no file has been uploaded yet. |
+| **Data Uploaded** | The file for this module has been uploaded. |
+| **Ready** | The data has been marked ready for analysis and is waiting to be processed. |
+| **Processing** | The system is currently running AI analysis for this module. |
+| **Completed** | This module's analysis results are available to view and validate. |
+| **Failed** | Processing for this module failed. It needs to be re-checked or re-run. |
+
+You can see both the case status and each module's status in the case list (worklist), usually shown as color-coded labels next to the patient's name and module name. See **Worklist by AI Module** for how to filter the case list by module status.
+
+## Related pages
+
+- **Creating a New Case**: for one patient at a time.
+- **Uploading Patient Files**: completing a case with examination files.
+- **Bulk Importing Cases**: when you have many patient files at once (for example, from a field visit).
+- **Worklist by AI Module**: filtering and monitoring cases by AI module status.
+- **Viewing AI Analysis Results**: how to read the results the system produces.
+- **Reviewing and Validating**: for doctors/validators, the final step before a case is considered complete.
+- **Case Change History**: viewing the trail of status changes for a case.
+- **Cancelling a Case**: requirements and steps for cancelling a case that hasn't been processed by AI yet.
+
+AI results in PRECIA are a decision support tool, not a final decision. Clinical judgment always remains with the doctor handling the case.

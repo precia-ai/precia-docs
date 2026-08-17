@@ -1,0 +1,56 @@
+---
+title: Membuat Siklus Evaluasi
+---
+
+# Membuat Siklus Evaluasi
+
+Halaman **Siklus evaluasi baru** dipakai untuk membuka siklus evaluasi adopsi AI yang baru: menentukan apa yang dievaluasi, periode waktunya, dan indikator mana yang diukur. Target angka untuk tiap indikator tidak diisi di halaman ini, target diambil otomatis dari **standing target** yang sedang berlaku.
+
+Hanya pengguna dengan izin pengaturan cakupan evaluasi (biasanya admin organisasi atau admin platform) yang bisa membuka dan mengirim form ini. Kalau akun Anda tidak punya izin ini, halaman akan menampilkan pesan "Anda tidak bisa mengatur cakupan siklus evaluasi" alih-alih form.
+
+**Prasyarat**: minimal harus ada satu standing target aktif sebelum Anda membuat siklus baru. Kalau belum ada standing target sama sekali, bagian Indikator di form ini akan kosong dan Anda tidak akan bisa mengirim form (indikator wajib diisi minimal satu). Buat standing target dulu lewat halaman **Target Standing**, lalu kembali ke sini.
+
+## 1. Membuka form
+
+Dari halaman daftar **Evaluasi**, klik tombol **Siklus baru** di pojok kanan atas (hanya muncul kalau Anda punya izin membuat siklus). Anda akan masuk ke halaman **Siklus evaluasi baru** dengan tiga bagian: **Siklus evaluasi baru** (info dasar), **Cakupan** (unit/modul/indikator), dan **Target hasil resolusi** (pratinjau, hanya bisa dibaca).
+
+![Form kosong Siklus evaluasi baru, terlihat field Judul, Tujuan, Pemicu, Alasan pemicu, Awal periode, dan Akhir periode](/screenshots/id/evaluasi-adopsi/membuat-siklus/01-form-kosong.png)
+
+## 2. Mengisi informasi dasar siklus
+
+Di kartu pertama, isi:
+
+- **Judul** (wajib): nama singkat siklus ini, misalnya "Tinjauan performa AI Q3". Kalau dikosongkan, sistem menampilkan pesan error saat Anda coba kirim form.
+- **Tujuan** (opsional): pertanyaan yang ingin dijawab siklus ini, misalnya alasan kenapa siklus ini dibuka.
+- **Pemicu**: pilih **Terjadwal** kalau ini siklus evaluasi rutin, atau **Ad hoc** kalau dibuka di luar jadwal karena ada kejadian tertentu (misalnya penurunan tingkat kesepakatan validator).
+- **Alasan pemicu** (opsional untuk Terjadwal, sebaiknya diisi untuk Ad hoc): penjelasan singkat kenapa siklus ini dibuka sekarang.
+- **Awal periode** dan **Akhir periode**: rentang tanggal yang dievaluasi. Secara bawaan sistem mengisi 90 hari terakhir sampai hari ini, tapi Anda bisa mengubahnya bebas. Akhir periode tidak boleh lebih awal dari awal periode; kalau salah isi, sistem menampilkan pesan error di bawah field Akhir periode saat form dikirim.
+
+## 3. Menentukan cakupan (unit, modul, indikator)
+
+Di kartu **Cakupan**, centang unit klinis, modul AI, dan indikator yang ingin dievaluasi.
+
+![Form terisi: satu unit klinis dan satu modul AI dicentang, dua indikator dicentang, tabel Target hasil resolusi menampilkan dua baris target, tombol Buat siklus di pojok kanan bawah](/screenshots/id/evaluasi-adopsi/membuat-siklus/02-cakupan-dan-indikator.png)
+
+- **Unit klinis** dan **Modul AI**: keduanya opsional. Kosongkan semua checkbox di salah satu grup untuk mencakup **semua** unit atau **semua** modul yang ada di organisasi Anda. Centang satu atau beberapa kalau Anda hanya ingin mengevaluasi unit/modul tertentu.
+- **Indikator** (wajib, minimal satu): daftar checkbox ini diambil dari indikator yang punya standing target aktif. Kalau tidak ada standing target sama sekali, bagian ini menampilkan pesan "Belum ada standing target yang berlaku, jadi belum ada indikator untuk dievaluasi" lengkap dengan tautan ke halaman **Target Standing** untuk membuatnya dulu.
+
+  **Catatan tampilan**: pada build saat ini, nama indikator (misalnya "Success Rate" atau "Unit Adoption Rate") tidak ditampilkan di sebelah checkbox-nya, checkbox tampil kosong tanpa label teks. Untuk tahu indikator mana yang mana, buka halaman **Target Standing** di tab terpisah dan cocokkan urutannya, checkbox pertama di form ini sesuai baris pertama di tabel standing target aktif, dan seterusnya.
+
+## 4. Memeriksa pratinjau target
+
+Begitu Anda mencentang minimal satu indikator, kartu **Target hasil resolusi** di bagian bawah otomatis menampilkan tabel berisi standing target yang cocok dengan indikator terpilih: nilai target, arah perbandingan (minimal/maksimal), baseline, dan tanggal mulai berlaku.
+
+Tabel ini **hanya untuk dibaca**, siklus tidak menyimpan target sendiri. Perhatikan juga: kolom Cakupan pada tabel ini mengikuti cakupan milik standing target itu sendiri (misalnya "Semua unit, semua modul"), bukan cakupan unit/modul yang Anda pilih untuk siklus ini. Kedua cakupan itu independen. Kalau ingin mengubah nilai target atau cakupannya, lakukan dari halaman **Target Standing**, tautannya tersedia di deskripsi kartu ini.
+
+Kalau belum ada indikator yang dicentang, kartu ini menampilkan pesan "Pilih indikator di atas untuk melihat target pembandingnya" dan tabel belum muncul.
+
+## 5. Mengirim form
+
+Setelah semua terisi, klik tombol **Buat siklus** di pojok kanan bawah. Tombol ini nonaktif selagi data unit/modul/indikator masih dimuat.
+
+Sistem memvalidasi tiga hal sebelum mengirim: Judul tidak boleh kosong, Akhir periode tidak boleh lebih awal dari Awal periode, dan minimal satu Indikator harus dicentang. Kalau ada yang tidak valid, form tidak terkirim dan pesan error muncul di bawah field yang bermasalah.
+
+**Penting**: begitu **Buat siklus** berhasil diklik, siklus langsung tercatat di sistem dan Anda otomatis diarahkan ke halaman detail siklus yang baru dibuat. Aksi ini tidak bisa dibatalkan dari form ini, siklus yang sudah dibuat tetap ada meski Anda tidak jadi melanjutkan pengisiannya. Lihat panduan terpisah "Detail Siklus Evaluasi" untuk langkah setelah siklus dibuat, seperti menjalankan review, follow-up, dan menutup siklus.
+
+Kalau Anda berubah pikiran sebelum mengirim, klik tombol **Batal** di sebelah **Buat siklus** untuk kembali ke daftar Evaluasi tanpa menyimpan apa pun.

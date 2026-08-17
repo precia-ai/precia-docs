@@ -1,0 +1,61 @@
+---
+title: Menambah Pengguna Baru
+---
+
+# Menambah Pengguna Baru
+
+Halaman ini dipakai untuk mendaftarkan akun baru bagi anggota tim di organisasi Anda, misalnya dokter, perawat, atau admin unit baru. Pengguna yang dibuat di sini otomatis tergabung ke organisasi Anda sendiri, tidak bisa dipilihkan ke organisasi lain.
+
+Hanya administrator organisasi (dan administrator platform) yang punya akses ke halaman ini.
+
+## Cara membuka halaman ini
+
+1. Buka halaman **Pengguna & Akses** dari sidebar kiri.
+2. Klik tombol **Tambah Pengguna** di pojok kanan atas.
+
+Anda akan masuk ke Formulir Pendaftaran berikut.
+
+![Formulir pendaftaran pengguna baru dalam keadaan kosong, dengan kolom data diri dan daftar peran](/screenshots/id/manajemen-pengguna/menambah-pengguna/01-form-kosong.png)
+
+## Langkah 1 — Isi data akun
+
+Lengkapi kolom-kolom pada bagian atas formulir:
+
+- **Email** — alamat email pengguna, dipakai untuk login. Wajib diisi dan harus berupa alamat email yang valid.
+- **Nama Pengguna** — username unik untuk login. Wajib diisi.
+- **Nama Lengkap** — nama lengkap pengguna. Kolom ini opsional, tapi disarankan diisi supaya pengguna mudah dikenali di daftar dan riwayat aktivitas.
+- **Organisasi** — sudah terisi otomatis dengan organisasi Anda dan tidak bisa diubah, karena administrator organisasi hanya bisa membuat pengguna untuk organisasinya sendiri.
+- **Kata Sandi** — kata sandi awal akun. Wajib diisi. Bagikan kata sandi ini ke pengguna yang bersangkutan lewat jalur yang aman, dan sarankan mereka menggantinya setelah login pertama.
+- **Status** — status akun setelah dibuat. Pilihannya:
+  - **Aktif** — akun langsung bisa dipakai login.
+  - **Nonaktif** — akun dibuat tapi tidak bisa login sampai diaktifkan kembali.
+  - **Terkunci** — akun dibuat dalam keadaan terkunci.
+  - **Menunggu Aktivasi** — akun menunggu proses aktivasi lebih lanjut.
+
+  Untuk kebanyakan kasus, biarkan status pada pilihan **Aktif**.
+
+## Langkah 2 — Pilih peran (role)
+
+Bagian **Peran** menampilkan seluruh peran yang tersedia untuk organisasi Anda, masing-masing sebagai kartu dengan kotak centang, nama peran, dan penjelasan singkat perannya. Contoh peran yang tersedia: Clinician (dokter/klinisi), Nurse / Technician (perawat/teknisi), Clinical Administrator, Clinical Validator, Auditor, Management, System Administrator, dan lainnya.
+
+Centang satu atau lebih peran yang sesuai dengan tanggung jawab pengguna tersebut. Kartu peran yang dicentang akan berubah warna latar menjadi biru muda, dan jumlah peran terpilih ditampilkan pada badge **"X dipilih"** di sebelah kanan judul bagian.
+
+![Formulir terisi lengkap dengan satu peran Nurse / Technician yang sudah dicentang](/screenshots/id/manajemen-pengguna/menambah-pengguna/02-form-terisi.png)
+
+**Catatan:** peran boleh dikosongkan dulu saat pembuatan akun dan ditetapkan belakangan lewat halaman [Mengatur Peran Pengguna](/manajemen-pengguna/mengatur-peran-pengguna). Tapi tanpa peran, pengguna belum bisa mengakses fitur apa pun di PRECIA setelah login, jadi sebaiknya tetapkan minimal satu peran dari awal.
+
+## Langkah 3 — Simpan pengguna
+
+Setelah semua kolom wajib terisi dan peran sudah dipilih, klik tombol **Buat pengguna** di pojok kanan bawah formulir.
+
+- Selama proses penyimpanan berjalan, tombol berubah menjadi "Membuat pengguna..." dan tidak bisa diklik ulang.
+- Jika berhasil, muncul pesan konfirmasi **"Pengguna berhasil dibuat."** di bagian bawah formulir, dan Anda akan otomatis diarahkan kembali ke halaman daftar pengguna sesaat kemudian.
+- Jika gagal (misalnya email atau nama pengguna sudah dipakai akun lain), muncul pesan kesalahan di bagian bawah formulir dan Anda tetap berada di halaman ini untuk memperbaiki data.
+
+![Pesan "Pengguna berhasil dibuat" tampil setelah formulir berhasil disimpan](/screenshots/id/manajemen-pengguna/menambah-pengguna/03-berhasil-dibuat.png)
+
+**Catatan penting:** pembuatan pengguna tidak bisa dibatalkan setelah tombol **Buat pengguna** diklik dan berhasil diproses. Kalau ada kesalahan data setelah akun dibuat, perbaiki lewat halaman [Detail Pengguna](/manajemen-pengguna/detail-pengguna) atau atur ulang perannya lewat halaman [Mengatur Peran Pengguna](/manajemen-pengguna/mengatur-peran-pengguna).
+
+## Membatalkan pembuatan pengguna
+
+Kalau ingin membatalkan sebelum menyimpan, klik tombol **Batal** di sebelah tombol **Buat pengguna**, atau klik **Kembali ke daftar pengguna** di pojok kanan atas. Data yang sudah diisi tidak akan tersimpan.

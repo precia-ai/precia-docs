@@ -1,0 +1,90 @@
+---
+title: Managing Unit Members
+---
+
+# Managing Unit Members
+
+The **Members** tab on a unit's detail page is where you assign a clinician or nurse to a clinical unit, change their operational role, designate who acts as a clinical validator, and remove members from the unit. This guide covers the **Members** tab specifically. For how to open a unit's detail page, see the "Unit Detail" guide.
+
+## 1. Opening the Members tab
+
+Open a unit's detail page; the **Members** tab is active by default. It shows a **Clinical Staff** table listing every user currently assigned to that unit.
+
+![Members tab on a unit detail page, showing the clinical staff table with an Assign Staff button and role action icons](/screenshots/en/manajemen-unit/mengatur-anggota-unit/01-tab-members.png)
+
+The table shows the following columns for each member:
+
+- **Name**: the member's full name and username.
+- **Role**: the member's operational role context in this unit (e.g. "Cardiology Specialist", "ICU Nurse").
+- **Validator**: a green **Validator** badge if the member acts as a clinical validator in this unit, or a **Staff** badge otherwise.
+- **Assigned**: the date the member was assigned to the unit.
+- **Actions**: three icon buttons, left to right: **edit role** (pencil), **toggle validator status** (toggle switch), and **remove from unit** (red trash icon).
+
+The **Assign Staff** button (blue, available both in the left sidebar and in the table header) opens a dialog for adding a new member.
+
+If the unit has no members yet, the table shows a message that no staff has been assigned.
+
+## 2. Assigning a new member
+
+Click the **Assign Staff** button. A dialog opens over the page.
+
+![Assign Clinical Staff dialog in its empty state, with a user search field and a role context field](/screenshots/en/manajemen-unit/mengatur-anggota-unit/02-dialog-assign-kosong.png)
+
+The dialog has two required fields:
+
+1. **User** — a search box to pick the user to assign. Only users from the same organization as this unit can be selected.
+2. **Role Context** — a free-text field describing the user's operational role in this unit, e.g. "Cardiology Specialist" or "Inpatient Nurse".
+
+### 2.1 Searching for and selecting a user
+
+Type a name, email, or username into the search field. Matching users appear automatically below the field as you type.
+
+![User search field filled with "dr", showing one matching user result below it](/screenshots/en/manajemen-unit/mengatur-anggota-unit/03-dialog-assign-cari-user.png)
+
+Click a user from the results list to select them. Once selected, the search field turns into a summary card of the chosen user (name, email, and organization). To change the selection, click the **×** icon on the card, then search again.
+
+### 2.2 Filling in the role context and saving
+
+After selecting the user, fill in the **Role Context** field with a short description of that user's operational role in this unit.
+
+![Assign Clinical Staff dialog with a user already selected and the role context filled with "Cardiology Specialist", ready to submit](/screenshots/en/manajemen-unit/mengatur-anggota-unit/04-dialog-assign-terisi.png)
+
+Click **Assign Member** to save. A few things to keep in mind:
+
+- Both fields (user and role context) are required. If either is left empty on submit, the dialog shows an error message under the relevant field and saves nothing.
+- If the selected user is already assigned to this unit, the system rejects the request and shows a message that the user is already a member of the unit.
+- New members always join as **Staff** (not a validator). To make a member a validator, use the validator toggle after the member has been added (see section 4).
+- Click **Cancel** at any time to close the dialog without saving.
+
+On success, the dialog closes automatically and the new member appears immediately in the Clinical Staff table.
+
+## 3. Editing a member's role
+
+To change a member's operational role description without touching their validator status, click the **pencil** icon in that member's row, in the Actions column.
+
+![Update Role dialog showing the member's name and an editable role context field, with a Save Changes button](/screenshots/en/manajemen-unit/mengatur-anggota-unit/05-dialog-edit-role.png)
+
+The **Update Role** dialog shows the member's name and a single **Role Context** field pre-filled with the current value. Edit the text, then click **Save Changes**.
+
+Notes:
+
+- The role context field is required; clearing it and saving shows an error message.
+- If you don't change anything (the text matches the original value exactly) and click **Save Changes**, the dialog simply closes without sending any save request.
+- Click **Cancel** to close the dialog without saving changes.
+
+## 4. Setting or removing validator status
+
+The toggle icon in the Actions column (between the pencil and trash icons) changes a member's validator status:
+
+- If the member is not yet a validator, click this icon to **designate** them as a clinical validator for the unit.
+- If the member is already a validator (green **Validator** badge in the Validator column, toggle icon shown in bright green), click the same icon to **revoke** their validator status back to regular Staff.
+
+The validator status change applies immediately, with no confirmation dialog. While the request is in flight, the icon briefly shows a spinning loading indicator.
+
+## 5. Removing a member from the unit
+
+Click the **red trash** icon in the Actions column to remove a member from the unit.
+
+**Important**: removal happens immediately when the icon is clicked, with no additional confirmation dialog. The member disappears from the Clinical Staff table right away and loses their operational access to this unit. Make sure you actually mean to remove that member before clicking this icon.
+
+Removing a member from a unit does not delete that user's account from the system, it only removes their assignment to the unit you're currently managing. The same user can be assigned back to this unit later using the "Assigning a new member" steps above.

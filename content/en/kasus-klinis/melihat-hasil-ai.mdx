@@ -1,0 +1,72 @@
+---
+title: Viewing AI Analysis Results
+---
+
+# Viewing AI Analysis Results
+
+Every AI module used on a case gets its own tab on the case detail page. Once a module's status turns to **Completed**, its result is available right there in that tab, complete with a confidence score, a classification, and a plain-language guide to reading it.
+
+This page walks through opening and reading that result. For what each module status means (Pending, Processing, Completed, Failed), see the **Clinical Cases** overview page.
+
+## 1. Open the case detail page
+
+From the worklist, click the case row you want to review. This opens the case detail page.
+
+On the right-hand panel there is one **Patient Info** tab, plus one additional tab for every AI module used on this case. The number of tabs matches the number of AI module slots listed in the **AI Modules** card on the left panel.
+
+![Patient info tab and one tab per AI module on the case detail page](/screenshots/en/kasus-klinis/melihat-hasil-ai/01-tab-info-pasien.png)
+
+The small dot next to each module's name shows that module's status:
+
+- Grey dot: module is still **Pending** data.
+- Blue dot: data has been **Uploaded**, not yet marked ready.
+- Light emerald dot: module is **Ready** for processing.
+- Amber dot: module is currently **Processing**.
+- Dark green dot: module is **Completed**, result is available.
+- Red dot: module **Failed**.
+
+## 2. Modules that don't have a result yet
+
+Opening the tab of a module whose status is still **Pending**, **Uploaded**, or **Ready** only shows the input for that module (the uploaded file, and/or its structured clinical data fields, if the module uses them). There is no result panel yet because the analysis has not run.
+
+![Module tab with Pending status, no AI result yet](/screenshots/en/kasus-klinis/melihat-hasil-ai/02-tab-modul-menunggu.png)
+
+The example above is a module whose input is structured clinical data fields rather than an uploaded file. While the module's status is not yet **Completed**, authorized users can still fill in or edit these fields. Once the module reaches **Completed** status, all these fields lock (read-only) as the exact data the AI used for that analysis.
+
+## 3. Reading the AI result panel
+
+Once a module is **Completed**, its result panel appears at the bottom of that module's tab, below the clinical data fields and the Ground Truth section.
+
+![AI result panel for the BOO Clinical Screening module, with confidence score and classification](/screenshots/en/kasus-klinis/melihat-hasil-ai/03-hasil-boo-screening.png)
+
+The parts of a result panel, top to bottom:
+
+1. **Module name and confidence score** — the top-right corner of the card shows the AI model's confidence percentage for this result, e.g. `84.1%`. The badge color reflects the confidence level: green for very high, blue for high, amber for moderate, red for low.
+2. **Module description** — a short sentence explaining what this module does, shown under the module name.
+3. **Probability value** — a progress bar labeled according to the module's output (e.g. "Obstruction Probability"), showing the probability as a percentage.
+4. **Classification** — the AI's classification result as a small badge (e.g. `BOO`), the model's category conclusion for this case.
+5. **Result reading guide** — a box explaining how to interpret the numbers and classification above, written specifically for that module.
+6. **AI interpretation** — an automatic summary generated from the score and classification.
+7. **Screening notice** — at the very bottom of the panel, a reminder that this result is a screening aid, not a final diagnosis.
+
+The exact labels (the name of the probability, the classification options) differ from module to module depending on what that module analyzes. The overall structure stays the same: confidence score, primary value/probability, classification, then explanation.
+
+## 4. Each module has its own result
+
+When a case uses more than one AI module, each module is analyzed independently and can reach a different conclusion. Switching tabs shows that module's own result.
+
+![AI result panel for the Detrusor Underactivity Screening module on the same case, with a different classification from the previous module](/screenshots/en/kasus-klinis/melihat-hasil-ai/04-hasil-detrusor.png)
+
+In the example above, the same case has three AI modules (BOO Multimodal, BOO Clinical Screening, and Detrusor Underactivity Screening). The BOO Clinical Screening module in the previous step classified this case as `BOO` at 84.1% confidence, while the Detrusor Underactivity Screening module classified it as `Non-DU` at 68.8% confidence. These two results stand on their own and should each be read in the context of their own module.
+
+## Important notes
+
+- **An AI result is not a diagnosis.** Every result panel always includes a note that this is a screening aid meant to help the doctor review the case faster, not a final clinical decision. The decision remains with the treating doctor.
+- **If a module previously failed and later succeeded on retry**, the result panel only shows the most recent run. The earlier failed run is not shown side-by-side with the successful result, to avoid casting doubt on a result that is actually fine.
+- **If a module failed and has not yet been retried successfully**, the panel shows a rose-colored warning card with the error message instead of a normal result panel.
+- **The AI model's version number is deliberately not shown** in this panel, since it is not information a doctor or nurse can act on. Model version stays in the system logs for technical support purposes.
+- If a case has a module whose input is a file (image/video), that module's AI result is shown alongside the uploaded file on the same tab.
+
+## Next step
+
+After reviewing the AI results for every relevant module, the usual next step is sending the case to a doctor/validator for review. See the **Reviewing and Validating** page for details.

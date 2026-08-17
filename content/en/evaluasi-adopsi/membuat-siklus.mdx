@@ -1,0 +1,56 @@
+---
+title: Creating an Evaluation Cycle
+---
+
+# Creating an Evaluation Cycle
+
+The **New evaluation cycle** page is used to open a new AI adoption evaluation cycle: define what is being evaluated, over which period, and which indicators to measure. Numeric targets for each indicator are not entered here, targets are pulled automatically from whichever **standing target** is currently in force.
+
+Only users holding the evaluation scope-setting permission (typically an organization admin or platform admin) can open and submit this form. If your account does not hold this permission, the page shows "You cannot set the scope of an evaluation cycle" instead of the form.
+
+**Prerequisite**: at least one active standing target must exist before you can create a new cycle. If there is no standing target at all, the Indicators section on this form will be empty and you won't be able to submit (at least one indicator is required). Create a standing target first from the **Standing Targets** page, then come back here.
+
+## 1. Opening the form
+
+From the **Evaluation** list page, click the **New cycle** button in the top-right corner (only shown if you have permission to create a cycle). You'll land on the **New evaluation cycle** page, split into three sections: **New evaluation cycle** (basic info), **Scope** (units/modules/indicators), and **Resolved targets** (read-only preview).
+
+![Empty New evaluation cycle form, showing the Title, Objective, Trigger, Trigger reason, Period start, and Period end fields](/screenshots/en/evaluasi-adopsi/membuat-siklus/01-form-kosong.png)
+
+## 2. Filling in the basic cycle info
+
+In the first card, fill in:
+
+- **Title** (required): a short name for this cycle, e.g. "Q3 AI performance review". Leaving it blank produces an error message when you try to submit.
+- **Objective** (optional): the question this cycle is meant to answer, e.g. why it's being opened.
+- **Trigger**: choose **Scheduled** for a routine evaluation cycle, or **Ad hoc** if it's being opened outside the regular schedule because of a specific event (e.g. a sustained drop in validator agreement).
+- **Trigger reason** (optional for Scheduled, recommended for Ad hoc): a short explanation of why this cycle is being opened now.
+- **Period start** and **Period end**: the date range being evaluated. By default the system fills in the last 90 days up to today, but you can change it freely. Period end cannot be earlier than period start; if it is, the system shows an error under the Period end field when you submit.
+
+## 3. Setting the scope (units, modules, indicators)
+
+In the **Scope** card, check the clinical units, AI modules, and indicators you want to evaluate.
+
+![Filled form: one clinical unit and one AI module checked, two indicators checked, the Resolved targets table showing two target rows, Create cycle button in the bottom-right corner](/screenshots/en/evaluasi-adopsi/membuat-siklus/02-cakupan-dan-indikator.png)
+
+- **Clinical units** and **AI modules**: both optional. Leave every checkbox unchecked in either group to cover **all** units or **all** modules in your organization. Check one or more if you only want to evaluate specific units/modules.
+- **Indicators** (required, at least one): this checkbox list is populated from the indicators that currently have an active standing target. If no standing target exists at all, this section shows "No standing target is in force, so there is no indicator to evaluate yet" along with a link to the **Standing Targets** page to create one first.
+
+  **Display note**: on the current build, the indicator name (e.g. "Success Rate" or "Unit Adoption Rate") is not shown next to its checkbox, the checkboxes render blank with no text label. To tell which checkbox is which, open the **Standing Targets** page in a separate tab and match the order, the first checkbox on this form corresponds to the first row in the active standing targets table, and so on.
+
+## 4. Reviewing the target preview
+
+As soon as you check at least one indicator, the **Resolved targets** card at the bottom automatically shows a table of the standing targets that match your selected indicators: target value, comparison direction (at least/at most), baseline, and the date it went into force.
+
+This table is **read-only**, a cycle does not carry targets of its own. Note also that the Scope column in this table follows the standing target's own scope (e.g. "All units, all modules"), not the unit/module scope you picked for this cycle. The two scopes are independent. To change a target's value or scope, do it from the **Standing Targets** page, linked from this card's description.
+
+If no indicator is checked yet, this card shows "Pick an indicator above to see the target it will be measured against" and the table has not appeared yet.
+
+## 5. Submitting the form
+
+Once everything is filled in, click the **Create cycle** button in the bottom-right corner. This button is disabled while unit/module/indicator data is still loading.
+
+The system validates three things before submitting: Title cannot be empty, Period end cannot be earlier than Period start, and at least one Indicator must be checked. If anything is invalid, the form is not submitted and an error message appears under the relevant field.
+
+**Important**: once **Create cycle** is clicked successfully, the cycle is immediately recorded in the system and you're automatically redirected to the newly created cycle's detail page. This action cannot be undone from this form, a cycle that has already been created stays created even if you don't continue filling anything else in. See the separate "Evaluation Cycle Detail" guide for what to do after a cycle is created, such as running a review, follow-ups, and closing the cycle.
+
+If you change your mind before submitting, click the **Cancel** button next to **Create cycle** to return to the Evaluation list without saving anything.

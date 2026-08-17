@@ -1,0 +1,69 @@
+---
+title: Worklist per Modul AI
+---
+
+# Worklist per Modul AI
+
+Daftar kerja transaksi biasa (lihat halaman **Ringkasan**) menampilkan kasus per pasien, satu baris per kasus. Tapi satu kasus bisa punya beberapa slot analisis AI sekaligus kalau unit punya lebih dari satu modul AI aktif (contoh: unit kardiologi dengan tiga modul EKG aktif). Kalau Anda ingin melihat progres per slot analisis, bukan per kasus, gunakan tab **Berdasarkan Modul AI**.
+
+Halaman ini menjelaskan cara membuka tampilan tersebut, menyaring slot berdasarkan modul dan status, serta melihat hasil analisis langsung dari tabel.
+
+## Kapan tab ini muncul
+
+Tab **Berdasarkan Modul AI** hanya muncul kalau Anda sudah berada dalam konteks satu unit tertentu (bukan tampilan gabungan "Umum/Semua unit"). Kalau akun Anda punya akses ke banyak unit, pilih unit dulu lewat tombol **Ganti Unit**, baru tab ini akan tampil di sebelah tab **Transaksi**.
+
+## 1. Buka tab Berdasarkan Modul AI
+
+Di halaman **Klinis**, dengan satu unit aktif, klik tab **Berdasarkan Modul AI** di samping tab **Transaksi**.
+
+![Tab Berdasarkan Modul AI di sebelah tab Transaksi](/screenshots/id/kasus-klinis/worklist-per-modul/01-tab-modul-ai.png)
+
+## 2. Tampilan tabel slot
+
+Setelah tab aktif, tabel berubah dari daftar kasus menjadi daftar slot analisis. Satu baris mewakili satu slot (kombinasi kasus + modul AI), jadi satu kasus dengan tiga modul aktif akan muncul sebagai tiga baris terpisah.
+
+![Tabel worklist slot dengan filter Modul AI dan Status Slot](/screenshots/id/kasus-klinis/worklist-per-modul/02-tabel-slot.png)
+
+Kolom yang tersedia:
+
+- **Kode** — kode transaksi kasus induk.
+- **Pasien** — nama dan MRN pasien.
+- **Status** — status slot: Menunggu, Data Terunggah, Siap, Diproses, Selesai, atau Gagal.
+- **Keyakinan** — skor keyakinan hasil AI (kalau sudah selesai diproses).
+- **Ground Truth** — label pembanding manual, kalau ada, biasanya diisi saat evaluasi modul.
+- **Cocok** — apakah hasil AI cocok dengan ground truth. Bertanda **N/A** kalau belum ada ground truth untuk dibandingkan.
+- **Dibuat** — waktu kasus dibuat.
+
+Di atas tabel ada dua filter:
+
+- **Modul AI** — persempit tampilan ke satu modul saja. Defaultnya "Semua modul" menampilkan slot dari semua modul yang aktif di unit ini.
+- **Status Slot** — persempit ke satu status slot saja (Menunggu, Data Terunggah, Siap, Diproses, Selesai, atau Gagal).
+
+## 3. Menyaring per modul AI
+
+Pilih salah satu modul di dropdown **Modul AI** untuk fokus ke slot modul tersebut saja. Ini berguna kalau unit Anda punya beberapa modul aktif dan Anda hanya perlu memantau satu jenis pemeriksaan, misalnya hanya slot **ECG EF Screening**.
+
+![Tabel slot tersaring untuk satu modul AI](/screenshots/id/kasus-klinis/worklist-per-modul/03-filter-modul.png)
+
+Filter Modul AI dan Status Slot bisa dipakai bersamaan. Kombinasi filter tetap tersimpan selama Anda tidak berpindah unit atau memuat ulang halaman.
+
+**Catatan**: tombol **Impor Massal** di sebelah filter hanya aktif kalau Anda sudah memilih satu modul AI spesifik (bukan "Semua modul"), dan hanya muncul untuk akun dengan izin impor. Lihat halaman **Mengimpor Banyak Kasus Sekaligus** untuk cara pakainya.
+
+## 4. Melihat detail hasil dari tabel
+
+Klik ikon panah di kolom paling kiri (atau klik dua kali barisnya) untuk membuka detail slot tanpa berpindah halaman.
+
+- Kalau slot **belum selesai diproses** (status Menunggu, Data Terunggah, Siap, atau Diproses), panel detail hanya menampilkan keterangan bahwa pemrosesan AI untuk slot ini belum selesai.
+- Kalau slot **sudah Selesai**, panel detail menampilkan hasil analisis AI lengkap: skor keyakinan, klasifikasi, dan rincian probabilitas per kelas.
+
+![Baris slot Selesai diperluas menampilkan hasil analisis AI](/screenshots/id/kasus-klinis/worklist-per-modul/04-detail-hasil.png)
+
+Klik ikon panah yang sama lagi (atau klik dua kali barisnya) untuk menutup detail.
+
+## Perbedaan dengan tab Transaksi
+
+Tab **Transaksi** cocok kalau Anda ingin melihat status keseluruhan tiap kasus (satu kasus = satu baris, status gabungan semua slotnya). Tab **Berdasarkan Modul AI** cocok kalau Anda ingin memantau beban kerja atau progres per modul AI, misalnya untuk memastikan semua slot ECG EF Screening minggu ini sudah selesai diproses, atau untuk mencari slot yang gagal (**Gagal**) pada modul tertentu.
+
+## Langkah selanjutnya
+
+Untuk membaca hasil analisis AI secara lebih detail dari halaman kasus (bukan dari tabel worklist), lihat halaman **Melihat Hasil Analisis AI**.

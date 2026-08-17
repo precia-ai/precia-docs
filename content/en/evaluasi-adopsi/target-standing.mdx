@@ -1,0 +1,101 @@
+---
+title: Standing Targets
+---
+
+# Standing Targets
+
+A **standing target** is the baseline commitment set for one KPI indicator, for example "success rate at least 90%". Every evaluation cycle is measured against whichever target is active during that cycle's period. This page is where you set, replace, and retire those targets.
+
+Standing targets work differently from ordinary evaluation data: **changing a target's value never overwrites the old one**. Every time a target's value or direction changes, the system closes the old row and creates a new one as its successor. The old target stays on record (under "Superseded targets") so a cycle that was already measured against it keeps an intact reference that never silently changes underneath it.
+
+Anyone holding the dashboard-read, compare-targets, or set-scope evaluation permission can view this page. The **New target**, **Supersede**, and **Retire** buttons only appear for users who hold the set-scope permission (usually a Platform Admin). If your account holds none of these permissions, the page shows a no-access message instead of an empty table.
+
+## 1. Open the Standing Targets page
+
+Click **Evaluation** in the left sidebar, then open the **Standing targets** button from the evaluation cycle list page (or go directly to `/evaluation/targets`).
+
+![List of active standing targets, with the Indicator key filter, New target button, and Supersede/Retire actions on each row](/screenshots/en/evaluasi-adopsi/target-standing/01-daftar-target.png)
+
+The page is split into two sections:
+
+- **Active targets**: targets currently in force, the reference any open evaluation cycle is measured against.
+- **Superseded targets**: closed targets, kept on record because a closed cycle was once measured against them.
+
+## 2. Reading the Active targets table
+
+Each row in the Active targets table represents one target currently in force, with these columns:
+
+- **Indicator**: the KPI indicator code being tracked (see the list of valid codes under [Available indicator codes](#available-indicator-codes) below).
+- **Target**: the target value with its direction, written as a word ("at least" or "at most") plus the comparison symbol (`>=` or `<=`) and the number. "at least 90 (`>= 90`)" means the actual value must reach 90 or higher to meet the target; "at most 800 (`<= 800`)" means the actual value must stay at 800 or below.
+- **Scope**: the target's scope, either a specific clinical unit name or "All units", and either a specific AI module name or "All modules". A target scoped to "All units, all modules" applies organization-wide.
+- **Baseline**: the indicator's value before this target was set (if filled in when the target was created), plus the baseline period's date range. This column is blank when no baseline was entered.
+- **In force from**: the date this target became active.
+- **Supersede** / **Retire**: actions to change or close this target (see sections 5 and 6). Only visible to users who hold the set-scope permission.
+
+## 3. Filtering by Indicator key
+
+Type an indicator code (e.g. `success_rate`) into the **Indicator key** box at the top to narrow both tables (Active targets and Superseded targets) down to that one indicator. Clear the box to show every indicator again.
+
+## 4. Available indicator codes
+
+The **Indicator key** is not free text. The backend only accepts one of these seven fixed codes, so make sure you type one of them exactly when creating a new target:
+
+| Indicator key | Meaning |
+|---|---|
+| `inference_count` | Number of AI inferences run |
+| `transaction_count` | Number of clinical transactions |
+| `success_rate` | Success rate (%) |
+| `unit_adoption_rate` | Clinical unit adoption rate (%) |
+| `validator_adoption_rate` | Validator/doctor adoption rate (%) |
+| `turnaround_p50_ms` | Median processing time (p50, milliseconds) |
+| `turnaround_p90_ms` | 90th-percentile processing time (p90, milliseconds) |
+
+If you type a code that is not on this list, saving the target fails with an error.
+
+## 5. Creating a new target
+
+Click **New target** in the top-right corner (only visible to users who hold the set-scope permission). A "New standing target" form opens above the table.
+
+![Empty New standing target form, with the Indicator key field, Target value field, Direction options, and Create target button](/screenshots/en/evaluasi-adopsi/target-standing/02-formulir-kosong.png)
+
+Fill in the following fields:
+
+1. **Indicator key**: type one of the codes from the table in section 4 (for example `success_rate`). Required.
+2. **Target value**: the numeric value the indicator must reach. Required, must be a number.
+3. **Direction**: pick one of the two radio options:
+   - **at least the target value (>=)**: use this when higher is better (e.g. a success rate). The target is met when the actual value reaches or exceeds the target number.
+   - **at most the target value (`<=`)**: use this when lower is better (e.g. a processing time). The target is met when the actual value stays at or below the target number.
+4. **Baseline value** (optional): the indicator's value before this target was set, as a "before vs. after" reference.
+5. **Baseline from** / **Baseline to** (optional): the date range that baseline value was measured over.
+6. **Scope unit** (optional): pick one specific clinical unit from the dropdown so the target only applies to that unit, or leave it on "All units" to apply organization-wide.
+7. **Scope AI module** (optional): pick one specific AI module from the dropdown, or leave it on "All modules".
+8. **Effective from**: the date this target becomes active. Pre-filled with today's date, editable.
+9. **Note** (optional): the reasoning behind this number or where it came from, for context for other readers.
+
+Example of a filled-in form:
+
+![Filled New standing target form: Indicator key turnaround_p90_ms, Target value 950, direction at most, baseline 1400 with a date range, a specific scope unit and module, and a note](/screenshots/en/evaluasi-adopsi/target-standing/03-formulir-terisi.png)
+
+Once every field is filled in, click **Create target**. On success, the form closes and the new target immediately appears in the Active targets table.
+
+![Active targets table after the new turnaround_p90_ms target was created, showing up as a new row in the table](/screenshots/en/evaluasi-adopsi/target-standing/04-target-dibuat.png)
+
+**Important**: only one active target may exist for a given indicator + scope (unit + module) combination at a time. If you try to create a new target for an indicator and scope that already has an active target, saving fails with a message that a target is already active — use **Supersede** on the existing target instead of creating a new one.
+
+## 6. Superseding an active target
+
+When a target's value or direction needs to change, do not create a second target for the same indicator — click **Supersede** on the row you want to change. The same form opens, pre-filled with that target's current values, with **Indicator key** locked (uneditable, because superseding a target always keeps the same indicator).
+
+Change the value, direction, scope, or effective date as needed, then click the Supersede button at the bottom of the form. The old target is automatically closed (its effective period ends today) and moves to the **Superseded targets** table, while a new row with the updated values appears in **Active targets**.
+
+## 7. Retiring an active target
+
+Click **Retire** on a row when that indicator genuinely no longer needs to be tracked (not because its value changed). Unlike Supersede, Retire **creates no successor row** — the target is simply closed and moves to the Superseded targets table with no new active target for that indicator.
+
+The Retire button acts immediately when clicked, with no additional confirmation dialog. Make sure you actually want to retire the target before clicking, since this cannot be undone from this page (a retired target can still be viewed in the Superseded targets table, but bringing it back active again requires creating a new target).
+
+## Notes
+
+- Both active and superseded targets stay visible on this page indefinitely — target history is never deleted, only marked inactive.
+- A target scoped to "All units, all modules" acts as the organization's general reference. A more narrowly scoped target (a specific unit or module) is used when that unit or module needs a different standard from the general one.
+- Setting at least one active target for the relevant indicator is a prerequisite before an evaluation cycle can be created with that indicator in its scope.

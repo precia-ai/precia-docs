@@ -1,0 +1,90 @@
+---
+title: Mengatur Anggota Unit
+---
+
+# Mengatur Anggota Unit
+
+Tab **Anggota** di halaman detail unit adalah tempat Anda menugaskan dokter/perawat ke sebuah unit klinis, mengubah peran operasional mereka, menetapkan siapa yang berperan sebagai validator, dan menghapus anggota dari unit. Panduan ini membahas tab **Anggota** secara khusus. Untuk cara membuka halaman detail unit, lihat panduan "Detail Unit".
+
+## 1. Membuka tab Anggota
+
+Buka halaman detail sebuah unit, lalu pastikan tab **Anggota** aktif (tab ini terbuka secara default saat Anda membuka detail unit). Tab ini menampilkan tabel **Staf Klinis** berisi seluruh pengguna yang sudah ditugaskan ke unit tersebut.
+
+![Tab Anggota pada halaman detail unit, menampilkan tabel staf klinis dengan tombol Tugaskan Staf dan ikon aksi ubah peran](/screenshots/id/manajemen-unit/mengatur-anggota-unit/01-tab-members.png)
+
+Tabel menampilkan kolom berikut untuk setiap anggota:
+
+- **Nama**: nama lengkap dan nama pengguna (username) anggota.
+- **Peran**: konteks peran operasional anggota di unit ini (contoh: "Dokter Spesialis Jantung", "Perawat ICU").
+- **Validator**: badge **Validator** (hijau) jika anggota berperan sebagai validator klinis di unit ini, atau badge **Staf** jika bukan.
+- **Ditugaskan**: tanggal anggota tersebut ditugaskan ke unit.
+- **Aksi**: tiga ikon tombol, dari kiri ke kanan: **ubah peran** (pensil), **tetapkan/cabut validator** (toggle), dan **hapus dari unit** (tempat sampah merah).
+
+Tombol **Tugaskan Staf** (kotak biru, tersedia di sidebar kiri maupun di header tabel) membuka dialog untuk menambahkan anggota baru.
+
+Jika unit belum memiliki anggota sama sekali, tabel menampilkan pesan bahwa belum ada staf yang ditugaskan.
+
+## 2. Menugaskan anggota baru
+
+Klik tombol **Tugaskan Staf**. Sebuah dialog terbuka di atas halaman.
+
+![Dialog Tugaskan Staf Klinis dalam kondisi kosong, dengan kolom pencarian pengguna dan kolom konteks peran](/screenshots/id/manajemen-unit/mengatur-anggota-unit/02-dialog-assign-kosong.png)
+
+Dialog ini berisi dua bagian yang wajib diisi:
+
+1. **Pengguna** — kotak pencarian untuk memilih pengguna yang akan ditugaskan. Pengguna hanya bisa dipilih dari organisasi yang sama dengan unit ini.
+2. **Konteks Peran** — teks bebas untuk mendeskripsikan peran operasional pengguna di unit ini, misalnya "Dokter Spesialis Jantung" atau "Perawat Rawat Inap".
+
+### 2.1 Mencari dan memilih pengguna
+
+Ketik nama, email, atau nama pengguna di kolom pencarian. Daftar pengguna yang cocok muncul otomatis di bawah kolom saat Anda mengetik.
+
+![Kolom pencarian pengguna diisi kata kunci "dr", menampilkan satu hasil pengguna yang cocok di bawahnya](/screenshots/id/manajemen-unit/mengatur-anggota-unit/03-dialog-assign-cari-user.png)
+
+Klik salah satu pengguna pada daftar hasil untuk memilihnya. Setelah dipilih, kotak pencarian berubah menjadi kartu ringkasan pengguna terpilih (nama, email, dan organisasi). Untuk mengganti pilihan, klik ikon **×** di kartu tersebut, lalu cari ulang.
+
+### 2.2 Mengisi konteks peran dan menyimpan
+
+Setelah memilih pengguna, isi kolom **Konteks Peran** dengan deskripsi singkat peran operasional pengguna tersebut di unit ini.
+
+![Dialog Tugaskan Staf Klinis dengan pengguna sudah terpilih dan konteks peran sudah diisi "Dokter Spesialis Jantung", siap ditugaskan](/screenshots/id/manajemen-unit/mengatur-anggota-unit/04-dialog-assign-terisi.png)
+
+Klik **Tugaskan Anggota** untuk menyimpan. Beberapa hal yang perlu diperhatikan:
+
+- Kedua kolom (pengguna dan konteks peran) wajib diisi. Jika salah satu kosong saat submit, dialog menampilkan pesan error di bawah kolom terkait dan tidak menyimpan apa pun.
+- Jika pengguna yang dipilih sudah lebih dulu ditugaskan ke unit ini, sistem menolak permintaan dan menampilkan pesan bahwa pengguna sudah menjadi anggota unit.
+- Anggota baru selalu masuk sebagai **Staf** (bukan validator). Untuk menjadikannya validator, gunakan toggle validator setelah anggota berhasil ditambahkan (lihat bagian 4).
+- Klik **Batal** kapan saja untuk menutup dialog tanpa menyimpan.
+
+Setelah berhasil, dialog tertutup otomatis dan anggota baru langsung muncul di tabel Staf Klinis.
+
+## 3. Mengubah peran (konteks peran) anggota
+
+Untuk mengubah deskripsi peran operasional seorang anggota tanpa mengubah status validatornya, klik ikon **pensil** pada kolom Aksi baris anggota tersebut.
+
+![Dialog Perbarui Peran menampilkan nama anggota dan kolom konteks peran yang bisa diedit, dengan tombol Simpan Perubahan](/screenshots/id/manajemen-unit/mengatur-anggota-unit/05-dialog-edit-role.png)
+
+Dialog **Perbarui Peran** menampilkan nama anggota dan satu kolom **Konteks Peran** berisi nilai saat ini. Ubah teksnya, lalu klik **Simpan Perubahan**.
+
+Catatan:
+
+- Kolom konteks peran wajib diisi; mengosongkannya lalu menyimpan akan menampilkan pesan error.
+- Jika Anda tidak mengubah apa pun (teks sama persis dengan nilai semula) dan langsung klik **Simpan Perubahan**, dialog hanya tertutup tanpa melakukan permintaan penyimpanan apa pun.
+- Klik **Batal** untuk menutup dialog tanpa menyimpan perubahan.
+
+## 4. Menetapkan atau mencabut status validator
+
+Ikon toggle di kolom Aksi (di antara ikon pensil dan tempat sampah) digunakan untuk mengubah status validator anggota:
+
+- Jika anggota belum berstatus validator, klik ikon ini untuk **menetapkan** anggota tersebut sebagai validator klinis unit.
+- Jika anggota sudah berstatus validator (badge **Validator** hijau di kolom Validator, ikon toggle berwarna hijau menyala), klik ikon yang sama untuk **mencabut** status validatornya kembali menjadi Staf biasa.
+
+Perubahan status validator berlaku langsung tanpa dialog konfirmasi. Selama proses berjalan, ikon menampilkan indikator loading berputar sebentar.
+
+## 5. Menghapus anggota dari unit
+
+Klik ikon **tempat sampah merah** pada kolom Aksi untuk menghapus anggota dari unit.
+
+**Penting**: penghapusan anggota berjalan langsung begitu ikon diklik, tanpa dialog konfirmasi tambahan. Anggota akan langsung hilang dari tabel Staf Klinis dan kehilangan akses operasionalnya ke unit ini. Pastikan Anda memang bermaksud menghapus anggota tersebut sebelum mengklik ikon ini.
+
+Menghapus anggota dari unit tidak menghapus akun pengguna itu sendiri dari sistem, hanya menghapus penugasannya ke unit yang sedang Anda kelola. Pengguna yang sama masih bisa ditugaskan kembali ke unit ini di kemudian hari melalui langkah "Menugaskan anggota baru" di atas.

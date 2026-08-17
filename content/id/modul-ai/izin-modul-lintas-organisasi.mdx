@@ -1,0 +1,59 @@
+---
+title: Izin Modul Lintas Organisasi
+---
+
+# Izin Modul Lintas Organisasi
+
+Setiap modul AI di PRECIA hanya bisa dipakai oleh organisasi (tenant) yang secara eksplisit diizinkan. Halaman **Detail Modul AI** menampilkan daftar organisasi yang saat ini berizin memakai sebuah modul, lintas organisasi, lewat kartu **Izin Tenant**. Dari kartu yang sama, admin membuka dialog **Kelola Izin** untuk mengubah izin tersebut.
+
+## Cara Membuka
+
+1. Login ke PRECIA sebagai admin.
+2. Klik menu **Registri AI** di sidebar kiri.
+3. Klik tombol **Buka** pada modul yang ingin diperiksa, atau klik langsung nama modulnya, untuk masuk ke halaman detail modul.
+4. Lihat kartu **Izin Tenant** di sisi kanan halaman detail.
+
+![Halaman detail modul AI dengan kartu Izin Tenant menampilkan daftar organisasi yang diizinkan, dan tombol Kelola Izin](/screenshots/id/modul-ai/izin-modul-lintas-organisasi/01-kartu-izin-tenant.png)
+
+## Membaca Kartu Izin Tenant
+
+Kartu **Izin Tenant** (kotak biru di atas) menampilkan seluruh organisasi yang saat ini diizinkan memakai modul ini, masing-masing sebagai badge berisi nama dan kode organisasi, misalnya `RSUI (Radiografer) (RSUI)`. Daftar ini bersifat lintas organisasi, artinya menampilkan semua tenant yang berizin, bukan hanya organisasi Anda sendiri. Angka pada badge **"N tenant aktif"** di bagian atas halaman (dekat status modul) selalu sama dengan jumlah badge organisasi di kartu ini.
+
+Jika belum ada organisasi yang diizinkan sama sekali, kartu ini menampilkan pesan "Belum ada organisasi yang diizinkan" alih-alih daftar badge.
+
+Tombol **Kelola Izin** (kotak biru di bawah kartu) muncul untuk membuka dialog pengaturan izin. Tombol ini hanya tampil bagi pengguna yang berhak membaca atau mengubah izin tenant modul AI:
+
+- Jika akun Anda punya hak untuk **mengubah** izin, tombol berlabel **Kelola Izin** dan dialog yang terbuka bisa disimpan.
+- Jika akun Anda hanya punya hak untuk **membaca** izin (tanpa hak ubah), tombol berlabel **Lihat Izin** dan dialog yang terbuka bersifat tampilan saja, tanpa tombol simpan.
+- Jika akun Anda tidak punya hak baca maupun ubah izin tenant sama sekali, tombol ini tidak akan muncul di halaman.
+
+> [!WARNING]
+> Izin tidak bisa diubah selagi status siklus hidup modul adalah **Nonaktif**. Mengklik tombol **Kelola Izin** pada modul nonaktif akan menampilkan pesan error "Izin tidak dapat diperbarui selama modul AI ini tidak aktif." di kartu, dan dialog tidak akan terbuka. Aktifkan dulu modul (ubah ke Pilot atau Klinis) sebelum mengatur izin tenant.
+
+## Mengelola Izin
+
+1. Klik tombol **Kelola Izin** pada kartu Izin Tenant.
+2. Dialog **Kelola Izin** terbuka, menampilkan nama modul yang sedang diatur dan daftar organisasi pada bagian **Organisasi yang Diizinkan** (kotak biru pada gambar berikut).
+
+![Dialog Kelola Izin terbuka menampilkan daftar organisasi yang diizinkan dengan checkbox, serta tombol Simpan Perubahan](/screenshots/id/modul-ai/izin-modul-lintas-organisasi/02-dialog-kelola-izin.png)
+
+3. Setiap organisasi pada daftar ditampilkan sebagai baris dengan checkbox, nama organisasi, dan kode organisasinya. Baris yang tercentang berarti organisasi tersebut sedang diizinkan memakai modul.
+4. Klik baris organisasi mana pun untuk mencentang (mengizinkan) atau membatalkan centang (mencabut izin). Perubahan ini belum tersimpan sampai Anda menekan tombol **Simpan Perubahan**.
+5. Klik **Simpan Perubahan** (kotak biru pada gambar) untuk menyimpan. Dialog otomatis tertutup setelah berhasil, kartu Izin Tenant dan riwayat log modul diperbarui menampilkan perubahan terbaru.
+6. Klik **Batal** untuk menutup dialog tanpa menyimpan perubahan apa pun.
+
+> [!NOTE]
+> Daftar organisasi pada dialog ini hanya menampilkan **organisasi Anda sendiri**, bukan daftar seluruh organisasi di platform. Halaman ini berlingkup organisasi, jadi dari sini Anda hanya bisa mengizinkan atau mencabut izin untuk organisasi tempat Anda terdaftar. Mengatur izin untuk organisasi lain adalah kewenangan admin platform di bagian Platform.
+
+> [!WARNING]
+> Mencabut centang lalu menyimpan langsung mencabut akses modul untuk seluruh organisasi Anda. Semua pengguna di organisasi tersebut akan langsung kehilangan akses ke modul ini setelah tersimpan. Pastikan tidak ada proses klinis yang sedang bergantung pada modul sebelum mencabut izinnya. Izin bisa dipulihkan kapan saja dengan mencentang kembali dan menyimpan ulang.
+
+## Menangani Error
+
+- Jika daftar organisasi gagal dimuat saat dialog dibuka, pesan error "Gagal memuat organisasi." muncul di atas daftar.
+- Jika penyimpanan gagal (misal karena masalah jaringan atau hak akses berubah di tengah jalan), pesan error muncul di dalam dialog dan dialog tetap terbuka sehingga Anda bisa mencoba **Simpan Perubahan** lagi.
+
+## Catatan
+
+- Perubahan izin tenant tercatat di **Log Lengkap** pada halaman detail modul, termasuk siapa yang mengubah dan kapan.
+- Jumlah "tenant aktif" di seluruh halaman (termasuk di tabel Daftar Modul AI) mengacu pada organisasi yang berstatus aktif di kartu Izin Tenant ini.

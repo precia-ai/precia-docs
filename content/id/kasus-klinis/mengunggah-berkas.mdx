@@ -1,0 +1,63 @@
+---
+title: Mengunggah Berkas Pasien
+---
+
+# Mengunggah Berkas Pasien
+
+Setelah kasus dibuat, setiap modul AI yang aktif di unit tersebut mendapat slot pemeriksaan sendiri di halaman detail kasus. Slot ini butuh berkas (gambar EKG, foto hasil pemeriksaan, dsb., tergantung modul) sebelum bisa ditandai siap dan dianalisis AI. Halaman ini menjelaskan langkah-langkahnya, dari membuka kasus sampai berkas ditandai siap dianalisis.
+
+## 1. Buka kasus dari worklist
+
+Dari halaman **Klinis**, cari kasus yang berkasnya belum diunggah (status **Belum Diproses**), lalu klik barisnya untuk membuka detail kasus.
+
+![Worklist kasus klinis, klik salah satu baris untuk membuka detailnya](/screenshots/id/kasus-klinis/mengunggah-berkas/01-worklist-klik-baris.png)
+
+## 2. Pilih tab modul AI
+
+Halaman detail kasus punya tab **Info Pasien** dan satu tab tambahan untuk setiap modul AI yang aktif di unit tersebut. Klik salah satu tab modul AI untuk membuka area unggah berkasnya. Titik kecil di sebelah nama modul menandakan modul itu belum punya berkas.
+
+![Halaman detail kasus, klik tab salah satu modul AI](/screenshots/id/kasus-klinis/mengunggah-berkas/02-buka-detail-kasus.png)
+
+## 3. Unggah berkas ke slot modul
+
+Setiap slot modul menampilkan area unggah bergaris putus-putus, berikut jumlah maksimum berkas yang diterima dan formatnya (tercantum di atas area unggah). Anda bisa menyeret berkas langsung ke area itu, atau klik **klik untuk memilih** untuk membuka jendela pilih berkas dari komputer.
+
+![Area unggah kosong untuk sebuah slot modul AI](/screenshots/id/kasus-klinis/mengunggah-berkas/03-dropzone-kosong.png)
+
+Setelah berkas dipilih, kartu berkas muncul di bawah area unggah lengkap dengan nama dan ukuran berkas. Klik tombol **Unggah** pada kartu itu untuk mulai mengunggah.
+
+## 4. Tunggu proses unggah selesai
+
+Selama proses berlangsung, tombol berubah menjadi **Mengunggah...** dan sebuah bilah progres menunjukkan persentase unggahan.
+
+![Bilah progres saat berkas sedang diunggah](/screenshots/id/kasus-klinis/mengunggah-berkas/04-progress-unggah.png)
+
+Jangan tutup atau muat ulang halaman selama proses ini berjalan — unggahan yang terputus tidak akan tersimpan dan harus diulang dari awal.
+
+## 5. Periksa berkas yang sudah terunggah
+
+Setelah selesai, status slot berubah menjadi **Data Terunggah**, area unggah tadi hilang (digantikan pesan bahwa slot sudah mencapai batas jumlah berkas, kalau memang hanya menerima satu berkas), dan berkas yang baru diunggah muncul di daftar **Berkas Terunggah**. Untuk berkas bertipe gambar, pratinjaunya langsung ditampilkan dan bisa diklik untuk diperbesar.
+
+![Berkas berhasil terunggah dan tombol Tandai Siap untuk AI](/screenshots/id/kasus-klinis/mengunggah-berkas/05-berkas-terunggah.png)
+
+Di setiap baris berkas tersedia tautan **Perbesar** (untuk gambar) dan **Hapus**. Kalau berkas yang diunggah salah, hapus dulu berkas itu sebelum bisa mengunggah yang baru — ini berlaku terutama untuk modul yang hanya menerima satu berkas per transaksi.
+
+## 6. Tandai siap untuk AI
+
+Kalau berkas yang diperlukan modul itu sudah lengkap, klik tombol **Tandai Siap untuk AI** di bawah daftar berkas. Tombol ini hanya muncul selama slot masih berstatus **Menunggu** atau **Data Terunggah** — begitu ditandai siap, tombol ini digantikan tombol **Jalankan AI**.
+
+Status slot berubah menjadi **Siap**, menandakan modul tersebut sudah punya semua data yang dibutuhkan dan tinggal menunggu proses analisis dijalankan (baik manual lewat tombol **Jalankan AI**, maupun otomatis tergantung pengaturan modul).
+
+![Status slot berubah menjadi Siap setelah ditandai, tombol Jalankan AI muncul](/screenshots/id/kasus-klinis/mengunggah-berkas/06-tandai-siap-dianalisis.png)
+
+## Catatan penting
+
+- **Ulangi untuk tiap modul.** Kalau kasus punya lebih dari satu modul AI aktif (misalnya tiga modul EKG sekaligus), ulangi langkah 2–6 untuk setiap tab modul. Setiap slot berdiri sendiri — mengunggah dan menandai siap satu modul tidak memengaruhi modul lain.
+- **Berkas Umum vs berkas per modul.** Tab **Info Pasien** juga punya area unggah sendiri untuk dokumen pendukung yang sifatnya umum (misalnya surat rujukan atau foto pasien), bukan berkas yang dianalisis AI. Berkas umum menerima semua format dan tidak terikat batas jumlah per slot.
+- **Format dan ukuran berkas.** Format yang diterima dan ukuran maksimum berkas ditampilkan di atas area unggah tiap slot, mengikuti pengaturan modul AI tersebut. Kalau format berkas tidak sesuai atau ukurannya melebihi batas, sistem menampilkan pesan kesalahan dan unggahan dibatalkan.
+- **Kasus harus masih bisa diedit.** Unggah berkas hanya bisa dilakukan selama status kasus masih **Belum Diproses**, **Data Tidak Valid**, atau **Gagal Diunggah**. Kasus yang sudah dikirim ke validator atau dibatalkan tidak bisa lagi menerima unggahan baru.
+- **Menghapus berkas bersifat final.** Berkas yang dihapus tidak bisa dikembalikan — kalau salah unggah, pastikan sebelum menekan **Hapus**.
+
+## Langkah selanjutnya
+
+Setelah slot ditandai siap (atau dijalankan lewat **Jalankan AI**), sistem akan memprosesnya secara asinkron. Lihat halaman **Melihat Hasil Analisis AI** untuk cara membaca hasilnya setelah selesai.

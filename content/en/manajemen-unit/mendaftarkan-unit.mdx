@@ -1,0 +1,67 @@
+---
+title: Registering a New Unit
+---
+
+# Registering a New Unit
+
+The **Register Clinical Unit** page is used to create a new clinical unit (department/poli) in your organization, such as Cardiology, Radiology, or any other new unit. Registration is split into 3 sequential steps: **Unit Identity**, **Initial Status**, and **Review & Register**.
+
+## 1. Opening the registration page
+
+From the **Units** page, click the **Register Unit** button in the top-right corner. You'll land in a 3-step wizard. The step numbers at the top show where you currently are; completed steps are marked with a checkmark icon.
+
+## 2. Step 1: Unit Identity
+
+This is the first step, containing the basic information needed to identify the unit.
+
+![Step 1 of the unit registration wizard, Unit Identity form with Unit Code and Unit Name filled in, Next button in the bottom-right corner](/screenshots/en/manajemen-unit/mendaftarkan-unit/01-langkah-identitas.png)
+
+Fill in the following fields:
+
+- **Unit Code** (required): a unique identifier for this unit within your organization, e.g. `POLI-JANTUNG`. This code must not match any existing unit's code; if it does, the system will reject it when you submit at the final step.
+- **Unit Name** (required): a human-readable name for the unit, e.g. "Poli Jantung".
+- **Service Type** (optional): the type of clinical service this unit provides, e.g. "Cardiology". May be left blank.
+
+Click the **Next** button (blue arrow) to move to the next step. If Unit Code or Unit Name is still empty, the system shows an error message under the relevant field and you cannot proceed until it's filled in.
+
+## 3. Step 2: Initial Status
+
+The second step sets the operational status this unit will start with.
+
+![Step 2 of the unit registration wizard, three status options Active/Pilot/Inactive, with the Pilot option selected](/screenshots/en/manajemen-unit/mendaftarkan-unit/02-langkah-status.png)
+
+Choose one of the three status options:
+
+- **Active**: the unit is ready for full clinical operations and can process transactions immediately.
+- **Pilot**: the unit is in a controlled rollout/trial phase.
+- **Inactive**: the unit is not yet accepting transactions.
+
+Click the status card you want to select it; the selected card is marked with a blue border. By default, **Active** is selected when the wizard first opens. This status can be changed later from the unit's detail page, so there's no need to worry about getting it wrong here.
+
+The **Back** button (left) returns you to step 1 without losing what you've already entered. The **Next** button (right) takes you to the final step.
+
+## 4. Step 3: Review & Register
+
+The final step shows a summary of everything you've entered so far, to confirm before it's actually submitted to the system.
+
+![Step 3 of the unit registration wizard, summary of Unit/Service Type/Initial Status, Register Unit button in the bottom-right corner](/screenshots/en/manajemen-unit/mendaftarkan-unit/03-langkah-review.png)
+
+Double-check the three summary sections:
+
+- **Unit**: the unit name and unit code that will be registered.
+- **Service Type**: the service type you entered earlier, or "Not specified" if left blank.
+- **Initial Status**: the status badge you chose in step 2.
+
+If something needs fixing, click the **Back** button to return to a previous step and change the data. Once you're sure everything is correct, click the **Register Unit** button (blue arrow) to submit the data and create the new unit.
+
+**Important**: once you click **Register Unit** and it succeeds, the unit is immediately recorded in the system and you're automatically redirected back to the **Units** page. This action cannot be undone from the wizard; if the unit code turns out to already be in use by another unit, the system shows an error message and keeps you on this step so you can fix the code.
+
+The **Clear** button (bottom left, available on every step) empties all fields and resets the wizard back to step 1 — useful if you want to start over from scratch.
+
+## 5. The new unit appears in the list
+
+Once successfully registered, the new unit immediately appears as a card on the **Units** page, complete with the status badge you selected.
+
+![The new unit "Unit Contoh Dokumentasi" appears in the units list after successful registration, with a Pilot status badge](/screenshots/en/manajemen-unit/mendaftarkan-unit/04-hasil-akhir.png)
+
+From here you can click that unit's card (or the **Manage unit** link) to open its detail page and complete further setup, such as adding unit members or enabling AI modules. See the separate "Unit Details" and "Managing Unit Members" guides for the next steps.

@@ -1,0 +1,84 @@
+---
+title: Analitik Platform
+---
+
+# Analitik Platform
+
+Halaman **Analitik Platform** menampilkan statistik penggunaan PRECIA lintas seluruh organisasi (tenant) sekaligus. Berbeda dengan halaman Analitik biasa yang hanya melihat satu organisasi, halaman ini membantu admin platform memantau adopsi dan aktivitas semua tenant dalam satu layar, tanpa perlu membuka organisasi satu per satu.
+
+Halaman ini hanya menampilkan jumlah dan rasio (transaksi, inferensi AI, tingkat keberhasilan, jumlah modul aktif). Tidak ada data klinis pasien yang ditampilkan di sini.
+
+## Siapa yang bisa mengakses
+
+Setiap grafik di halaman ini punya izin sendiri, jadi tampilan bisa berbeda antar akun:
+
+- Kartu ringkasan (KPI) dan grafik volume per tenant butuh izin **monitoring:read_report_all_orgs**.
+- Grafik adopsi modul dan daftar tenant tanpa aktivitas butuh izin **evaluation:read_dashboard_all_orgs**.
+
+Akun **Super Admin (SUP)** memegang kedua izin ini sehingga melihat seluruh isi halaman. Kalau akun kamu tidak memegang izin apa pun dari keduanya, halaman akan menampilkan pesan "Akses ditolak" alih-alih data kosong.
+
+## Membuka halaman
+
+1. Masuk ke Mode Platform (lihat halaman "Ringkasan Organisasi & Platform" kalau belum tahu caranya).
+2. Klik menu **Analitik** di sidebar Mode Platform.
+
+## Memilih rentang waktu
+
+![Kartu ringkasan Analitik Platform dengan filter rentang waktu dan empat KPI utama](/screenshots/id/organisasi-platform/analitik-platform/01-ringkasan.png)
+
+Di pojok kanan atas kartu judul (ditandai kotak biru pertama pada gambar), tersedia tiga pilihan rentang waktu:
+
+- **7 hari terakhir**
+- **30 hari terakhir** (pilihan default saat halaman dibuka)
+- **90 hari terakhir**
+
+Klik salah satu tombol untuk mengganti rentang. Seluruh angka dan grafik di halaman langsung dihitung ulang mengikuti rentang yang dipilih. Tombol **Muat ulang** di sebelahnya mengambil data terbaru tanpa mengubah rentang waktu yang sedang aktif, berguna kalau kamu ingin memastikan angka sudah paling baru sebelum melapor.
+
+Empat kartu di bawahnya (ditandai kotak biru kedua) adalah ringkasan cepat untuk rentang waktu yang dipilih:
+
+- **Tenant Aktif** — jumlah organisasi yang punya transaksi atau inferensi pada periode ini, dibanding total organisasi terdaftar (format "5 / 6" berarti 5 dari 6 organisasi aktif).
+- **Transaksi** — total kasus klinis yang dibuat di seluruh tenant pada periode ini.
+- **Inferensi AI** — total proses AI yang dijalankan di seluruh tenant.
+- **Tingkat Keberhasilan** — persentase inferensi AI yang berhasil diproses (tidak gagal) pada periode ini.
+
+Catatan: kartu-kartu ini belum menampilkan pembanding terhadap periode sebelumnya (tertulis "Tidak ada pembanding untuk periode sebelumnya"), jadi gunakan angka ini sebagai potret satu periode, bukan tren.
+
+## Volume inferensi per tenant
+
+![Grafik batang volume inferensi AI per organisasi, diurutkan dari tertinggi](/screenshots/id/organisasi-platform/analitik-platform/02-volume-tenant.png)
+
+Grafik ini mengurutkan organisasi dari yang paling banyak menjalankan inferensi AI hingga yang paling sedikit, pada rentang waktu yang sedang dipilih. Berguna untuk cepat melihat tenant mana yang paling aktif memakai modul AI dan mana yang volumenya masih rendah.
+
+## Adopsi modul dan tenant tanpa aktivitas
+
+![Dua panel berdampingan: grafik adopsi modul AI per tenant dan daftar tenant tanpa aktivitas](/screenshots/id/organisasi-platform/analitik-platform/03-adopsi-dormant.png)
+
+Dua panel ini berdampingan:
+
+- **Adopsi modul per tenant** (panel kiri) — menghitung berapa modul AI *berbeda* yang benar-benar dipakai tiap organisasi pada periode ini, bukan berapa modul yang diaktifkan. Organisasi bisa saja punya banyak modul aktif tapi hanya memakai sebagian, angka di sini menunjukkan pemakaian nyata.
+- **Tenant tanpa aktivitas** (panel kanan) — daftar organisasi yang sama sekali tidak punya transaksi maupun inferensi pada periode yang dipilih. Setiap baris menampilkan nama organisasi, kode organisasi, dan status akunnya (misalnya "active" atau "inactive"). Kalau semua tenant aktif pada periode ini, panel ini menampilkan pesan bahwa tidak ada tenant dorman.
+
+Panel tenant tanpa aktivitas ini berguna untuk menemukan organisasi yang sudah onboarding tapi belum benar-benar memakai sistem, sehingga tim bisa menindaklanjuti (misalnya pelatihan ulang atau pengecekan kendala teknis).
+
+## Tabel perbandingan tenant
+
+![Tabel perbandingan lengkap seluruh tenant: transaksi, inferensi, gagal, tingkat keberhasilan, dan jumlah modul](/screenshots/id/organisasi-platform/analitik-platform/04-tabel-perbandingan.png)
+
+Tabel di bagian paling bawah merangkum data yang sama dengan grafik-grafik di atas, tapi dalam bentuk angka lengkap per organisasi:
+
+| Kolom | Keterangan |
+|---|---|
+| Organisasi | Nama tenant. Baris yang tidak aktif pada periode ini ditandai label "tidak aktif" di sebelah nama dan seluruh barisnya tampak pudar. |
+| Transaksi | Jumlah kasus klinis yang dibuat pada periode ini. |
+| Inferensi | Jumlah proses AI yang dijalankan pada periode ini. |
+| Gagal | Jumlah inferensi yang gagal diproses. |
+| Tingkat keberhasilan | Persentase inferensi yang berhasil. Tanda "-" muncul kalau tenant tidak punya inferensi sama sekali pada periode ini, sehingga rasio tidak bisa dihitung. |
+| Modul | Jumlah modul AI berbeda yang benar-benar dipakai tenant tersebut pada periode ini. |
+
+Tabel ini hanya muncul kalau akunmu punya izin volume tenant (izin yang sama dengan grafik "Volume inferensi per tenant"); kalau akunmu hanya punya izin adopsi modul, tabel ini tidak akan terlihat meski grafik adopsi dan tenant dorman tetap tampil.
+
+## Catatan penting
+
+- Mengganti rentang waktu memuat ulang seluruh data di halaman, bukan hanya satu grafik. Perhatikan ikon muat ulang yang berputar sebagai tanda data sedang diambil.
+- Jika koneksi ke server gagal, halaman menampilkan pesan galat berwarna merah di bawah kartu judul, dan angka sebelumnya tetap ditampilkan sampai percobaan berikutnya berhasil.
+- Semua angka di halaman ini adalah agregat lintas organisasi. Untuk melihat detail transaksi atau inferensi satu organisasi tertentu, buka halaman Analitik di dalam organisasi yang bersangkutan, bukan dari sini.

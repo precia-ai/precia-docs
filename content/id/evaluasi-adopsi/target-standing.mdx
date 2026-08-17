@@ -1,0 +1,101 @@
+---
+title: Target Standing
+---
+
+# Target Standing
+
+**Target standing** (standing target) adalah nilai baku yang ditetapkan untuk satu indikator KPI, misalnya "tingkat keberhasilan minimal 90%". Setiap siklus evaluasi diukur terhadap target yang sedang berlaku (aktif) pada periode siklus tersebut. Halaman ini adalah tempat menetapkan, mengganti, dan menghentikan target-target itu.
+
+Target standing berbeda dari data siklus evaluasi biasa: **mengubah nilai target tidak menimpa data lama**. Setiap kali nilai atau arah target diubah, sistem menutup target lama dan membuat baris baru sebagai penggantinya. Target lama tetap tersimpan (di bagian "Target yang digantikan") supaya siklus yang sudah diukur terhadapnya tetap punya acuan yang utuh dan tidak berubah di belakang layar.
+
+Halaman ini bisa dibaca oleh siapa pun yang punya izin baca dashboard evaluasi, izin bandingkan target, atau izin menetapkan target. Tapi tombol **Target baru**, **Gantikan**, dan **Hentikan** hanya muncul untuk pengguna yang punya izin menetapkan target (biasanya dipegang Admin Platform). Jika akun Anda tidak punya izin apa pun ke area Evaluasi, halaman akan menampilkan pesan tidak punya akses, bukan tabel kosong.
+
+## 1. Membuka halaman Target Standing
+
+Klik menu **Evaluasi** di sidebar kiri, lalu buka tombol **Target baku** dari halaman daftar siklus evaluasi (atau langsung ke route `/evaluation/targets`).
+
+![Daftar target standing aktif, dengan filter Indicator key, tombol Target baru, dan aksi Gantikan/Hentikan pada tiap baris](/screenshots/id/evaluasi-adopsi/target-standing/01-daftar-target.png)
+
+Halaman terbagi jadi dua bagian:
+
+- **Target aktif**: target yang sedang berlaku sekarang, jadi acuan siklus evaluasi yang masih terbuka.
+- **Target yang digantikan**: target lama yang sudah ditutup, ditinggalkan sebagai catatan karena pernah dipakai sebagai acuan siklus yang sudah selesai ditutup.
+
+## 2. Membaca tabel Target aktif
+
+Tiap baris pada tabel Target aktif mewakili satu target yang berlaku, dengan kolom:
+
+- **Indicator**: kode indikator KPI yang diukur (lihat daftar kode yang valid di bagian [Kode indikator yang tersedia](#kode-indikator-yang-tersedia) di bawah).
+- **Target**: nilai target beserta arahnya, ditulis sebagai kata ("minimal" atau "maksimal") plus simbol pembanding (`>=` atau `<=`) dan angkanya. "Minimal 90 (`>= 90`)" berarti nilai aktual harus mencapai 90 atau lebih supaya target terpenuhi; "maksimal 800 (`<= 800`)" berarti nilai aktual harus tetap di 800 atau di bawahnya.
+- **Scope**: cakupan target, berupa nama unit klinis tertentu atau "Semua unit", dan nama modul AI tertentu atau "Semua module". Target dengan cakupan "Semua unit, semua module" berlaku untuk seluruh organisasi.
+- **Baseline**: nilai indikator sebelum target ini ditetapkan (kalau diisi saat pembuatan target), beserta rentang tanggal periode baseline-nya. Kolom ini kosong kalau baseline tidak diisi.
+- **Berlaku sejak**: tanggal target ini mulai berlaku.
+- **Gantikan** / **Hentikan**: aksi untuk mengubah atau menutup target ini (lihat bagian 5 dan 6). Hanya muncul untuk pengguna dengan izin menetapkan target.
+
+## 3. Menyaring dengan Indicator key
+
+Isi kotak **Indicator key** di bagian atas dengan kode indikator (misalnya `success_rate`) untuk mempersempit kedua tabel (Target aktif dan Target yang digantikan) hanya ke indikator tersebut. Kosongkan kotak untuk menampilkan semua indikator lagi.
+
+## 4. Kode indikator yang tersedia
+
+Kode indikator (**Indicator key**) bukan teks bebas. Backend hanya menerima salah satu dari tujuh kode berikut, jadi pastikan mengetik persis salah satu di antaranya saat membuat target baru:
+
+| Indicator key | Arti |
+|---|---|
+| `inference_count` | Jumlah inferensi AI yang dijalankan |
+| `transaction_count` | Jumlah transaksi klinis |
+| `success_rate` | Tingkat keberhasilan (%) |
+| `unit_adoption_rate` | Tingkat adopsi unit klinis (%) |
+| `validator_adoption_rate` | Tingkat adopsi validator/dokter (%) |
+| `turnaround_p50_ms` | Waktu proses median (p50, milidetik) |
+| `turnaround_p90_ms` | Waktu proses persentil ke-90 (p90, milidetik) |
+
+Kalau kode yang diketik tidak ada di daftar ini, penyimpanan target akan gagal dengan pesan kesalahan.
+
+## 5. Membuat target baru
+
+Klik tombol **Target baru** di pojok kanan atas (hanya muncul untuk pengguna dengan izin menetapkan target). Sebuah formulir "Standing target baru" akan terbuka di atas tabel.
+
+![Formulir Standing target baru dalam keadaan kosong, dengan field Indicator key, Nilai target, pilihan Arah, dan tombol Buat target](/screenshots/id/evaluasi-adopsi/target-standing/02-formulir-kosong.png)
+
+Isi field berikut:
+
+1. **Indicator key**: ketik salah satu kode dari tabel di bagian 4 (misalnya `success_rate`). Field ini wajib diisi.
+2. **Nilai target**: angka target yang harus dicapai. Field ini wajib diisi dan harus berupa angka.
+3. **Arah**: pilih salah satu dari dua opsi radio:
+   - **minimal nilai target (>=)**: dipakai kalau semakin tinggi semakin baik (misalnya tingkat keberhasilan). Target terpenuhi kalau nilai aktual mencapai atau melewati angka target.
+   - **maksimal nilai target (`<=`)**: dipakai kalau semakin rendah semakin baik (misalnya waktu proses). Target terpenuhi kalau nilai aktual tetap di angka target atau di bawahnya.
+4. **Nilai baseline** (opsional): nilai indikator sebelum target ini ditetapkan, sebagai pembanding "sebelum vs sesudah".
+5. **Baseline dari** / **Baseline sampai** (opsional): rentang tanggal periode baseline tersebut diukur.
+6. **Scope unit** (opsional): pilih satu unit klinis tertentu dari dropdown supaya target hanya berlaku untuk unit itu, atau biarkan "Semua unit" supaya berlaku untuk seluruh organisasi.
+7. **Scope AI module** (opsional): pilih satu modul AI tertentu dari dropdown, atau biarkan "Semua module".
+8. **Berlaku sejak**: tanggal target ini mulai berlaku. Terisi otomatis dengan tanggal hari ini, bisa diubah.
+9. **Catatan** (opsional): alasan penetapan angka ini atau sumbernya, untuk konteks bagi pembaca lain.
+
+Contoh formulir yang sudah terisi:
+
+![Formulir Standing target baru terisi contoh: Indicator key turnaround_p90_ms, Nilai target 950, arah maksimal, baseline 1400 dengan rentang tanggal, scope unit dan modul tertentu, dan catatan](/screenshots/id/evaluasi-adopsi/target-standing/03-formulir-terisi.png)
+
+Setelah semua field terisi, klik **Buat target**. Kalau berhasil, formulir tertutup dan target baru langsung muncul di tabel Target aktif.
+
+![Tabel Target aktif setelah target baru turnaround_p90_ms berhasil dibuat, tampil sebagai baris baru di tabel](/screenshots/id/evaluasi-adopsi/target-standing/04-target-dibuat.png)
+
+**Catatan penting**: satu kombinasi indikator + cakupan (unit + modul) hanya boleh punya satu target aktif dalam waktu bersamaan. Kalau Anda mencoba membuat target baru untuk indikator dan cakupan yang sudah punya target aktif, penyimpanan akan gagal dengan pesan bahwa target sudah aktif — gunakan **Gantikan** pada target yang sudah ada, bukan membuat target baru.
+
+## 6. Mengganti (supersede) target aktif
+
+Kalau nilai atau arah target perlu berubah, jangan membuat target baru untuk indikator yang sama — klik **Gantikan** pada baris target yang ingin diubah. Formulir yang sama akan terbuka, sudah terisi dengan nilai target itu saat ini, dengan **Indicator key** dikunci (tidak bisa diubah, karena mengganti target berarti tetap untuk indikator yang sama).
+
+Ubah nilai, arah, cakupan, atau tanggal berlaku sesuai kebutuhan, lalu klik tombol Gantikan di bagian bawah formulir. Target lama otomatis ditutup (tanggal berlakunya berhenti di hari ini) dan dipindah ke tabel **Target yang digantikan**, sementara baris baru dengan nilai yang sudah diperbarui muncul di tabel **Target aktif**.
+
+## 7. Menghentikan (retire) target aktif
+
+Klik **Hentikan** pada baris target yang ingin dihentikan kalau indikator itu memang sudah tidak perlu dipantau lagi (bukan karena nilainya berubah). Berbeda dari Gantikan, Hentikan **tidak membuat baris pengganti** — target langsung ditutup dan pindah ke tabel Target yang digantikan tanpa target aktif baru untuk indikator tersebut.
+
+Tombol Hentikan langsung menjalankan aksi begitu diklik, tanpa dialog konfirmasi tambahan. Pastikan Anda memang ingin menghentikan target tersebut sebelum mengklik, karena tindakan ini tidak bisa dibatalkan dari halaman ini (target yang sudah dihentikan bisa dilihat lagi di tabel Target yang digantikan, tapi untuk mengaktifkannya kembali Anda harus membuat target baru).
+
+## Catatan
+
+- Target aktif dan target yang digantikan sama-sama tetap terlihat di halaman ini — riwayat target tidak pernah dihapus, hanya ditandai tidak aktif.
+- Target dengan cakupan "Semua unit, semua module" berlaku sebagai acuan umum organisasi. Target dengan cakupan yang lebih sempit (unit atau modul tertentu) dipakai kalau unit/modul itu perlu standar yang berbeda dari standar umum.
+- Menetapkan minimal satu target aktif untuk indikator yang relevan adalah syarat sebelum siklus evaluasi bisa dibuat dengan indikator tersebut sebagai cakupannya.

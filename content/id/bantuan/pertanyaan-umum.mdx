@@ -1,0 +1,140 @@
+---
+title: Pertanyaan Umum
+---
+
+# Pertanyaan Umum
+
+Kumpulan pertanyaan yang paling sering muncul saat memakai PRECIA sehari-hari, mulai dari kendala login, menu yang tidak muncul, sampai kasus yang tersangkut di satu status tertentu. Kalau jawaban di sini belum menyelesaikan masalah Anda, lihat halaman **Menghubungi Dukungan**.
+
+## Login dan akun
+
+### Kenapa saya tidak bisa login walaupun username/email dan kata sandi sudah benar?
+
+Kemungkinan penyebabnya:
+
+- Ada salah ketik, terutama huruf besar/kecil pada kata sandi.
+- Akun belum dibuat atau belum diaktifkan oleh admin organisasi/admin unit.
+- Akun sedang dinonaktifkan sementara oleh admin.
+
+PRECIA tidak membedakan pesan error antara "akun tidak ada" dan "kata sandi salah", keduanya sama-sama menampilkan **"Email atau kata sandi salah. Silakan coba lagi."** Hubungi admin organisasi atau admin unit Anda untuk memastikan status akun. Detail lengkap ada di halaman **Masuk ke Akun**.
+
+### Bagaimana cara mendaftar akun baru?
+
+PRECIA tidak menyediakan pendaftaran akun mandiri. Admin organisasi atau admin unit Anda yang membuatkan akun terlebih dahulu, lalu memberi tahu username/email dan kata sandi awal untuk login pertama kali.
+
+### Saya lupa kata sandi, bagaimana cara reset sendiri?
+
+Belum bisa. PRECIA saat ini belum punya fitur reset kata sandi mandiri di halaman login. Hubungi admin organisasi atau admin unit Anda untuk meminta kata sandi baru dibuatkan.
+
+### Saya bisa login ke halaman Profil, tapi kolom Kata Sandi Saat Ini di halaman Ubah Kata Sandi saya lupa. Apa yang harus dilakukan?
+
+Halaman **Profil** tidak bisa membantu kalau Anda lupa kata sandi saat ini, kolom itu wajib diisi dengan kata sandi lama yang benar. Solusinya sama seperti lupa kata sandi biasa: hubungi admin organisasi atau admin unit Anda.
+
+### Kenapa status akun saya "Terkunci" atau "Menunggu Aktivasi"?
+
+Status akun (Aktif, Terkunci, Menunggu Aktivasi, atau Nonaktif) ditampilkan di halaman Profil Anda, tapi hanya admin organisasi/admin platform yang bisa mengubahnya. Kalau status Anda bukan Aktif, hubungi admin organisasi untuk menanyakan alasannya dan meminta diaktifkan.
+
+## Menu dan akses
+
+### Kenapa menu tertentu (misalnya Pengguna & Akses, Audit, atau Registri AI) tidak muncul di sidebar saya?
+
+Menu yang tampil di sidebar menyesuaikan **peran** akun Anda. Kalau sebuah menu seharusnya ada tapi tidak muncul, kemungkinan besar itu karena peran akun Anda belum mencakupnya, bukan kesalahan aplikasi. Contoh, dokter yang hanya menangani kasus klinis biasanya tidak melihat menu Pengguna & Akses karena mengelola akun pengguna bukan bagian dari perannya.
+
+Hubungi admin organisasi Anda kalau merasa butuh akses tambahan untuk pekerjaan Anda. Lihat halaman **Mengenal Peran Pengguna** untuk daftar lengkap peran dan cakupan aksesnya.
+
+### Saya admin unit, kenapa saya tidak bisa mengubah pengaturan organisasi atau membuat organisasi baru?
+
+Itu wewenang Admin Sistem organisasi (untuk pengaturan seluruh organisasi) atau Admin Platform (untuk hal lintas organisasi, seperti membuat organisasi/tenant baru). Admin unit (Admin Klinis) hanya mengatur keanggotaan unit, kebijakan modul AI per unit, dan operasional unit sehari-hari.
+
+### Kenapa tab "Berdasarkan Modul AI" tidak muncul di halaman Klinis saya?
+
+Tab ini hanya muncul kalau Anda sudah berada dalam konteks satu unit tertentu, bukan tampilan gabungan "Umum/Semua unit". Kalau akun Anda punya akses ke banyak unit, pilih unit dulu lewat tombol **Ganti Unit**, tab ini akan tampil di sebelah tab **Transaksi** setelah unit aktif dipilih.
+
+### Kenapa saya bisa melihat organisasi lain padahal saya bukan admin platform?
+
+Kalau Anda bukan Admin Platform atau Super Admin, seharusnya Anda hanya melihat data organisasi tempat akun Anda terdaftar. Kalau kartu identitas akun di sidebar menampilkan nama organisasi yang salah, periksa dulu apakah akun Anda memang punya akses ke lebih dari satu organisasi. Kalau ragu, hubungi admin organisasi Anda.
+
+## Kasus klinis tersangkut di satu status
+
+### Kasus saya berstatus "Belum Diproses" terus, kenapa tidak jalan ke AI?
+
+Kasus baru tidak otomatis diproses AI. Berkas pasien untuk tiap modul AI harus diunggah dulu, lalu ditandai **Siap Dianalisis**. Setelah itu, sistem baru memproses otomatis. Lihat halaman **Mengunggah Berkas Pasien** untuk langkahnya.
+
+### Kasus saya berstatus "Unggah Gagal", apa yang harus saya lakukan?
+
+Periksa dua hal: ukuran berkas tidak melebihi batas yang ditampilkan di layar unggah, dan format berkas sesuai yang diminta modul (misalnya `.png` atau `.jpg`). Kalau sudah sesuai tapi tetap gagal, coba unggah ulang. Kalau tetap gagal, hubungi dukungan lewat halaman **Bantuan**.
+
+### Kenapa tombol "Kirim ke Validator" tidak bisa diklik?
+
+Dua kemungkinan:
+
+- Status kasus saat ini bukan salah satu dari **Belum Diproses**, **Data Tidak Valid**, **Unggah Gagal**, atau **Perlu Diulang**. Kalau kasus sudah pernah dikirim sebelumnya, tombol ini otomatis nonaktif.
+- Belum ada satu pun modul AI yang selesai memproses hasil analisisnya. Sistem mensyaratkan minimal satu hasil AI selesai sebelum kasus bisa dikirim ke validator. Tunggu sampai analisis AI selesai, lalu coba kirim lagi.
+
+### Kasus saya berstatus "Perlu Diulang", apa artinya?
+
+Artinya validator atau dokter meninjau berkas yang diunggah dan menilai pemeriksaan perlu diambil ulang, misalnya kualitas gambar tidak memadai. Kasus dikembalikan ke klinisi yang menangani untuk mengunggah ulang berkas yang benar, lalu kirim ulang ke validator setelah selesai.
+
+### Kenapa saya tidak bisa membatalkan kasus yang sudah dikirim ke dokter?
+
+Ini disengaja. Opsi pembatalan hanya aktif kalau status kasus masih **Draf**, **Belum Diproses**, **Data Tidak Valid**, atau **Unggah Gagal**. Begitu kasus sudah **Dikirim ke Dokter**, **Ditinjau Dokter**, sedang diproses AI, atau sudah **Selesai**, tombol pembatalan otomatis nonaktif, supaya kasus yang sedang ditinjau tenaga medis lain tidak hilang tiba-tiba. Kalau kasus itu tetap perlu dibatalkan, hubungi admin unit atau admin organisasi.
+
+### Saya salah membatalkan kasus, bisa dibatalkan (undo)?
+
+Tidak bisa. Pembatalan kasus bersifat final, tidak ada tombol untuk mengaktifkan kembali kasus yang sudah berstatus Dibatalkan. Kalau ternyata pembatalan keliru, buat kasus baru dan isi datanya ulang.
+
+### Kenapa formulir Buat Transaksi Klinis tidak ada pilihan modul AI?
+
+Memang tidak ada opsi memilih modul secara manual. Kasus otomatis mendapat slot analisis untuk setiap modul AI yang sedang aktif di unit yang dipilih. Kalau unit belum punya modul AI aktif sama sekali, hubungi admin unit atau admin organisasi untuk mengaktifkannya lebih dulu.
+
+## Validasi klinis
+
+### Kenapa menu Validasi tidak muncul di sidebar saya?
+
+Menu ini hanya muncul untuk pengguna dengan peran validator klinis atau klinisi (dokter). Kalau Anda merasa perlu peran ini, hubungi admin organisasi Anda.
+
+### Saya sudah mempublikasikan validasi, bisa diubah lagi?
+
+Tidak bisa dari halaman Validasi. Setelah **Publikasikan validasi** diklik, keputusan menjadi final dan status berubah menjadi **Dipublikasikan**, tidak ada aksi lanjutan yang bisa dilakukan lagi di panel itu. Pastikan keputusan sudah benar sebelum mempublikasikan.
+
+### Apa bedanya "Minta pengambilan ulang" di halaman Validasi dengan "Ajukan Pengulangan" di halaman detail kasus?
+
+Keduanya sama-sama mengembalikan kasus untuk pemeriksaan ulang, bedanya siapa yang memicunya dan di tahap mana. **Ajukan Pengulangan** dilakukan klinisi dari halaman detail kasus sebelum kasus dikirim ke validator (kasus jadi status **Perlu Diulang**). **Minta pengambilan ulang** dilakukan validator setelah meninjau hasil, kalau validator menilai kualitas berkas tidak memadai untuk dinilai; validasi ini tidak akan dipublikasikan dan kasus dikembalikan ke klinisi terkait.
+
+## Pengelolaan pengguna dan unit
+
+### Saya mencabut satu-satunya peran milik seorang pengguna, apa akibatnya?
+
+Pengguna itu langsung kehilangan akses ke semua fitur PRECIA sampai diberikan peran baru, karena tidak ada peran aktif yang tersisa. Segera berikan peran baru lewat halaman **Kelola Peran** kalau ini terjadi tanpa sengaja.
+
+### Kenapa saya tidak bisa menugaskan seorang pengguna ke unit tertentu?
+
+Dialog **Tugaskan Staf** hanya menampilkan pengguna dari organisasi yang sama dengan unit tersebut. Kalau pengguna yang dicari tidak muncul di hasil pencarian, kemungkinan akunnya terdaftar di organisasi lain, atau pengguna itu sudah lebih dulu ditugaskan ke unit ini (sistem menolak penugasan ganda).
+
+### Apa bedanya "menghapus anggota dari unit" dengan menghapus akun pengguna?
+
+Menghapus anggota dari tab Anggota unit hanya menghapus penugasan pengguna itu ke unit yang sedang dikelola, bukan menghapus akun pengguna dari sistem. Pengguna yang sama masih bisa ditugaskan kembali ke unit ini di kemudian hari, dan akunnya tetap bisa dipakai untuk unit lain.
+
+## Modul AI
+
+### Kenapa saya tidak bisa mengubah izin tenant sebuah modul AI?
+
+Izin tenant tidak bisa diubah selagi status lifecycle modul adalah **Nonaktif**. Aktifkan dulu modul (ubah ke Pilot atau Klinis) sebelum mengatur izin tenant. Kalau modul sudah aktif tapi tombol **Kelola Izin**/**Lihat Izin** tetap tidak muncul, berarti akun Anda tidak punya hak baca atau ubah izin tenant modul AI, hubungi admin platform.
+
+### Unit saya sudah aktif tapi modul AI tidak muncul untuk dipakai, kenapa?
+
+Modul AI harus diaktifkan dulu di kebijakan AI unit tersebut sebelum bisa dipakai untuk memproses kasus. Kalau unit belum punya modul aktif, hubungi admin unit (Admin Klinis) atau admin organisasi untuk mengaktifkannya.
+
+## Lainnya
+
+### Saya mengubah bahasa/tampilan, apakah ini memengaruhi pengguna lain?
+
+Tidak. Pengatur **Bahasa** dan **Tampilan** di bagian bawah sidebar hanya berlaku untuk sesi/perangkat Anda sendiri, tidak mengubah pengaturan pengguna lain.
+
+### Kenapa dashboard saya hanya menampilkan dua kartu pintasan, tidak ada grafik atau statistik?
+
+Ini bukan kesalahan tampilan. Dashboard versi lengkap (dengan kartu statistik, grafik throughput, dan status transaksi) hanya muncul untuk akun yang punya akses laporan/analitik, misalnya Admin Organisasi, Admin Platform, atau Manajemen. Akun yang tidak punya akses ini (misalnya sebagian akun Klinisi/Validator) akan melihat dashboard sederhana berisi dua kartu pintasan menuju **Klinis** dan **Validasi** saja.
+
+### Kasus yang sama muncul dua kali di daftar kerja, apa itu wajar?
+
+Kalau Anda sedang membuka tab **Berdasarkan Modul AI**, ini wajar. Tab tersebut menampilkan satu baris per slot analisis, jadi satu kasus dengan tiga modul AI aktif akan muncul sebagai tiga baris terpisah. Kalau Anda ingin melihat satu baris per kasus, gunakan tab **Transaksi** biasa.

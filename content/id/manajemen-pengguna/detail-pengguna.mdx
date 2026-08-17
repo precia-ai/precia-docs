@@ -1,0 +1,61 @@
+---
+title: Detail Pengguna
+---
+
+# Detail Pengguna
+
+Halaman detail pengguna menampilkan profil lengkap satu akun: informasi identitas, organisasi, peran yang dimiliki, status akun, serta riwayat perubahan yang pernah terjadi pada akun tersebut. Dari halaman ini Anda juga bisa mengaktifkan/menonaktifkan akun, mengunci/membuka kunci akun, dan masuk ke halaman pengaturan peran.
+
+Hanya administrator organisasi dan administrator platform yang bisa membuka halaman ini.
+
+## Cara membuka halaman ini
+
+1. Login ke PRECIA.
+2. Klik menu **Pengguna & Akses** di sidebar kiri untuk membuka [Daftar Pengguna](/manajemen-pengguna).
+3. Klik tombol **Detail** pada baris pengguna yang ingin dilihat.
+
+![Halaman detail pengguna dengan informasi akun, peran, dan tindakan cepat](/screenshots/id/manajemen-pengguna/detail-pengguna/01-profil-pengguna.png)
+
+## Membaca informasi profil
+
+Bagian atas halaman menampilkan nama lengkap dan alamat email pengguna, serta badge status akun di pojok kanan atas (Aktif, Nonaktif, Terkunci, atau Menunggu Aktivasi).
+
+Kartu **Informasi Akun** menampilkan:
+
+- **Nama Pengguna** — username login akun tersebut.
+- **Organisasi** — organisasi tempat pengguna terdaftar.
+- **Dibuat Pada** — tanggal akun ini pertama kali didaftarkan.
+- **Login Terakhir** — waktu login terakhir pengguna, atau "Belum pernah" jika akun belum pernah login sama sekali.
+- **Peran Pengguna** — satu atau lebih badge peran yang saat ini diberikan ke pengguna. Jika belum ada peran, kolom ini menampilkan tulisan "Belum ada peran".
+
+## Tindakan Cepat
+
+Kartu **Tindakan Cepat** di sisi kanan berisi tiga tombol untuk mengelola akun:
+
+- **Nonaktifkan Pengguna / Aktifkan Pengguna** — mengubah status akun antara aktif dan nonaktif. Label tombol menyesuaikan status akun saat ini: jika akun aktif, tombol bertuliskan "Nonaktifkan Pengguna"; jika tidak aktif, tombol bertuliskan "Aktifkan Pengguna".
+- **Kunci Akun / Buka Kunci** — mengunci akun sehingga pengguna tidak bisa login sama sekali. Sebelum akun benar-benar terkunci, sistem menampilkan konfirmasi berisi alamat email pengguna yang akan dikunci. Jika akun sudah berstatus Terkunci, tombol ini berubah menjadi "Buka Kunci" untuk mengembalikan akses login.
+- **Kelola Peran** — membuka halaman [Mengatur Peran Pengguna](/manajemen-pengguna/mengatur-peran-pengguna) untuk menambah, mencabut, atau mengganti peran pengguna ini.
+
+**Catatan:** selama proses aktivasi/nonaktivasi atau kunci/buka kunci sedang berjalan, tombol tindakan tidak bisa diklik lagi sampai prosesnya selesai dan halaman diperbarui otomatis.
+
+## Riwayat Identitas dan Peran
+
+Di bawah kartu Informasi Akun ada kartu **Riwayat Identitas dan Peran** yang mencatat setiap perubahan pada akun ini, diurutkan dari yang terbaru.
+
+![Kartu riwayat identitas dan peran menampilkan catatan perubahan akun](/screenshots/id/manajemen-pengguna/detail-pengguna/02-riwayat-perubahan.png)
+
+Setiap entri riwayat menampilkan jenis perubahan, nama petugas yang melakukan perubahan (atau "Sistem" jika perubahan dilakukan otomatis), dan waktu kejadian. Jenis perubahan yang bisa muncul di sini antara lain:
+
+- **Akun dibuat** — saat akun pertama kali didaftarkan.
+- **Peran ditambahkan / dicabut** — saat administrator menambah atau mencabut peran melalui halaman Kelola Peran.
+- **Peran diganti** — saat administrator mengganti satu peran dengan peran lain lewat fitur Tukar Peran.
+- **Informasi akun diperbarui** — perubahan data profil, misalnya nama atau data lain pada akun.
+- **Kata sandi diperbarui** — saat kata sandi akun diganti.
+- **Status berubah** — perubahan status akun, misalnya dari Aktif menjadi Nonaktif atau sebaliknya.
+
+Jika akun belum pernah mengalami perubahan apa pun selain pembuatan awal, daftar ini hanya berisi satu entri. Jika riwayat gagal dimuat (misalnya karena gangguan koneksi), kartu ini menampilkan pesan bahwa riwayat tidak tersedia.
+
+## Kondisi khusus
+
+- Jika ID pengguna pada URL tidak valid atau pengguna sudah dihapus, halaman ini menampilkan tampilan "tidak ditemukan" alih-alih detail akun.
+- Jika data gagal dimuat karena gangguan lain, halaman menampilkan pesan error beserta tombol **Coba Lagi**.

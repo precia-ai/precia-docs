@@ -1,0 +1,72 @@
+---
+title: Managing Organizations
+---
+
+# Managing Organizations
+
+The **Organizations** page in the Platform area lists every organization (tenant) registered in PRECIA. From here, a platform admin (Super Admin or Platform Admin) can view the full list, register new organizations, edit organization details, and activate or deactivate them.
+
+This page is only accessible to the Super Admin (SUP) and Platform Admin (PAD) roles. See "Organization & Platform Overview" for how to enter Platform Mode.
+
+## 1. Opening the organizations list
+
+Open the **Organizations** menu in the Platform Mode sidebar. The page shows:
+
+- Three summary cards at the top: **Total** organizations, **Active** count, and **Inactive / Suspended** count.
+- A search field to filter the list by organization name or code.
+- A table with Code, Name, Type, Status, and Actions (Edit / Deactivate or Activate) columns for each organization.
+
+The **New Organization** button in the top-right corner is used to register a new tenant.
+
+![Organizations list with the New Organization button highlighted](/screenshots/en/organisasi-platform/mengelola-organisasi/01-daftar-organisasi.png)
+
+The Actions column (Edit and Deactivate/Activate) only appears for accounts with permission to manage organizations. If this column is missing, your account can only view the list, not modify it.
+
+## 2. Adding a new organization
+
+1. Click the **New Organization** button. The **New Organization** modal opens.
+2. Fill in the three fields:
+   - **Code** — a unique, permanent code for this organization, e.g. `RSUD-01`. This code **cannot be changed once the organization is created**, so double-check it before continuing.
+   - **Name** — the organization's full name.
+   - **Type** — pick one of four available types: Hospital, Clinic, Research Center, or Laboratory.
+3. Click **Create** to save. The modal closes automatically and the new organization appears at the top of the table with **Active** status.
+
+![New Organization modal with Code, Name, Type fields and the Create button highlighted](/screenshots/en/organisasi-platform/mengelola-organisasi/02-modal-tambah-organisasi.png)
+
+If something goes wrong (for example the code is already used by another organization), an error message appears at the top of the form and the modal stays open so you can fix it. Click **Cancel** at any time to close the modal without saving.
+
+## 3. Editing organization details
+
+1. On the row of the organization you want to edit, click **Edit**.
+2. The **Edit Organization** modal opens, pre-filled with the organization's current data.
+3. The **Code** field is shown but cannot be edited (codes are permanent). You can only change **Name** and **Type**.
+4. Click **Save** to apply the changes, or **Cancel** to close the modal without saving.
+
+![Edit Organization modal with Code locked, Name and Type editable](/screenshots/en/organisasi-platform/mengelola-organisasi/03-modal-edit-organisasi.png)
+
+## 4. Deactivating an organization
+
+An organization that is currently active shows a red **Deactivate** button in the Actions column.
+
+![Deactivate button on a row for an organization that is still active](/screenshots/en/organisasi-platform/mengelola-organisasi/04-tombol-nonaktifkan.png)
+
+Click that button to deactivate the organization immediately. **There is no additional confirmation dialog** — as soon as you click, the organization's status changes to **Inactive** and the button changes to **Activate**. The **Active** and **Inactive / Suspended** summary cards at the top of the page update right away too.
+
+![Organization row after being deactivated, status now Inactive with an Activate button](/screenshots/en/organisasi-platform/mengelola-organisasi/05-organisasi-nonaktif.png)
+
+Things to keep in mind before deactivating an organization:
+
+- Deactivating an organization affects **every user in that organization**, not just some of them. Make sure you really intend to do this before clicking the button.
+- Since there is no confirmation dialog, avoid clicking Deactivate/Activate carelessly while browsing this page.
+
+## 5. Reactivating an organization
+
+For an organization with Inactive status, the Actions column shows an **Activate** button. Click it to bring the organization's status back to **Active**. Just like deactivating, this takes effect immediately with no additional confirmation dialog.
+
+## Organization status summary
+
+| Status | Meaning |
+|---|---|
+| Active | The organization operates normally; all its users can access PRECIA according to their own permissions. |
+| Inactive | The organization was turned off via the Deactivate button. |
+| Suspended | A special status shown alongside Inactive in the summary card; it is not managed through the Deactivate/Activate button on this page. |

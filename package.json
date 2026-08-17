@@ -1,0 +1,26 @@
+{
+  "name": "precia-docs",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "shots": "node scripts/screenshots/run.js"
+  },
+  "dependencies": {
+    "next": "^16.3.1",
+    "nextra": "^4.6.1",
+    "nextra-theme-docs": "^4.6.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "playwright": "^1.62.1",
+    "sharp": "^0.35.3"
+  },
+  "overrides": {
+    "zod": "4.3.6"
+  }
+}

@@ -1,0 +1,45 @@
+---
+title: Case Change History
+---
+
+# Case Change History
+
+Every clinical case in PRECIA keeps a complete history record: when the case was created, who created it, which files were uploaded or deleted, when the case status changed, and when AI processing finished. This history cannot be edited or deleted by anyone, so you can rely on it whenever you need to check what actually happened to a case.
+
+## Opening a case's history
+
+1. Open the **Clinical** menu in the sidebar, then open the detail page of the case you want to check.
+2. Scroll to the bottom of the case detail page and find the **Transaction History** card.
+3. Click the **View History** button.
+
+   ![Case detail page with the View History button in the Transaction History card at the bottom marked with a blue box](/screenshots/en/kasus-klinis/riwayat-perubahan-kasus/01-tombol-lihat-riwayat.png)
+
+You will be taken to the **Transaction Change History** page for that specific case.
+
+## Reading the history page
+
+The history page has two sections:
+
+- **History Summary**: shows the transaction code, the unit handling the case, and the total number of changes recorded.
+- **History Timeline**: a list of every event recorded for this case, ordered from **newest to oldest**.
+
+![Transaction change history page, the History Timeline card containing the list of events marked with a blue box](/screenshots/en/kasus-klinis/riwayat-perubahan-kasus/02-linimasa-riwayat.png)
+
+Each row in the timeline shows:
+
+- **Event type**, for example "Transaction created", "File Uploaded", or "AI Processing Completed".
+- **Status change**, if that event changed the case's status (for example, status changed from Unprocessed to Ready for AI). If the status did not change on that event, a "Status remains ..." note is shown instead.
+- **Timestamp**, the exact date and time the event was recorded.
+- **Performed by**, the name of the user who performed the action. If the event was done automatically by the system (for example, AI processing completing), this field shows **System**.
+- **Notes**, any reason or extra note entered when the action was taken (for example, a cancellation reason or a retake request reason). If there is no note, this field shows a "-" mark.
+
+## When to use this page
+
+Use this page whenever you need to:
+
+- Check who last updated the patient data on a case.
+- Trace exactly when an examination file was uploaded or deleted.
+- Confirm the reason recorded when a case was cancelled or when a retake was requested.
+- Review the full sequence of a case, from creation through doctor review, for internal audit purposes.
+
+If a case has not had any change besides being created, the timeline will only show a single "Transaction created" event.

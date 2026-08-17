@@ -1,0 +1,117 @@
+---
+title: Audit Platform
+---
+
+# Audit Platform
+
+Halaman **Audit Platform** menampilkan seluruh jejak aktivitas (audit trail) di PRECIA lintas semua organisasi (tenant) sekaligus. Tampilannya sama persis dengan halaman Audit biasa yang dibuka dari dalam satu organisasi, karena keduanya memakai ruang kerja yang sama. Yang membedakan bukan tampilannya, melainkan izin akses yang membukanya: dari Mode Platform, halaman ini tidak dibatasi pada satu organisasi sama sekali.
+
+Karena tampilan yang identik bisa berarti dua lingkup data yang sangat berbeda, halaman ini selalu menampilkan penanda lingkup di bagian atas supaya kamu tidak salah duga sedang melihat data satu organisasi saja.
+
+## Siapa yang bisa mengakses
+
+Akses lintas organisasi ke halaman ini butuh izin khusus (di antaranya dipegang oleh peran **Super Admin/SUP**). Peran lain yang membuka menu Audit dari dalam satu organisasi (misalnya Admin Organisasi) hanya melihat data organisasinya sendiri, meski tampilannya sama. Kalau akunmu tidak punya izin baca audit sama sekali, halaman ini menampilkan pesan "Akses audit tidak tersedia" alih-alih data kosong.
+
+## Membuka halaman
+
+1. Masuk ke Mode Platform.
+2. Klik menu **Audit** di sidebar Mode Platform.
+
+## Penanda lingkup dan ringkasan
+
+![Halaman Audit Platform menampilkan penanda lingkup lintas organisasi dan kartu ringkasan](/screenshots/id/organisasi-platform/audit-platform/01-ringkasan.png)
+
+Dua kotak biru pada gambar menandai bagian yang perlu diperhatikan pertama kali:
+
+- **Pita "Menampilkan seluruh organisasi"** di paling atas — penegasan eksplisit bahwa halaman yang sedang dibuka mencakup semua tenant, bukan satu organisasi. Pita ini hanya muncul saat halaman dibuka dari Mode Platform.
+- **Kartu "Akses lintas organisasi"** di kanan judul — mengingatkan bahwa untuk mempersempit ke satu organisasi tertentu, gunakan filter organisasi (dijelaskan di bagian [Filter](#menyaring-hasil)), bukan berpindah halaman.
+
+Di bawahnya, enam kartu angka merangkum aktivitas pada rentang waktu yang sedang aktif:
+
+| Kartu | Keterangan |
+|---|---|
+| Peristiwa dalam rentang | Total jumlah kejadian (aksi apa pun) yang tercatat pada rentang waktu dan filter yang sedang aktif. |
+| Akses sensitif | Jumlah akses ke data kesehatan terlindungi (PHI) yang tercatat. |
+| Tindakan ditolak | Jumlah aksi yang ditolak sistem karena tidak diizinkan. |
+| Peristiwa kritis | Jumlah kejadian berkeparahan kritis. |
+| Kasus terbuka | Jumlah kasus investigasi yang statusnya masih terbuka. |
+| Temuan terbuka | Jumlah temuan kepatuhan yang belum diremediasi. |
+
+Di bawah kartu ringkasan ada blok **Integritas ledger** yang menunjukkan apakah rantai pencatatan audit (append-only, tidak bisa diubah) sudah diverifikasi. Status "Belum diperiksa" berarti belum ada verifikasi yang dijalankan sejak halaman dibuka; cara menjalankan verifikasi dijelaskan di bagian [Tata kelola](#tab-tata-kelola).
+
+Di bawah blok integritas ada lima tab: **Aliran peristiwa**, **Kasus**, **Temuan**, **Bukti**, dan **Tata kelola**. Bagian berikut menjelaskan tiap tab.
+
+## Tab Aliran peristiwa
+
+Tab default saat halaman dibuka. Menampilkan tabel kronologis semua kejadian, terbaru lebih dulu, dengan kolom Waktu, Aktor, Tindakan, Sumber daya, Hasil, dan Keparahan. Tombol **Muat ulang peristiwa** di kanan atas tabel mengambil data terbaru tanpa mengubah filter yang sedang aktif. Kalau daftar masih panjang, gulir ke bawah dan gunakan tombol muat lebih banyak untuk memuat halaman berikutnya secara bertahap.
+
+### Menyaring hasil
+
+![Panel filter audit terbuka menampilkan kolom pencarian dan tombol Terapkan filter](/screenshots/id/organisasi-platform/audit-platform/02-filter.png)
+
+Klik tombol **Filter** di atas tabel untuk membuka panel ini. Kotak biru menandai kolom **Pencarian** (kotak biru pertama), tempat mengetik kata kunci aktor, tindakan, atau identitas sumber daya, dan tombol **Terapkan filter** (kotak biru kedua) di kanan bawah panel untuk menjalankan pencarian.
+
+Panel filter menyediakan banyak kriteria sekaligus, di antaranya:
+
+- Rentang tanggal (tanggal mulai dan akhir)
+- Organisasi dan unit
+- Aktor dan layanan sumber
+- Jenis peristiwa dan kategori
+- Tindakan, hasil, dan keparahan
+- Jenis dan identitas sumber daya
+- Status HTTP, alamat IP, ID permintaan, ID korelasi
+- Kasus terkait
+- Akses sensitif (ya/tidak/semua)
+
+Isi kriteria yang diperlukan lalu klik **Terapkan filter**. Filter yang aktif tercermin di URL halaman, jadi tautan hasil filter tertentu bisa dibagikan atau dibuka lagi nanti. Klik **Atur ulang** untuk mengosongkan semua kriteria.
+
+### Membuka detail peristiwa
+
+![Panel detail satu peristiwa audit terbuka dari samping, dengan nilai sensitif tersamar dan tombol Ungkap PHI](/screenshots/id/organisasi-platform/audit-platform/03-detail-peristiwa.png)
+
+Klik ikon panah di ujung kanan salah satu baris untuk membuka panel detail dari sisi kanan layar. Panel ini menampilkan:
+
+- Identitas peristiwa: jenis tindakan, jalur permintaan, waktu persis, aktor, sumber daya, ID permintaan, dan ID korelasi.
+- Blok **Informasi kesehatan terlindungi**: field yang mengandung data sensitif ditampilkan tersamar (misalnya `••••••`).
+- Tabel **Sebelum dan sesudah**: nilai field sebelum dan sesudah perubahan, kalau peristiwa ini adalah sebuah perubahan data.
+- **Jejak korelasi**: daftar peristiwa lain yang berbagi ID korelasi yang sama, berguna untuk menelusuri satu rangkaian aksi yang saling terkait.
+
+Tombol **Ungkap PHI** (ditandai kotak biru) membuka nilai yang tersamar. Karena ini akses ke data sensitif, sistem mewajibkan kamu mengisi alasan kerja minimal 10 karakter sebelum nilai ditampilkan. Setiap pengungkapan ini sendiri **membuat peristiwa audit baru**, jadi tindakan mengungkap PHI juga tercatat dan bisa ditinjau ulang oleh audit lain. Nilai yang diungkap punya batas waktu kedaluwarsa, setelah itu akan tersamar kembali.
+
+## Tab Kasus
+
+![Tab Kasus menampilkan daftar kasus investigasi dan tombol Buat kasus](/screenshots/id/organisasi-platform/audit-platform/04-tab-kasus.png)
+
+Kasus investigasi mengelompokkan beberapa peristiwa audit yang saling terkait di bawah satu penyelidikan, lengkap dengan pemilik dan status. Klik **Buat kasus** (ditandai panah) untuk membuka kasus baru: isi judul singkat, deskripsi lingkup dan alasan, prioritas, dan (opsional) daftar ID peristiwa awal yang ingin langsung dimasukkan, dipisah koma.
+
+Klik salah satu kasus di daftar kiri untuk melihat detailnya di panel kanan, termasuk status kasus dan kontrol **legal hold**. Legal hold mengesampingkan jadwal retensi dan penghapusan otomatis untuk peristiwa yang tercakup di kasus tersebut, dipakai saat data harus dipertahankan untuk keperluan hukum atau investigasi berkelanjutan meski masa retensi normalnya sudah lewat.
+
+Dari panel detail peristiwa (lihat bagian sebelumnya), kamu juga bisa menambahkan satu peristiwa ke kasus yang sudah ada lewat tombol **Tambahkan ke kasus**.
+
+## Tab Temuan
+
+![Tab Temuan kepatuhan dalam kondisi kosong, belum ada temuan yang dicatat](/screenshots/id/organisasi-platform/audit-platform/05-tab-temuan.png)
+
+Temuan kepatuhan melacak observasi hasil audit dari draf sampai remediasi terverifikasi, terpisah dari kasus investigasi. Klik **Buat temuan** untuk mencatat temuan baru. Kalau belum ada temuan yang dicatat pada lingkup dan filter yang sedang aktif, panel ini menampilkan kondisi kosong seperti pada gambar.
+
+## Tab Bukti
+
+![Tab Bukti dalam kondisi kosong, belum ada paket bukti yang dibuat](/screenshots/id/organisasi-platform/audit-platform/06-tab-bukti.png)
+
+Paket bukti adalah ekspor data audit yang dibatasi ruang lingkupnya dan dilengkapi checksum, disiapkan untuk keperluan peninjauan internal atau regulator eksternal. Karena berisi checksum, penerima bukti bisa memverifikasi bahwa berkas tidak diubah setelah diekspor. Kalau belum ada paket yang dibuat, tab ini menampilkan kondisi kosong seperti pada gambar.
+
+## Tab Tata kelola
+
+![Tab Tata kelola menampilkan kebijakan retensi di kiri dan kontrol verifikasi integritas ledger di kanan, ditandai panah](/screenshots/id/organisasi-platform/audit-platform/07-tab-tata-kelola.png)
+
+Tab ini berisi dua panel:
+
+- **Kebijakan retensi** (kiri) — mengatur berapa lama peristiwa audit disimpan (**Retensi default**, dalam hari, contoh 1825 hari setara 5 tahun), kapan peristiwa lama dipindah ke arsip (**Arsipkan setelah**), dan apakah **penghapusan otomatis** setelah masa retensi habis diaktifkan. Legal hold pada suatu kasus mengesampingkan jadwal ini untuk peristiwa yang tercakup di dalamnya. Klik **Simpan kebijakan retensi** untuk menerapkan perubahan.
+- **Integritas ledger** (kanan, ditandai panah) — tombol **Verifikasi integritas** menjalankan pengecekan bahwa rantai pencatatan audit belum dimodifikasi sejak terakhir diverifikasi. Hasilnya (Terverifikasi, Perlu ditinjau, atau Verifikasi gagal) juga tampil di blok Integritas ledger pada bagian atas halaman.
+
+## Catatan penting
+
+- Halaman ini dan halaman Audit di dalam satu organisasi memakai komponen yang persis sama; satu-satunya pembeda adalah lingkup data yang diizinkan oleh backend berdasarkan izin akunmu. Selalu perhatikan pita lingkup di bagian atas sebelum menyimpulkan cakupan data yang sedang dilihat.
+- Mengungkap PHI selalu memerlukan alasan tertulis dan selalu tercatat sebagai peristiwa audit baru. Tindakan ini tidak bisa dibatalkan setelah nilai ditampilkan, jadi pastikan alasannya memang diperlukan.
+- Legal hold pada suatu kasus mencegah peristiwa yang tercakup di dalamnya dihapus otomatis oleh kebijakan retensi, meski masa retensi normalnya sudah lewat.
+- Rentang waktu, organisasi, dan kriteria filter lain yang diterapkan di tab Aliran peristiwa tercermin di URL halaman, sehingga bisa dibagikan sebagai tautan langsung ke hasil filter tertentu.

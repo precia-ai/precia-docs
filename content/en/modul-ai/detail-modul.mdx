@@ -1,0 +1,103 @@
+---
+title: AI Module Detail
+---
+
+# AI Module Detail
+
+The **AI Module Detail** page shows complete information for a single AI module: its lifecycle status, which organizations may use it, how it works technically (explained in plain language), its status change history, and a full audit log. From this page, platform admins can also update the module's lifecycle status and edit its metadata. This page is accessible to platform admins only.
+
+## How to Open
+
+1. Log in to PRECIA as a platform admin.
+2. Click the **AI Registry** menu in the left sidebar to open the module list.
+3. Click the **Open** button on the row of the module you want to view.
+
+![AI module detail page for ECG EF Screening with the Edit Details, Update Status, and Manage Permissions buttons highlighted](/screenshots/en/modul-ai/detail-modul/01-detail-modul.png)
+
+## Reading the Top of the Page
+
+The top of the page shows:
+
+- The **module name**, its unique code (e.g. `AI-ECG-LVEF`), and the model version (e.g. `DenseNet-5fold-20250320`).
+- A **short description** of what the module does.
+- The current **lifecycle status** badge (Clinical/Pilot/Inactive) and the number of **enabled tenants** (organizations that have enabled the module).
+- The **Edit Details** button for editing the module's metadata (highlighted with a blue box in the image, top right).
+- Three info boxes: **Domain** (the module's clinical field), **Current note** (the latest governance note), and **Updated** (the date the metadata or status was last changed).
+
+## Lifecycle Status
+
+The **Lifecycle Status** card shows the module's current lifecycle status along with its governance note. The **Update Status** button (highlighted with a blue box) opens a dialog for changing the module's lifecycle status.
+
+> **Note:** This button only appears for platform admins who have permission to manage module lifecycle. If it does not appear, your account does not have permission to change this module's status.
+
+### Changing the Lifecycle Status
+
+1. Click the **Update Status** button.
+2. The **Update Lifecycle Status** dialog opens, showing three status options: **Pilot**, **Clinical**, and **Inactive**.
+
+![Update Lifecycle Status dialog with status options, the required note field, and the Confirm Update button highlighted](/screenshots/en/modul-ai/detail-modul/02-dialog-ubah-status.png)
+
+3. Click one of the new status options. The status that is currently active cannot be selected again (its button appears faded/disabled).
+4. Fill in the **Status Note** field (required) with the reason for the change, for example "Approved for clinical use following validation." The change cannot be saved without this note.
+5. Click **Confirm Update** to save, or **Cancel** to close the dialog without making changes.
+
+> **Important:** A lifecycle status change takes effect immediately once confirmed and is recorded in the module's audit log. Changing the status to **Inactive** stops this module from being used operationally by every organization that has it enabled, so make sure the reason note is clear before confirming.
+
+## Tenant Permissions
+
+The **Tenant Permissions** card lists the organizations currently allowed to use this module, each shown as a badge with the organization's name and code. The **Manage Permissions** button (for admins with edit rights) or **View Permissions** (for admins with view-only access) opens a dialog for setting per-organization access.
+
+> **Note:** If the module's status is **Inactive**, the permissions button shows an error message instead and the dialog cannot be opened, because an inactive module cannot be granted new access permissions.
+
+## Edit Module Details (Edit Metadata)
+
+The **Edit Details** button in the top-right corner of the page opens a dialog for editing the module's display information.
+
+1. Click the **Edit Details** button.
+2. The **Edit Module Details** dialog opens, containing four editable fields: **Name**, **Version**, **Domain**, and **Description**.
+
+![Edit Module Details dialog with the Name field highlighted and the Save Changes button highlighted](/screenshots/en/modul-ai/detail-modul/03-dialog-edit-metadata.png)
+
+3. Update the fields as needed. The **Name**, **Version**, and **Domain** fields are required and cannot be left blank.
+4. Click **Save Changes** to save, or **Cancel** to close the dialog without making changes.
+
+> **Important note:** Editing metadata here (name, version, domain, description) only changes how the module's information is displayed — it does **not** change how the module technically integrates or what data it sends and receives. Technical integration changes must be made by the platform engineering team.
+
+## How This Module Works
+
+The **How This Module Works** section explains the module's technical behavior in plain language, no code required:
+
+- **When It Runs** — whether the module runs automatically or needs to be triggered manually.
+- **What It Accepts** — the type of input the module processes (e.g. an uploaded file).
+- **Runs When Transaction Status Is** — the clinical transaction status that triggers the module to run automatically (e.g. `ready_for_ai`).
+- **Accepted File Types** — the file formats the module supports.
+- **Patient Data Shared With This Module** — which patient data fields are sent to the module (e.g. `patient_gender`, `patient_dob`). If empty, no identifying patient data is shared.
+- **Result Fields Shown to Clinicians** — the result fields doctors/clinicians will see once the module finishes processing, along with their technical field name and data type.
+
+This section is informational only (read-only); to change how the module integrates, contact the platform engineering team as noted in the section's description.
+
+## Status History
+
+The **Status History** section lists recent lifecycle status changes, each with a status badge, the note entered at the time of the change, when it happened, and who made it. If no status change has ever occurred, this section shows "No status history recorded yet."
+
+## Full Log (Activity Log)
+
+The **Full Log** section at the very bottom of the page is the complete audit trail for this module: initial registration, metadata changes, tenant permission changes, and lifecycle status changes. This section only appears for platform admins who have permission to view trace history.
+
+1. Click the **Show Full Log** button to open the log list.
+
+![Full Log section expanded, showing a list of activity log entries with the Hide Full Log button highlighted](/screenshots/en/modul-ai/detail-modul/04-log-aktivitas.png)
+
+2. Each log entry shows:
+   - An action type badge (e.g. **Update Tenant Permissions**, **Update Status**, **Update Metadata**).
+   - A short summary sentence of the action.
+   - When the action was performed.
+   - The name and email of the **actor** who performed it, or "System" if it was done automatically.
+3. Click **Show More** at the bottom of the list if there are additional log entries not yet shown.
+4. Click **Hide Full Log** to collapse the log list again.
+
+This log is permanent and cannot be deleted or edited, since it serves as the compliance record of every change made to the module.
+
+## Back to the Module List
+
+Click the **Back to AI Registry** link in the top-left corner of the page to return to the list of all AI modules.

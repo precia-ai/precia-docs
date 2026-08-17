@@ -1,0 +1,63 @@
+---
+title: AI Module List
+---
+
+# AI Module List
+
+The **AI Registry** page shows the catalog of every AI module registered on the PRECIA platform, together with its lifecycle status and the number of organizations (tenants) that have it enabled. This page is only accessible to platform administrators.
+
+## How to Open
+
+1. Log in to PRECIA as a platform administrator.
+2. Click **AI Registry** in the left sidebar.
+
+![AI module list view with summary cards and the module directory table](/screenshots/en/modul-ai/index/01-daftar-modul.png)
+
+## Summary Cards
+
+At the top of the page are four summary cards (marked with blue boxes in the image):
+
+- **Total Modules** — the total number of AI modules registered in the platform registry.
+- **Clinical Ready** — the number of modules with `Clinical` status, meaning they are available for full clinical use consideration.
+- **Pilot** — the number of modules with `Pilot` status, meaning they are still under controlled rollout/limited trial.
+- **Inactive** — the number of modules with `Inactive` status, meaning they are not available for operations.
+
+## Module Lifecycle Status
+
+Every AI module has one of three lifecycle statuses, shown as a colored badge in the **Status** column:
+
+| Status | Meaning |
+|---|---|
+| **Clinical** | The module is mature and available for clinical use consideration at the unit level. |
+| **Pilot** | The module is under controlled rollout, usually limited to specific organizations/units for evaluation. |
+| **Inactive** | The module is not available for operations (for example, withdrawn from service or not yet released). |
+
+This status determines whether a clinical unit is allowed to enable the module for case processing (further controlled by the unit's AI policy).
+
+## Searching for a Module
+
+Use the search box above the table to filter the module list by **module name** or **module code** (e.g. `AI-ECG-LVEF`). Type a keyword and the list filters live, no button needs to be pressed.
+
+![Search results for AI modules with keyword "ECG", showing three matching cardiology modules](/screenshots/en/modul-ai/index/02-cari-modul.png)
+
+Example above: typing `ECG` narrows 6 modules down to 3 modules whose name or code contains that keyword. Note the counter to the right of the search box ("3 of 6 modules shown"), which always reflects the filtered result count relative to the total. Click the **x** icon in the search box to clear the filter and return to the full list.
+
+## Reading the Module Directory Table
+
+The **Module Directory** table shows the following columns for each module:
+
+- **Module** — the module's name and unique code (example: `AI-ECG-DIGITIZATION-MITRAL`).
+- **Domain** — the clinical domain of the module (example: Urology, Cardiology).
+- **Tenants** — the number of organizations that have this module enabled, shown as an "N enabled" badge.
+- **Status** — the lifecycle status badge (Clinical/Pilot/Inactive) as described above.
+- **Updated** — the date the module's metadata or status was last changed.
+- **Details** — an **Open** button that leads to the module's detail page.
+
+## Opening a Module's Detail
+
+Click the **Open** button on any module row to open that module's detail page. From there, platform administrators can manage the module's metadata, change its lifecycle status, and configure per-organization access permissions. See the **AI Module Detail** page for the full guide.
+
+## Notes
+
+- The module list on this page is platform-wide, not scoped to a single organization. Every module ever registered in the registry appears here, regardless of which organization has enabled it.
+- Changing a module's lifecycle status (for example, from Pilot to Clinical) affects every organization that has it enabled, so this should be done carefully, usually after a clinical evaluation process.

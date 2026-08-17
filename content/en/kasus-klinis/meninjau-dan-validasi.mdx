@@ -1,0 +1,59 @@
+---
+title: Reviewing and Validating
+---
+
+# Reviewing and Validating
+
+Once a clinician sends a case to a doctor (see the **Uploading Patient Files** page), the case lands in the validator's queue on the **Validation** page. This page covers two parts: how to send a case to a validator from its detail page, and how a validator reviews and then publishes a decision.
+
+## 1. Send a case to a validator (from the case detail page)
+
+On a clinical transaction's detail page, scroll down to the **Clinical Review** section. It has two actions: sending the case to a validator, and requesting a retake.
+
+![The Clinical Review section on a case detail page, with Send to Validator and Request Retake buttons](/screenshots/en/kasus-klinis/meninjau-dan-validasi/04-tinjauan-klinis-detail-transaksi.png)
+
+1. Click **Send to Validator** to hand the case over to the clinical validation queue.
+
+   **Important note**: this button is only clickable when the case status is **Unprocessed**, **Invalid Data**, **Upload Failed**, or **Retake Required**. Once a case has already been sent, its status changes and this button becomes disabled.
+
+   The system also requires at least one AI module to have finished processing before the case can be sent. If no AI result exists yet, an error message appears and the send is cancelled. Wait for AI processing to finish (see **Viewing AI Analysis Results**), then try sending again.
+
+2. If an uploaded file turns out to be unusable (a blurry image, or the wrong examination entirely) and the case needs to be re-examined from scratch, fill in **Retake reason** with a clear explanation, then click **Request Retake**. This field is required — the button does nothing while it's empty.
+
+   Requesting a retake moves the case back to **Retake Required** status, signalling the clinician handling the case to re-upload the correct files.
+
+## 2. Review a case on the Validation page
+
+Open **Validation** in the side menu (only visible to users with a validator/doctor role). The page is split into two panels: the **Worklist** on the left, and the **Validation Detail** on the right.
+
+![The Clinical Validation page showing cases awaiting a decision alongside cases that already have one](/screenshots/en/kasus-klinis/meninjau-dan-validasi/01-worklist.png)
+
+The worklist has two groups:
+
+- **Awaiting your decision** — cases that a clinician has sent over but that have no validation decision recorded yet. Each one is labelled **Not started**. Click one to open the "start validation" form: pick which AI result to judge (if the case has more than one module), choose a decision (**Accepted**, **Rejected**, **Requires Review**, or **Inconclusive**), add clinical notes, then click **Record decision**.
+- **Recorded decisions** — cases that already have a validation decision, marked either **Published** or **Pending** (the decision has been recorded but not yet published to the case record).
+
+Click any row to open its detail in the right-hand panel.
+
+### Cases that are already published
+
+If the selected case is **Published**, the detail panel shows a full summary: patient, transaction code, decision, validation and publish timestamps, clinical notes, and the AI result (confidence score plus a note that it is not a final diagnosis).
+
+![Validation detail for an already-published case, with status Published](/screenshots/en/kasus-klinis/meninjau-dan-validasi/02-detail-terpublikasi.png)
+
+A published case is final. No further action is available from this screen.
+
+### Cases that are not yet published
+
+If a decision has been recorded but not yet published (status **Pending**), the detail panel shows two further actions below the AI result summary.
+
+![Validation detail for a Pending case, with Publish validation and Request retake buttons](/screenshots/en/kasus-klinis/meninjau-dan-validasi/03-detail-belum-publikasi.png)
+
+1. Click **Publish validation** to lock in this decision as the case's final outcome. Once published, the status changes to **Published** and can no longer be changed from this page.
+2. If, after review, the examination turns out to need repeating (for example the image quality wasn't good enough to assess), fill in **Retake reason**, then click **Request retake**. This field is required. This action sends the case back to the relevant clinician for a fresh examination, and this validation record will never be published.
+
+## Important notes
+
+- The AI result shown in the validation panel always carries a note that it supports rapid screening and is not a final diagnosis — the clinical decision remains entirely with the reviewing doctor.
+- Send to Validator only succeeds once at least one AI module has finished its analysis. If the button looks enabled but sending fails with a message about AI processing, it means no AI result is available yet.
+- Publishing a validation is final and cannot be undone from this page. Make sure the decision is correct before clicking **Publish validation**.

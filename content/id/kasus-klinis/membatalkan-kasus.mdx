@@ -1,0 +1,53 @@
+---
+title: Membatalkan Kasus
+---
+
+# Membatalkan Kasus
+
+Kasus yang dibuat karena kesalahan (salah unit, salah data pasien, duplikat, dan sejenisnya) bisa dibatalkan langsung dari halaman detail kasus, selama kasus itu belum masuk ke tahap pemrosesan AI atau dikirim ke dokter. Halaman ini menjelaskan syarat, cara, dan akibat pembatalan.
+
+## Kapan kasus bisa dibatalkan
+
+Opsi pembatalan hanya aktif kalau status kasus saat ini salah satu dari:
+
+- **Draf**
+- **Belum Diproses**
+- **Data Tidak Valid**
+- **Unggah Gagal**
+
+Begitu kasus sudah **Dikirim ke Dokter**, **Ditinjau Dokter**, sedang diproses AI, atau sudah **Selesai**, tombol pembatalan otomatis nonaktif. Kalau kasus Anda sudah di tahap itu tapi tetap perlu dibatalkan, hubungi admin unit atau admin organisasi.
+
+## 1. Buka detail kasus yang ingin dibatalkan
+
+Dari daftar kerja transaksi di menu **Klinis**, klik baris kasus yang ingin dibatalkan untuk membuka halaman detailnya. Pastikan Anda berada di tab **Info Pasien** (tab aktif secara default). Gulir ke bawah sampai menemukan kartu **Batalkan Transaksi** berwarna merah muda, biasanya terletak setelah bagian Tinjauan Klinis.
+
+![Kartu Batalkan Transaksi pada halaman detail kasus](/screenshots/id/kasus-klinis/membatalkan-kasus/01-tombol-batalkan.png)
+
+Kalau status kasus tidak memenuhi syarat pembatalan, kartu ini tetap terlihat tapi kolom alasan dan tombolnya nonaktif (abu-abu), disertai keterangan "Status saat ini tidak memenuhi syarat untuk dibatalkan."
+
+## 2. Isi alasan pembatalan
+
+Kolom **Alasan pembatalan** wajib diisi — sistem tidak mengizinkan pembatalan tanpa alasan. Tulis alasan yang jelas dan ringkas, misalnya "Data pasien salah input, dibuat ulang dengan MRN yang benar." Alasan ini akan tercatat permanen di riwayat kasus dan bisa dilihat pengguna lain yang punya akses ke kasus tersebut.
+
+![Kolom alasan pembatalan terisi, tombol Batalkan Transaksi siap diklik](/screenshots/id/kasus-klinis/membatalkan-kasus/02-isi-alasan.png)
+
+Kalau kolom ini dibiarkan kosong lalu tombol pembatalan diklik, sistem menampilkan pesan kesalahan "Alasan pembatalan wajib diisi." dan pembatalan tidak diproses.
+
+## 3. Klik Batalkan Transaksi
+
+Setelah alasan terisi, klik tombol merah **Batalkan Transaksi**. Proses berjalan langsung tanpa dialog konfirmasi tambahan — begitu tombol diklik, kasus langsung berpindah ke status **Dibatalkan**.
+
+![Halaman detail kasus setelah berhasil dibatalkan, dengan pesan sukses dan kartu pembatalan nonaktif](/screenshots/id/kasus-klinis/membatalkan-kasus/03-hasil-dibatalkan.png)
+
+Setelah berhasil:
+
+- Pesan hijau "Transaksi berhasil dibatalkan." muncul di bagian atas halaman.
+- Status kasus berubah menjadi **Dibatalkan** dan tidak bisa diproses AI lagi.
+- Kartu **Batalkan Transaksi** langsung nonaktif — kolom alasan terkunci dan tombol berubah abu-abu, karena kasus yang sudah dibatalkan tidak bisa dibatalkan ulang.
+- Tombol unggah berkas, kirim ke dokter, dan pengajuan pengulangan juga ikut nonaktif untuk kasus ini.
+
+## Catatan penting
+
+- **Pembatalan tidak bisa dibatalkan (undo).** Setelah status berubah menjadi Dibatalkan, tidak ada tombol untuk mengaktifkan kembali kasus tersebut dari halaman ini. Kalau ternyata pembatalan keliru, buat kasus baru dan isi datanya ulang.
+- Alasan pembatalan yang sudah dikirim tercatat permanen di **Riwayat Transaksi** kasus tersebut (klik **Lihat Riwayat** di bagian bawah halaman detail untuk melihatnya).
+- Kasus yang statusnya sudah lewat tahap Belum Diproses (misalnya sudah dikirim ke dokter) tidak bisa dibatalkan sendiri lewat halaman ini — ini disengaja, supaya kasus yang sedang ditinjau tenaga medis lain tidak hilang tiba-tiba.

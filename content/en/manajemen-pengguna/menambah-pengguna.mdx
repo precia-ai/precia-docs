@@ -1,0 +1,61 @@
+---
+title: Adding a New User
+---
+
+# Adding a New User
+
+This page is used to register a new account for a team member in your organization, for example a doctor, nurse, or a new unit admin. Users created here automatically join your own organization, they cannot be assigned to a different one.
+
+Only organization administrators (and platform administrators) have access to this page.
+
+## How to open this page
+
+1. Open the **Users & Access** page from the left sidebar.
+2. Click the **Add User** button in the top-right corner.
+
+You will land on the Registration Form below.
+
+![Empty user registration form, showing account fields and the list of roles](/screenshots/en/manajemen-pengguna/menambah-pengguna/01-form-kosong.png)
+
+## Step 1 — Fill in account details
+
+Complete the fields at the top of the form:
+
+- **Email** — the user's email address, used to log in. Required, and must be a valid email address.
+- **Username** — a unique username for login. Required.
+- **Full Name** — the user's full name. Optional, but recommended so the user is easy to identify in lists and activity history.
+- **Organization** — pre-filled with your organization and cannot be changed, since an organization administrator can only create users within their own organization.
+- **Password** — the account's initial password. Required. Share this password with the user through a secure channel, and advise them to change it after their first login.
+- **Status** — the account status right after creation. Options are:
+  - **Active** — the account can log in immediately.
+  - **Inactive** — the account is created but cannot log in until reactivated.
+  - **Locked** — the account is created in a locked state.
+  - **Pending Activation** — the account is waiting for a further activation step.
+
+  For most cases, leave the status as **Active**.
+
+## Step 2 — Choose roles
+
+The **Roles** section lists every role available to your organization, each shown as a card with a checkbox, role name, and a short description. Example roles include Clinician, Nurse / Technician, Clinical Administrator, Clinical Validator, Auditor, Management, System Administrator, and others.
+
+Check one or more roles that match this user's responsibilities. A checked role card turns light blue, and the number of selected roles is shown on the **"X selected"** badge next to the section title.
+
+![Fully filled form with the Nurse / Technician role already checked](/screenshots/en/manajemen-pengguna/menambah-pengguna/02-form-terisi.png)
+
+**Note:** roles can be left unassigned when creating the account and set later from the [Managing User Roles](/manajemen-pengguna/mengatur-peran-pengguna) page. However, without any role the user cannot access any feature in PRECIA after logging in, so it is best to assign at least one role from the start.
+
+## Step 3 — Save the user
+
+Once every required field is filled and roles are selected, click the **Create user** button at the bottom-right of the form.
+
+- While saving is in progress, the button changes to "Creating user..." and cannot be clicked again.
+- On success, a confirmation message **"User created successfully."** appears at the bottom of the form, and you are automatically redirected back to the users list shortly after.
+- On failure (for example, the email or username is already used by another account), an error message appears at the bottom of the form and you remain on this page to correct the data.
+
+![The "User created successfully" message shown after the form is saved](/screenshots/en/manajemen-pengguna/menambah-pengguna/03-berhasil-dibuat.png)
+
+**Important note:** creating a user cannot be undone once the **Create user** button is clicked and the request succeeds. If there is a data mistake after the account is created, fix it from the [User Detail](/manajemen-pengguna/detail-pengguna) page, or adjust roles from the [Managing User Roles](/manajemen-pengguna/mengatur-peran-pengguna) page.
+
+## Cancelling user creation
+
+To cancel before saving, click the **Cancel** button next to **Create user**, or click **Back to users** in the top-right corner. Any data already entered will not be saved.

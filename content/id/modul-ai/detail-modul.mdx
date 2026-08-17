@@ -1,0 +1,103 @@
+---
+title: Detail Modul AI
+---
+
+# Detail Modul AI
+
+Halaman **Detail Modul AI** menampilkan informasi lengkap satu modul kecerdasan buatan (AI): status lifecycle, organisasi yang boleh memakainya, cara kerja teknis (dalam bahasa yang mudah dipahami), riwayat perubahan status, dan log audit lengkap. Dari halaman ini admin platform juga bisa mengubah status lifecycle modul dan mengedit metadatanya. Halaman ini hanya bisa diakses oleh admin platform.
+
+## Cara Membuka
+
+1. Login ke PRECIA sebagai admin platform.
+2. Klik menu **Registri AI** di sidebar kiri untuk membuka daftar modul.
+3. Klik tombol **Buka** pada baris modul yang ingin dilihat detailnya.
+
+![Halaman detail modul AI ECG EF Screening dengan tombol Ubah Detail, Perbarui Status, dan Kelola Izin ditandai](/screenshots/id/modul-ai/detail-modul/01-detail-modul.png)
+
+## Membaca Bagian Atas Halaman
+
+Di bagian atas halaman ditampilkan:
+
+- **Nama modul**, kode unik (contoh `AI-ECG-LVEF`), dan versi model (contoh `DenseNet-5fold-20250320`).
+- **Deskripsi singkat** tentang fungsi modul.
+- Badge **status lifecycle** saat ini (Klinis/Pilot/Nonaktif) dan jumlah **tenant aktif** (organisasi yang sudah mengaktifkan modul).
+- Tombol **Ubah Detail** untuk mengedit metadata modul (kotak biru kanan atas pada gambar).
+- Tiga kotak info: **Domain** (bidang klinis modul), **Catatan terkini** (catatan tata kelola terakhir), dan **Diperbarui** (tanggal metadata/status terakhir diubah).
+
+## Status Siklus Hidup
+
+Kartu **Status Siklus Hidup** menampilkan status lifecycle modul saat ini beserta catatan tata kelolanya. Tombol **Perbarui Status** (kotak biru pada gambar) membuka dialog untuk mengubah status lifecycle modul.
+
+> **Catatan:** Tombol ini hanya muncul untuk admin platform yang punya hak mengelola siklus hidup modul. Jika tidak muncul, akun Anda tidak punya izin untuk mengubah status modul ini.
+
+### Mengubah Status Lifecycle
+
+1. Klik tombol **Perbarui Status**.
+2. Dialog **Perbarui Status Siklus Hidup** terbuka, menampilkan tiga pilihan status: **Pilot**, **Klinis**, dan **Nonaktif**.
+
+![Dialog Perbarui Status Siklus Hidup dengan pilihan status, kotak catatan wajib diisi, dan tombol Konfirmasi Pembaruan ditandai](/screenshots/id/modul-ai/detail-modul/02-dialog-ubah-status.png)
+
+3. Klik salah satu pilihan status baru. Status yang sedang aktif saat ini tidak bisa dipilih ulang (tombolnya tampak pudar/nonaktif).
+4. Isi kolom **Catatan Status** (wajib) dengan alasan perubahan, misalnya "Disetujui untuk penggunaan klinis setelah validasi selesai". Perubahan tidak bisa disimpan tanpa catatan ini.
+5. Klik **Konfirmasi Pembaruan** untuk menyimpan, atau **Batal** untuk menutup dialog tanpa perubahan.
+
+> **Penting:** Perubahan status lifecycle langsung berlaku begitu dikonfirmasi dan tercatat di log audit modul. Mengubah status ke **Nonaktif** akan menghentikan modul ini dari operasional aktif di seluruh organisasi yang memakainya, jadi pastikan catatan alasan sudah jelas sebelum konfirmasi.
+
+## Izin Tenant
+
+Kartu **Izin Tenant** menampilkan daftar organisasi yang saat ini boleh memakai modul ini, masing-masing sebagai badge nama organisasi beserta kodenya. Tombol **Kelola Izin** (untuk admin dengan hak kelola) atau **Lihat Izin** (untuk admin yang hanya boleh melihat) membuka dialog pengaturan izin akses per organisasi.
+
+> **Catatan:** Jika status modul **Nonaktif**, tombol pengelolaan izin akan menampilkan pesan error dan dialog tidak bisa dibuka, karena modul nonaktif tidak bisa diberi izin akses baru.
+
+## Ubah Detail Modul (Edit Metadata)
+
+Tombol **Ubah Detail** di pojok kanan atas halaman membuka dialog untuk mengedit informasi tampilan modul.
+
+1. Klik tombol **Ubah Detail**.
+2. Dialog **Ubah Detail Modul** terbuka, berisi empat kolom yang bisa diedit: **Nama**, **Versi**, **Domain**, dan **Deskripsi**.
+
+![Dialog Ubah Detail Modul dengan kolom Nama ditandai dan tombol Simpan Perubahan ditandai](/screenshots/id/modul-ai/detail-modul/03-dialog-edit-metadata.png)
+
+3. Ubah kolom yang diperlukan. Kolom **Nama**, **Versi**, dan **Domain** wajib diisi, tidak boleh dikosongkan.
+4. Klik **Simpan Perubahan** untuk menyimpan, atau **Batal** untuk menutup dialog tanpa perubahan.
+
+> **Catatan penting:** Mengubah metadata di sini (nama, versi, domain, deskripsi) hanya mengubah tampilan informasi modul, **tidak mengubah** cara modul terintegrasi secara teknis atau data apa yang dikirim/diterimanya. Perubahan teknis integrasi harus dilakukan oleh tim platform engineering.
+
+## Cara Kerja Modul Ini
+
+Bagian **Cara Kerja Modul Ini** menjelaskan perilaku teknis modul dalam bahasa yang mudah dipahami, tanpa perlu membaca kode:
+
+- **Kapan Berjalan** — apakah modul berjalan otomatis atau perlu dipicu manual.
+- **Apa yang Diterima** — jenis input yang diproses modul (misal berkas unggahan).
+- **Berjalan Saat Status Transaksi** — status transaksi klinis yang memicu modul berjalan otomatis (misal `ready_for_ai`).
+- **Tipe Berkas yang Diterima** — format berkas yang didukung.
+- **Data Pasien yang Dibagikan ke Modul Ini** — field data pasien apa saja yang dikirim ke modul (misal `patient_gender`, `patient_dob`). Jika kosong, tidak ada data pasien identitas yang dibagikan.
+- **Bidang Hasil yang Ditampilkan ke Klinisi** — field hasil yang akan dilihat dokter/klinisi setelah modul selesai memproses, lengkap dengan nama field teknis dan tipe datanya.
+
+Bagian ini bersifat informasi saja (read-only); untuk mengubah cara modul terintegrasi, hubungi tim platform engineering seperti disebutkan di deskripsi bagian ini.
+
+## Riwayat Status
+
+Bagian **Riwayat Status** menampilkan daftar perubahan status lifecycle terbaru, masing-masing dengan badge status, catatan yang diisi saat perubahan, waktu perubahan, dan siapa yang melakukannya. Jika belum pernah ada perubahan status, bagian ini menampilkan "Belum ada riwayat status yang tercatat."
+
+## Log Lengkap (Log Aktivitas)
+
+Bagian **Log Lengkap** di bagian paling bawah halaman adalah jejak audit lengkap untuk modul ini: registrasi awal, perubahan metadata, perubahan izin tenant, dan perubahan status lifecycle. Bagian ini hanya muncul untuk admin platform yang punya hak melihat riwayat jejak (trace history).
+
+1. Klik tombol **Tampilkan Log Lengkap** untuk membuka daftar log.
+
+![Log Lengkap modul AI dalam keadaan terbuka, menampilkan daftar entri log aktivitas dengan tombol Sembunyikan Log Lengkap ditandai](/screenshots/id/modul-ai/detail-modul/04-log-aktivitas.png)
+
+2. Setiap entri log menampilkan:
+   - Badge jenis aksi (misal **Update Tenant Permissions**, **Update Status**, **Update Metadata**).
+   - Ringkasan aksi dalam kalimat singkat.
+   - Waktu aksi dilakukan.
+   - Nama dan email pelaku (**Pelaku**) yang melakukan aksi, atau "Sistem" jika dilakukan otomatis oleh sistem.
+3. Klik **Tampilkan Lebih Banyak** di bagian bawah daftar jika masih ada entri log lain yang belum ditampilkan.
+4. Klik **Sembunyikan Log Lengkap** untuk menutup kembali daftar log.
+
+Log ini bersifat permanen dan tidak bisa dihapus atau diedit, karena berfungsi sebagai catatan kepatuhan (compliance) atas semua perubahan yang terjadi pada modul.
+
+## Kembali ke Daftar Modul
+
+Klik tautan **Kembali ke Registri AI** di pojok kiri atas halaman untuk kembali ke halaman daftar seluruh modul AI.

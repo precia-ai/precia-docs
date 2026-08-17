@@ -1,0 +1,63 @@
+---
+title: Uploading Patient Files
+---
+
+# Uploading Patient Files
+
+Once a case is created, every AI module active in that unit gets its own examination slot on the case detail page. Each slot needs a file (an ECG image, an examination photo, etc., depending on the module) before it can be marked ready and analyzed by AI. This page walks through the steps, from opening the case to marking a slot ready for analysis.
+
+## 1. Open the case from the worklist
+
+From the **Clinical** page, find a case whose files haven't been uploaded yet (status **Unprocessed**), then click its row to open the case detail.
+
+![Clinical worklist, click a row to open its detail](/screenshots/en/kasus-klinis/mengunggah-berkas/01-worklist-klik-baris.png)
+
+## 2. Select an AI module tab
+
+The case detail page has a **Patient Info** tab plus one additional tab for every AI module active in that unit. Click one of the AI module tabs to open its file upload area. A small dot next to the module name means that module doesn't have a file yet.
+
+![Case detail page, click one of the AI module tabs](/screenshots/en/kasus-klinis/mengunggah-berkas/02-buka-detail-kasus.png)
+
+## 3. Upload a file to the module's slot
+
+Each module slot shows a dashed upload area, together with the maximum number of files it accepts and the accepted formats (listed above the upload area). You can drag a file directly onto it, or click **click to select** to open a file picker on your computer.
+
+![Empty upload area for an AI module slot](/screenshots/en/kasus-klinis/mengunggah-berkas/03-dropzone-kosong.png)
+
+Once a file is picked, a file card appears below the upload area with the file's name and size. Click **Upload** on that card to start uploading.
+
+## 4. Wait for the upload to finish
+
+While the upload is running, the button changes to **Uploading...** and a progress bar shows the percentage completed.
+
+![Progress bar while a file is uploading](/screenshots/en/kasus-klinis/mengunggah-berkas/04-progress-unggah.png)
+
+Don't close or reload the page while this is running — an interrupted upload isn't saved and has to be started over.
+
+## 5. Check the uploaded file
+
+Once it finishes, the slot's status changes to **Data Uploaded**, the upload area disappears (replaced by a message that the slot has reached its file limit, if it only accepts one file), and the newly uploaded file appears in the **Uploaded Files** list. For image files, a preview is shown immediately and can be clicked to expand.
+
+![File uploaded successfully, with the Mark Ready for AI button](/screenshots/en/kasus-klinis/mengunggah-berkas/05-berkas-terunggah.png)
+
+Each file row has **Expand** (for images) and **Delete** links. If the wrong file was uploaded, delete it first before uploading a new one — this matters especially for modules that only accept one file per transaction.
+
+## 6. Mark ready for AI
+
+Once all the files that module needs are uploaded, click **Mark Ready for AI** below the file list. This button only appears while the slot is still **Pending** or **Data Uploaded** — once marked ready, it's replaced by a **Trigger AI** button.
+
+The slot's status changes to **Ready**, meaning that module now has everything it needs and is just waiting for analysis to run (either manually via **Trigger AI**, or automatically depending on the module's configuration).
+
+![Slot status changes to Ready after marking, with the Trigger AI button](/screenshots/en/kasus-klinis/mengunggah-berkas/06-tandai-siap-dianalisis.png)
+
+## Important notes
+
+- **Repeat for each module.** If a case has more than one active AI module (e.g. three ECG modules at once), repeat steps 2–6 for each module tab. Every slot is independent — uploading and marking one module ready doesn't affect the others.
+- **General files vs. per-module files.** The **Patient Info** tab has its own upload area for general supporting documents (referral letters, patient photos, etc.) that aren't analyzed by AI. General files accept every format and aren't bound by a per-slot file limit.
+- **File format and size.** The accepted formats and maximum file size are shown above each slot's upload area, following that AI module's configuration. If a file's format doesn't match or its size exceeds the limit, the system shows an error and the upload is cancelled.
+- **The case must still be editable.** Uploading files is only possible while the case status is **Unprocessed**, **Invalid Data**, or **Upload Failed**. A case that's already been sent to a validator or cancelled can no longer accept new uploads.
+- **Deleting a file is final.** A deleted file cannot be recovered — if the wrong file was uploaded, double-check before clicking **Delete**.
+
+## Next steps
+
+Once a slot is marked ready (or run via **Trigger AI**), the system processes it asynchronously. See the **Viewing AI Analysis Results** page for how to read the results once it's done.
