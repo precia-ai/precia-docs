@@ -335,7 +335,11 @@ module.exports = [
       await loginKhanza(page)
     },
     annotate: [
-      // Status di kiri bawah kini menampilkan ID operator.
+      // ID operator disamarkan: pada deployment ini password sama persis
+      // dengan nomor induk, sehingga menampilkannya berarti menerbitkan
+      // kredensial yang masih berlaku.
+      { type: 'redact', x: 120, y: 811, width: 116, height: 20 },
+      // Status di kiri bawah kini menampilkan bahwa operator sudah masuk.
       { type: 'box', x: 4, y: 811, width: 232, height: 20 },
       // Tombol Registrasi yang sudah aktif.
       { type: 'box', x: 78, y: 92, width: 88, height: 28 }
