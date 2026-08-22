@@ -1,0 +1,136 @@
+---
+title: MEDICCA Operator Workflow
+---
+
+# MEDICCA Operator Workflow
+
+This page describes what a registration desk operator can actually do in a MEDICCA SIMRS connected to PRECIA. Every step below was executed directly against the MEDICCA development environment, and every limitation listed here is also the result of direct observation rather than assumption.
+
+The MEDICCA interface is only available in Indonesian, so the screenshots and all on screen labels are in Indonesian.
+
+## What MEDICCA covers today
+
+The deployed MEDICCA only contains the registration desk module. After signing in as an operator the menu bar holds three entries, namely **REGISTRASI PASIEN** (patient registration), **HISTORI REGISTRASI** (registration history), and **PENGATURAN** (settings) with a single tariff submenu. There is nothing else, and that menu already reflects the full capability of the application for an operator.
+
+Operator capability is limited to two things:
+
+1. Registering patient records.
+2. Creating an outpatient visit registration for that patient.
+
+Beyond those two, MEDICCA provides nothing. In particular:
+
+- **There is no clinical order module.** An operator cannot raise an examination request, a laboratory order, a radiology order, or an AI reading request from inside MEDICCA.
+- **There is no encounter, specimen, or examination result module.** The MEDICCA database has no tables for any of them.
+- **There is no screen for viewing AI results.** AI results pushed back by PRECIA are stored in the MEDICCA database, but no interface page displays them.
+- **The emergency registration module is unusable by operators.** Every patient row carries a **UGD** link, but the Petugas Loket access level holds no rights over the emergency tables. Following that link produces a permission denial and returns the operator to the login page. Emergency registrations are never sent to PRECIA either.
+
+In other words, the only MEDICCA event relevant to PRECIA is the **outpatient visit registration**. That registration is the candidate for a PRECIA clinical transaction.
+
+## Prerequisites performed by the administrator
+
+A standard MEDICCA installation ships with no staff account at all, and the **Petugas Loket** access level is created with no table permissions whatsoever. The two prerequisite steps below must therefore be completed first by the MEDICCA administrator, using the built-in administrator account defined in the application configuration file. Without both steps nobody can use MEDICCA.
+
+### Prerequisite 1. Granting permissions to the operator level
+
+Open **PENGATURAN** then **HAK AKSES**. The list of access levels appears. On the **Petugas Loket** row, follow the permission link to open the per table permission matrix.
+
+Tick at least **Daftar** (list), **Tampilan** (view), and **Cari** (search) for the supporting reference tables, and additionally **Tambah/Salin** (add) and **Ubah** (edit) for **REGISTRASI PASIEN** and **HISTORI REGISTRASI**. Press **Perbarui** to save.
+
+![MEDICCA permission matrix for the operator level, with the HISTORI REGISTRASI row, the REGISTRASI PASIEN row, and the Perbarui button marked by blue boxes](/screenshots/en/integrasi-simrs/alur-operator-medicca/01-hak-akses-petugas-loket.png)
+
+Note that two rows are labelled **HISTORI REGISTRASI**. The first one is the outpatient registration table and that is the row to tick. The second one is the emergency registration table, deliberately left empty because the emergency module is not part of this workflow.
+
+If this step is skipped, an operator account still signs in successfully but the navigation renders empty and every page refuses with a permission denied message.
+
+### Prerequisite 2. Creating an operator account
+
+Open **PENGATURAN** then **PETUGAS LOKET**, and press **Tambah Data Baru**. Fill in **Nama Petugas** (staff name), **NIK** (national identity number), **Username**, and **Password**, then set **Level** to **Petugas Loket**.
+
+![MEDICCA add operator form, with the Username field, the Password field, the Level selector, and the Tambah button marked by blue boxes](/screenshots/en/integrasi-simrs/alur-operator-medicca/02-tambah-petugas-loket.png)
+
+Two points the administrator should know:
+
+1. The **Level** selector offers a single value, **Petugas Loket**. Additional administrators cannot be created from this screen.
+2. The staff unit is filled automatically with LOKET and cannot be changed, because only staff assigned to the LOKET unit are recognised as application users.
+
+Press **Tambah** to save. The password is stored hashed by the application, and the account can be used immediately.
+
+## Step 1. Signing in to MEDICCA
+
+Open your organisation's MEDICCA address. The root address redirects to the login page. Enter the **Nama Pengguna** (username) and **Kata Sandi** (password) of the operator account, then press **Login**.
+
+![MEDICCA login page with the username field, the password field, and the Login button marked by blue boxes](/screenshots/en/integrasi-simrs/alur-operator-medicca/03-halaman-login.png)
+
+After a successful sign in the application opens the **REGISTRASI PASIEN** list directly.
+
+## Step 2. Opening the patient list
+
+The **REGISTRASI PASIEN** list holds every registered patient. Two main actions are available from this page:
+
+- The **TAMBAH DATA PASIEN BARU** button, for registering a patient who has never attended before.
+- The **RAWAT JLN** link on a patient row, for creating an outpatient visit registration for an existing patient.
+
+![MEDICCA patient list, with the menu bar, the add new patient button, and the outpatient link on a patient row marked by blue boxes](/screenshots/en/integrasi-simrs/alur-operator-medicca/04-daftar-pasien.png)
+
+The **Kartu Pasien** link on each row only prints a patient identity card and has no connection to PRECIA. The **UGD** link cannot be used by an operator, as explained in the scope section.
+
+## Step 3. Adding a new patient
+
+Press **TAMBAH DATA PASIEN BARU**. A form window opens over the list. Fill in the following fields:
+
+- **Nama Pasien** (patient name), mandatory.
+- **No BPJS** and **No KTP** (insurance and identity numbers), optional.
+- **Tempat Lahir** and **Tgl Lahir** (place and date of birth), mandatory.
+- **Jenis Kelamin** (gender), pick one.
+- **Alamat** (address), mandatory.
+- **Kelurahan** (village), mandatory and chosen through a search window. Press the magnifier icon next to the field, pick a village from the list, then press **Pilih**.
+- **Agama** (religion), pick one.
+
+![MEDICCA new patient form filled with sample data, with the patient name field, the village search field, and the Tambah button marked by blue boxes](/screenshots/en/integrasi-simrs/alur-operator-medicca/05-form-pasien-baru.png)
+
+Press **Tambah** to save. The medical record number is generated automatically and does not need to be entered.
+
+## Step 4. Creating the outpatient registration
+
+Return to the patient list and press the **RAWAT JLN** link on the relevant patient row. The registration form opens with the patient identity already filled in and not editable from this screen. The staff name is also filled automatically from the signed in account.
+
+Fields the operator has to choose:
+
+- **Asal Rujukan** (referral source), mandatory.
+- **Jenis Pasien** (patient class), mandatory.
+- **Poliklinik** (clinic), mandatory. Seven outpatient clinics are offered, namely Umum, Penyakit Dalam, Gigi, Mata, Rehab Medik, Kandungan, and Anak. The emergency unit does not appear on this form.
+- **Biaya Daftar** (registration fee), mandatory. The total is computed automatically once the choice is made.
+
+![MEDICCA outpatient registration form, with the clinic option group, the fee option group, and the Tambah button marked by blue boxes](/screenshots/en/integrasi-simrs/alur-operator-medicca/06-form-registrasi.png)
+
+Press **Tambah** to save the registration. The application returns to the patient list.
+
+## Step 5. Checking the registration history
+
+Open **HISTORI REGISTRASI** to confirm the registration was stored. The newest row shows the date, time, patient name, medical record number, clinic, care type, patient class, total fee, and the name of the operator who entered the data.
+
+![MEDICCA registration history page, with the history menu entry and the newest registration row marked by blue boxes](/screenshots/en/integrasi-simrs/alur-operator-medicca/07-histori-registrasi.png)
+
+At this point everything a MEDICCA operator can do is complete. There is no further step inside MEDICCA.
+
+## What happens after a registration is saved
+
+Saving an outpatient registration triggers one background process on the MEDICCA side. The registration is appended as one line to the integration queue file. A command line worker shipped with the MEDICCA integration package then reads that queue, signs in to the PRECIA API, and attempts to create a clinical transaction. The reverse direction is also prepared, with PRECIA pushing AI results to the MEDICCA callback address and MEDICCA storing them in its AI result table.
+
+Only two parts of this are proven to work today:
+
+1. **Queue writing.** Pressing **Tambah** on the registration form always appends one queue line carrying the registration identifier and a timestamp.
+2. **Authentication to PRECIA.** The queue worker successfully signs in to the PRECIA API with the configured service account, so the rejection that follows is not an authentication failure.
+
+Everything else does not work yet. The honest account follows.
+
+## Limitations that apply today
+
+- **Registrations never reach PRECIA.** The transaction code MEDICCA builds joins a fixed eight character prefix with the forty eight character registration identifier, giving fifty six characters. The PRECIA transaction code column accepts at most fifty characters, and the request is rejected with a validation error on the code field. Until the code construction is shortened, every real registration is rejected and stays in the queue.
+- **The queue is not processed automatically.** Neither the MEDICCA package nor the server carries a scheduler that runs the queue worker or the result poller. Until a worker is run manually, registrations only accumulate in the queue.
+- **A queue write failure is invisible to the operator.** If the queue file cannot be written, the registration is still stored and the screen still reports success, while the failure is only recorded in the server log.
+- **The return direction is not wired to the right organisation.** PRECIA pushes an AI result to a SIMRS only when a clinical validation is published, and the destination is determined by the SIMRS configuration of the organisation that owns the transaction. The current MEDICCA configuration directs registrations to an organisation whose SIMRS adapter is not MEDICCA, so AI results would never come back to MEDICCA even once the code length problem is fixed. The clinic to unit mapping also points at units of that same organisation rather than at hospital units.
+- **The MEDICCA callback endpoint itself is ready.** The AI result receiver in MEDICCA is live and protected by a shared secret header. A request without the correct secret is refused, and a request with the correct secret proceeds to payload validation. The obstacle in the return direction is therefore the organisation targeting, not the MEDICCA receiver.
+- **Operators cannot see AI results.** Received results are stored in the database, but no MEDICCA page displays them, so results can only be read through PRECIA.
+
+Until the points above are addressed, the MEDICCA workflow stops at the visit registration. An operator can register a patient and create an outpatient registration, and nothing more. The complete round trip from a MEDICCA registration to an AI result returning into MEDICCA has never been completed successfully.
