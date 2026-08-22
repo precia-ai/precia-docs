@@ -59,7 +59,9 @@ Kalau kolom status masih berbunyi **Log Out**, kredensial belum diterima. Ulangi
 
 Tekan `Alt+R` untuk membuka modul **Registrasi**. Jendela **Registrasi Periksa Hari Ini** menampilkan tabel pendaftaran untuk tanggal berjalan.
 
-Kolom yang paling penting adalah **No.Rawat**. Nilai itulah satu-satunya kunci yang dipakai pada seluruh langkah berikutnya, termasuk saat kasus dikirim ke PRECIA dan saat hasilnya ditelusuri kembali. Penyaring **Periode** di bagian bawah jendela menentukan rentang tanggal yang ditampilkan, dan secara bawaan berisi tanggal berjalan. Kalau belum ada pendaftaran pada tanggal tersebut, tabel tampil kosong dengan penanda **Record : 0**.
+Kolom yang paling penting adalah **No.Rawat**. Nilai itulah satu-satunya kunci yang dipakai pada seluruh langkah berikutnya, termasuk saat kasus dikirim ke PRECIA dan saat hasilnya ditelusuri kembali. Penyaring **Periode** di bagian bawah jendela menentukan rentang tanggal yang ditampilkan, dan secara bawaan berisi tanggal berjalan.
+
+Pada tangkapan layar di bawah, tabel tampil kosong dengan penanda **Record : 0**. Penyebabnya, kasus contoh pada halaman ini terdaftar pada 28 Juli 2026, bukan pada tanggal berjalan saat tangkapan layar dibuat, sedangkan penyaring **Periode** tidak dapat diubah dari klien demo sehingga rentang tanggalnya tidak dapat digeser. Nomor rawat kasus lama tetap dapat dipakai untuk pengiriman, hanya barisnya yang tidak dapat ditampilkan di layar. Rincian batasan ini ada pada bagian [Batasan yang perlu diketahui](#batasan-yang-perlu-diketahui).
 
 ![Jendela Registrasi Periksa Hari Ini pada Khanza, judul jendela, kolom No.Rawat, dan penyaring Periode ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/05-daftar-registrasi.png)
 
@@ -79,7 +81,7 @@ Isi permintaan pengiriman terdiri atas tiga nilai:
 
 Jawaban yang menandakan berhasil adalah pesan **Kasus terdaftar untuk dikirim ke PRECIA**. Kalau nomor rawat dan kode modul yang sama dikirim ulang, layanan menjawab dengan pesan **Kasus ini sudah pernah diajukan ke PRECIA** dan tidak membuat kasus ganda, sehingga pengiriman ulang aman dilakukan.
 
-Layanan yang sama juga menyediakan pemeriksaan status kasus. Jawabannya berisi status pengiriman per modul AI dan hasil AI bila sudah tersedia, sehingga tim integrasi dapat memastikan kasus benar-benar terkirim tanpa membuka PRECIA.
+Layanan yang sama juga menyediakan pemeriksaan status kasus. Pada verifikasi ini, jawaban yang teramati berisi status pengiriman per modul AI, sehingga tim integrasi dapat memastikan kasus benar-benar terkirim tanpa membuka PRECIA. Menurut kontrak layanan, jawaban yang sama juga memuat hasil AI bila hasil tersebut sudah tersedia, tetapi bagian itu belum teramati pada lingkungan demo.
 
 Setelah kasus masuk antrean, layanan pendamping Khanza memeriksa antrean setiap 30 detik, masuk ke PRECIA, lalu membuat transaksinya. Pada uji coba terakhir, transaksi terbentuk 8 detik setelah kasus masuk antrean. Semua kegiatan ini berjalan tanpa campur tangan petugas.
 

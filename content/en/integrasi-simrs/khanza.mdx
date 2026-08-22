@@ -59,7 +59,9 @@ If the status field still reads **Log Out**, the credentials were not accepted. 
 
 Press `Alt+R` to open the **Registrasi** (registration) module. The **Registrasi Periksa Hari Ini** window lists the registrations for the current date.
 
-The most important column is **No.Rawat**, the visit number. That value is the only key used in every following step, both when the case is sent to PRECIA and when the result is traced back. The **Periode** (period) filter at the bottom of the window sets the date range shown and defaults to the current date. If there is no registration on that date, the table is empty and the counter reads **Record : 0**.
+The most important column is **No.Rawat**, the visit number. That value is the only key used in every following step, both when the case is sent to PRECIA and when the result is traced back. The **Periode** (period) filter at the bottom of the window sets the date range shown and defaults to the current date.
+
+In the screenshot below the table is empty and the counter reads **Record : 0**. The reason is that the example case on this page was registered on 28 July 2026, not on the date the screenshot was taken, while the **Periode** filter cannot be changed from the demo client, so the date range cannot be moved. The visit number of an older case can still be used for sending; only its row cannot be displayed on screen. This limitation is described in [Limitations you should know](#limitations-you-should-know).
 
 ![Khanza Registrasi Periksa Hari Ini window, the window title, the No.Rawat column and the Periode filter marked with blue boxes](/screenshots/en/integrasi-simrs/khanza/05-daftar-registrasi.png)
 
@@ -79,7 +81,7 @@ The send request carries three values:
 
 A successful send is confirmed with the message **Kasus terdaftar untuk dikirim ke PRECIA** (case registered for sending to PRECIA). If the same visit number and module code are sent again, the service answers with **Kasus ini sudah pernah diajukan ke PRECIA** (this case has already been submitted to PRECIA) and creates no duplicate, so resending is safe.
 
-The same service also offers a case status check. Its answer carries the send status per AI module and the AI result once one is available, so the integration team can confirm the case really was sent without opening PRECIA.
+The same service also offers a case status check. In this verification the observed answer carried the send status per AI module, so the integration team can confirm the case really was sent without opening PRECIA. The documented service contract states that the same answer also carries the AI result once one is available, but that part was not observed on the demo environment.
 
 Once the case is queued, the Khanza companion service checks the queue every 30 seconds, signs in to PRECIA and creates the transaction. In the most recent test run the transaction was created 8 seconds after the case entered the queue. All of this runs without staff intervention.
 
