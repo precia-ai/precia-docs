@@ -1,3 +1,4 @@
 export default {
-  index: 'Integrasi SIMRS'
+  index: 'Integrasi SIMRS',
+  'gnu-health': 'GNU Health'
 }
