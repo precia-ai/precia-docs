@@ -1,0 +1,129 @@
+---
+title: CARE (ohcnetwork)
+---
+
+# Integrasi CARE (ohcnetwork)
+
+CARE adalah rekam medis elektronik sumber terbuka dari Open Healthcare Network. Pada lingkungan uji coba PRECIA, CARE dipakai untuk memperagakan satu alur kerja klinis yang utuh: dokter memesan pemeriksaan radiologi di CARE, lalu pesanan itu muncul sebagai kasus klinis di PRECIA tanpa ada yang perlu mengetik ulang data pasien.
+
+Halaman ini ditujukan untuk pengguna rumah sakit, yaitu dokter, perawat, dan administrator klinis. Seluruh langkah di bawah dikerjakan lewat peramban, tanpa perlu memasang aplikasi tambahan.
+
+Alamat yang dipakai pada lingkungan uji coba:
+
+| Sistem | Alamat |
+|---|---|
+| CARE | `https://care-dev.precia.site` |
+| PRECIA | `https://app-dev.precia.site` |
+
+## Sebelum mulai
+
+Butir berikut disiapkan oleh tim implementasi PRECIA satu kali saat penyiapan, bukan oleh pengguna rumah sakit. Pastikan semuanya sudah tersedia sebelum Anda mencoba alur di bawah.
+
+1. **Akun staf CARE.** Anda membutuhkan nama pengguna dan kata sandi staf pada fasilitas yang dipakai untuk uji coba. Akun pasien tidak dapat memesan pemeriksaan.
+2. **Katalog pemeriksaan pencitraan di CARE.** CARE bawaan hanya menyediakan katalog laboratorium. Tim implementasi menambahkan kategori **Imaging** beserta pemeriksaan **Chest X-ray (PRECIA AI)**. Tanpa penambahan itu, kotak pilihan pemesanan tidak menawarkan satu pun pemeriksaan radiologi dan alur ini tidak dapat dijalankan.
+3. **Organisasi dan unit di PRECIA.** Organisasi rumah sakit harus sudah terdaftar di PRECIA dan memiliki unit radiologi, pada contoh ini bernama **RAD - Radiologi**.
+4. **Akun PRECIA dengan akses unit tersebut.** Akun Anda di PRECIA harus berada pada organisasi yang sama dan berhak membaca daftar kerja unit radiologi.
+
+## Langkah 1. Masuk ke CARE
+
+Buka `https://care-dev.precia.site/login`. Pastikan tab **Log in as Staff** yang aktif, lalu isi **Username** dan **Password** akun staf Anda dan tekan **Login**.
+
+![Halaman masuk CARE, tab Log in as Staff, kolom Username dan Password, serta tombol Login ditandai kotak biru](/screenshots/id/integrasi-simrs/care/01-masuk-care.png)
+
+CARE membatasi percobaan masuk menjadi lima kali dalam sepuluh menit untuk satu nama pengguna, dan percobaan yang gagal ikut dihitung. Bila Anda salah mengetik kata sandi beberapa kali, tunggu sepuluh menit sebelum mencoba lagi.
+
+## Langkah 2. Membuka encounter pasien
+
+Buka fasilitas, pilih pasien, lalu buka encounter yang sedang berjalan. Periksa nama pasien pada kepala halaman untuk memastikan Anda berada pada pasien yang benar.
+
+Pada tab **Overview** terdapat deretan pintasan. Tekan kartu **Service Request** untuk membuka formulir pemesanan.
+
+![Halaman encounter CARE, identitas pasien dan kartu pintasan Service Request ditandai kotak biru](/screenshots/id/integrasi-simrs/care/02-encounter-pasien.png)
+
+## Langkah 3. Membuka formulir Service Request
+
+Formulir **Service Request** terbuka dengan satu isian wajib, yaitu kotak pilihan **Select Activity Definition**. Isian inilah yang menentukan pemeriksaan apa yang dipesan.
+
+![Formulir Service Request di CARE, kotak pilihan Select Activity Definition ditandai kotak biru dan ditunjuk panah biru](/screenshots/id/integrasi-simrs/care/03-formulir-permintaan.png)
+
+Tombol **Submit** belum perlu ditekan pada tahap ini. Kirim permintaan hanya setelah pemeriksaan dipilih pada langkah berikutnya.
+
+## Langkah 4. Membuka kategori Imaging
+
+Tekan kotak pilihan **Select Activity Definition**. Daftar katalog terbuka dan menampilkan dua kategori, yaitu **Imaging** dan **Lab Tests**. Tekan **Imaging**.
+
+![Katalog pemeriksaan CARE terbuka, kategori Imaging ditandai kotak biru](/screenshots/id/integrasi-simrs/care/04-kategori-imaging.png)
+
+Bila kategori **Imaging** tidak muncul dan hanya ada **Lab Tests**, katalog pencitraan belum dipasang pada fasilitas tersebut. Hubungi tim implementasi PRECIA dan jangan melanjutkan langkah berikutnya.
+
+## Langkah 5. Memilih pemeriksaan
+
+Di dalam kategori **Imaging** tersedia pemeriksaan **Chest X-ray (PRECIA AI)**. Jejak navigasi di bagian atas daftar menunjukkan posisi Anda, yaitu **Root** lalu **Imaging**. Tekan nama pemeriksaan untuk memilihnya.
+
+![Isi kategori Imaging di CARE, jejak navigasi Root ke Imaging dan pemeriksaan Chest X-ray (PRECIA AI) ditandai kotak biru](/screenshots/id/integrasi-simrs/care/05-memilih-pemeriksaan.png)
+
+## Langkah 6. Mengirim permintaan
+
+Pemeriksaan yang dipilih kini tampil sebagai satu baris pada formulir, lengkap dengan lencana kategori **Imaging** dan nama dokter pemesan. Tidak ada isian lain yang wajib dilengkapi.
+
+Tekan **Submit** untuk mengirim permintaan.
+
+![Formulir Service Request CARE berisi Chest X-ray (PRECIA AI) dengan lencana Imaging, baris pemeriksaan dan tombol Submit ditandai kotak biru](/screenshots/id/integrasi-simrs/care/06-mengirim-permintaan.png)
+
+## Langkah 7. Memastikan permintaan tercatat di CARE
+
+Kembali ke encounter dan buka tab **Service Requests**. Permintaan yang baru dikirim tampil sebagai baris baru dengan status **Active** dan prioritas **Routine**.
+
+![Tab Service Requests pada encounter CARE, nama tab dan baris permintaan Chest X-ray (PRECIA AI) berstatus Active ditandai kotak biru](/screenshots/id/integrasi-simrs/care/07-daftar-permintaan.png)
+
+Baris berstatus **Active** inilah yang dibaca PRECIA. Permintaan yang masih berstatus **Draft** atau yang sudah **Completed** tidak diambil.
+
+## Langkah 8. Melihat daftar kerja di PRECIA
+
+Masuk ke `https://app-dev.precia.site`, buka menu **Klinis**, lalu pilih unit **RAD - Radiologi** pada penyaring **Unit**.
+
+Setiap permintaan pencitraan dari CARE muncul sebagai satu baris pada **Daftar Kerja Transaksi**. Kode setiap baris berawalan `CARE-`, nama pasien dan tanggal lahir terisi otomatis, dan status awalnya **Belum Diproses**.
+
+![Daftar Kerja Transaksi PRECIA pada unit RAD - Radiologi, penyaring Unit dan seluruh baris berkode CARE ditandai kotak biru](/screenshots/id/integrasi-simrs/care/08-worklist-precia.png)
+
+Perhatikan tanggal dan jam pada kolom **Dibuat** untuk mengenali permintaan yang baru saja Anda kirim.
+
+## Langkah 9. Membuka detail kasus di PRECIA
+
+Klik salah satu baris untuk membuka detail kasus. Halaman detail menampilkan kode kasus, nama pasien, nomor rekam medis, tanggal lahir, unit tujuan, dan kolom **Catatan** yang memuat rujukan ke permintaan asli di CARE beserta nama pemeriksaan.
+
+![Detail kasus PRECIA, kode kasus beserta nomor rekam medis dan kolom Catatan berisi rujukan CARE ServiceRequest ditandai kotak biru](/screenshots/id/integrasi-simrs/care/09-detail-kasus.png)
+
+Dari titik ini kasus diperlakukan sama seperti kasus yang dibuat langsung di PRECIA. Anda dapat mengunggah berkas pendukung dan meneruskan kasus ke validator melalui tombol **Kirim ke Validator**.
+
+## Cara mencocokkan kasus PRECIA dengan permintaan CARE
+
+Ada dua penanda yang menghubungkan keduanya, dan keduanya dapat dibaca langsung di layar.
+
+1. **Kode kasus.** Kode di PRECIA berbentuk `CARE-` diikuti nomor permintaan di CARE. Sebagai contoh, kasus berkode `CARE-7907b219-6f3d-45af-83a8-af4d96a578ba` berasal dari permintaan CARE bernomor `7907b219-6f3d-45af-83a8-af4d96a578ba`.
+2. **Kolom Catatan.** Kolom ini menyebutkan nomor permintaan CARE dan nama pemeriksaan yang dipesan.
+
+Bila Anda perlu memastikan satu kasus tertentu, salin potongan nomor tersebut lalu tempelkan ke kotak **Cari** pada daftar kerja PRECIA.
+
+## Batasan saat ini
+
+Bagian ini menjelaskan apa yang belum berjalan pada lingkungan uji coba. Semua butir di bawah teramati langsung, bukan perkiraan.
+
+1. **Perpindahan kasus dari CARE ke PRECIA belum berjalan otomatis.** Konektor yang membaca permintaan dari CARE belum terpasang sebagai layanan yang berjalan terjadwal. Pada peragaan, langkah tersebut dijalankan oleh tim implementasi setelah permintaan dikirim. Karena itu jangan menunggu kasus muncul dengan sendirinya di PRECIA, dan jangan menyimpulkan ada kegagalan bila kasus belum tampak.
+2. **Hasil AI belum dikirim kembali ke CARE.** PRECIA belum menulis hasil pemeriksaan ke tab **Diagnostic Reports** milik CARE pada lingkungan ini. Arah pengiriman balik sudah diuji secara terpisah oleh tim teknis, tetapi belum tersambung ke alur PRECIA, sehingga pengguna belum dapat mengandalkannya.
+3. **Belum ada modul AI yang terpasang pada unit radiologi.** Pada detail kasus, bagian **Modul AI** menampilkan keterangan bahwa belum ada slot yang dikonfigurasi. Artinya kasus dari CARE tersimpan dengan benar, tetapi belum ada analisis AI yang berjalan atasnya.
+4. **Nomor rekam medis diisi dengan nomor pasien milik CARE.** Nilai pada kolom MRN adalah pengenal pasien di CARE, bukan nomor rekam medis rumah sakit. Nilai itu konsisten dan dapat dipakai untuk pencarian, tetapi jangan dianggap sama dengan nomor rekam medis pada sistem pendaftaran.
+5. **Prioritas tidak diambil dari CARE.** Seluruh permintaan pada contoh di atas berprioritas **Routine** di CARE, sedangkan salah satu kasus di PRECIA tercatat berprioritas **Mendesak**. Prioritas kasus ditentukan saat kasus dibawa masuk ke PRECIA, jadi periksa kembali nilainya di PRECIA bila prioritas penting bagi alur kerja Anda.
+6. **Jenis kelamin yang tidak dikenal PRECIA dipetakan menjadi Lainnya.** Data uji coba CARE memuat nilai jenis kelamin yang tidak memiliki padanan di PRECIA. Nilai semacam itu ditampilkan sebagai **Lainnya** pada detail kasus.
+7. **Antarmuka CARE hanya tersedia dalam bahasa Inggris pada pemasangan ini.** Karena itu tangkapan layar CARE pada halaman berbahasa Indonesia ini tetap menampilkan istilah bahasa Inggris. Istilah PRECIA mengikuti bahasa yang Anda pilih.
+8. **Seluruh pasien dan pemeriksaan pada lingkungan ini adalah data contoh.** Tidak ada data pasien sungguhan di dalamnya.
+
+## Bila kasus tidak muncul di PRECIA
+
+Periksa berurutan:
+
+1. **Status permintaan di CARE.** Buka tab **Service Requests** pada encounter dan pastikan statusnya **Active**. Permintaan berstatus **Draft** tidak diambil.
+2. **Kategori pemeriksaan.** Pastikan pemeriksaan yang dipilih berada di kategori **Imaging**. Pemeriksaan laboratorium tidak masuk ke unit radiologi PRECIA.
+3. **Unit yang sedang dilihat di PRECIA.** Pastikan penyaring **Unit** pada daftar kerja diarahkan ke **RAD - Radiologi**, bukan ke unit lain.
+4. **Organisasi akun PRECIA Anda.** Kasus hanya terlihat oleh akun yang berada pada organisasi pemilik kasus. Bila daftar kerja kosong padahal unitnya benar, hubungi administrator organisasi Anda.
+5. **Sinkronisasi belum dijalankan.** Sesuai batasan nomor satu di atas, perpindahan kasus belum otomatis. Hubungi tim implementasi PRECIA untuk menjalankannya.

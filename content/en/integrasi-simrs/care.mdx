@@ -1,0 +1,129 @@
+---
+title: CARE (ohcnetwork)
+---
+
+# CARE (ohcnetwork) Integration
+
+CARE is an open source electronic medical record from the Open Healthcare Network. In the PRECIA trial environment, CARE is used to demonstrate one complete clinical workflow: a doctor orders a radiology examination in CARE, and that order then appears as a clinical case in PRECIA without anyone having to retype the patient data.
+
+This page is written for hospital users, meaning doctors, nurses, and clinical administrators. Every step below is performed in a web browser, with no additional software to install.
+
+Addresses used in the trial environment:
+
+| System | Address |
+|---|---|
+| CARE | `https://care-dev.precia.site` |
+| PRECIA | `https://app-dev.precia.site` |
+
+## Before you start
+
+The items below are prepared once by the PRECIA implementation team during setup, not by hospital users. Make sure all of them are in place before you try the workflow.
+
+1. **A CARE staff account.** You need a staff username and password on the facility used for the trial. Patient accounts cannot place orders.
+2. **The imaging catalogue in CARE.** Stock CARE only provides a laboratory catalogue. The implementation team adds the **Imaging** category together with the **Chest X-ray (PRECIA AI)** examination. Without that addition, the ordering combobox offers no radiology examination at all and this workflow cannot be run.
+3. **The organization and unit in PRECIA.** The hospital organization must already be registered in PRECIA and must have a radiology unit, named **RAD - Radiologi** in this example.
+4. **A PRECIA account with access to that unit.** Your PRECIA account must belong to the same organization and be allowed to read the radiology unit worklist.
+
+## Step 1. Sign in to CARE
+
+Open `https://care-dev.precia.site/login`. Make sure the **Log in as Staff** tab is active, enter the **Username** and **Password** of your staff account, and press **Login**.
+
+![CARE sign-in page, the Log in as Staff tab, the Username and Password fields, and the Login button marked with blue boxes](/screenshots/en/integrasi-simrs/care/01-masuk-care.png)
+
+CARE limits sign-in attempts to five within ten minutes per username, and failed attempts count towards that limit. If you mistype your password several times, wait ten minutes before trying again.
+
+## Step 2. Opening the patient encounter
+
+Open the facility, select the patient, then open the encounter that is in progress. Check the patient name in the page header to confirm you are on the correct patient.
+
+The **Overview** tab shows a row of shortcuts. Press the **Service Request** card to open the ordering form.
+
+![CARE encounter page, the patient identity header and the Service Request shortcut card marked with blue boxes](/screenshots/en/integrasi-simrs/care/02-encounter-pasien.png)
+
+## Step 3. Opening the Service Request form
+
+The **Service Request** form opens with one required field, the **Select Activity Definition** combobox. That field determines which examination is ordered.
+
+![CARE Service Request form, the Select Activity Definition combobox marked with a blue box and a blue arrow](/screenshots/en/integrasi-simrs/care/03-formulir-permintaan.png)
+
+There is no need to press **Submit** yet. Send the request only after the examination has been selected in the next step.
+
+## Step 4. Opening the Imaging category
+
+Press the **Select Activity Definition** combobox. The catalogue opens and shows two categories, **Imaging** and **Lab Tests**. Press **Imaging**.
+
+![CARE examination catalogue open, the Imaging category marked with a blue box](/screenshots/en/integrasi-simrs/care/04-kategori-imaging.png)
+
+If the **Imaging** category does not appear and only **Lab Tests** is listed, the imaging catalogue has not been installed on that facility. Contact the PRECIA implementation team and do not continue with the next step.
+
+## Step 5. Selecting the examination
+
+Inside the **Imaging** category there is one examination, **Chest X-ray (PRECIA AI)**. The breadcrumb at the top of the list shows your position, **Root** then **Imaging**. Press the examination name to select it.
+
+![Contents of the Imaging category in CARE, the Root to Imaging breadcrumb and the Chest X-ray (PRECIA AI) examination marked with blue boxes](/screenshots/en/integrasi-simrs/care/05-memilih-pemeriksaan.png)
+
+## Step 6. Sending the request
+
+The selected examination now appears as a row on the form, complete with the **Imaging** category badge and the name of the ordering doctor. No other field is required.
+
+Press **Submit** to send the request.
+
+![CARE Service Request form holding Chest X-ray (PRECIA AI) with the Imaging badge, the examination row and the Submit button marked with blue boxes](/screenshots/en/integrasi-simrs/care/06-mengirim-permintaan.png)
+
+## Step 7. Confirming the request was recorded in CARE
+
+Return to the encounter and open the **Service Requests** tab. The request you just sent appears as a new row with status **Active** and priority **Routine**.
+
+![Service Requests tab on the CARE encounter, the tab name and the Chest X-ray (PRECIA AI) request row with status Active marked with blue boxes](/screenshots/en/integrasi-simrs/care/07-daftar-permintaan.png)
+
+Rows with status **Active** are the ones PRECIA reads. Requests still in **Draft**, and requests already **Completed**, are not picked up.
+
+## Step 8. Viewing the worklist in PRECIA
+
+Sign in at `https://app-dev.precia.site`, open the **Clinical** menu, then select the **RAD - Radiologi** unit in the **Unit** filter.
+
+Every imaging request from CARE appears as one row in the **Transaction Worklist**. Each row carries a code prefixed with `CARE-`, the patient name and birth date are filled in automatically, and the initial status is **Unprocessed**.
+
+![PRECIA Transaction Worklist on the RAD - Radiologi unit, the Unit filter and every CARE coded row marked with blue boxes](/screenshots/en/integrasi-simrs/care/08-worklist-precia.png)
+
+Check the date and time in the **Created** column to identify the request you have just sent.
+
+## Step 9. Opening the case detail in PRECIA
+
+Click one of the rows to open the case detail. The detail page shows the case code, patient name, medical record number, birth date, destination unit, and a **Notes** field carrying the reference back to the original request in CARE together with the examination name.
+
+![PRECIA case detail, the case code with the medical record number and the Notes field holding the CARE ServiceRequest reference marked with blue boxes](/screenshots/en/integrasi-simrs/care/09-detail-kasus.png)
+
+From this point the case behaves exactly like a case created directly in PRECIA. You can upload supporting files and pass the case on to a validator with the **Send to Validator** button.
+
+## Matching a PRECIA case to a CARE request
+
+Two markers connect the two, and both can be read straight off the screen.
+
+1. **The case code.** The PRECIA code is `CARE-` followed by the request number in CARE. For example, the case coded `CARE-7907b219-6f3d-45af-83a8-af4d96a578ba` comes from the CARE request numbered `7907b219-6f3d-45af-83a8-af4d96a578ba`.
+2. **The Notes field.** It states the CARE request number and the name of the examination ordered.
+
+If you need to confirm one specific case, copy part of that number and paste it into the **Search** box on the PRECIA worklist.
+
+## Current limitations
+
+This section describes what does not yet work in the trial environment. Every item below was observed directly, not assumed.
+
+1. **Moving a case from CARE to PRECIA is not yet automatic.** The connector that reads requests from CARE is not installed as a scheduled running service. During the demonstration that step is performed by the implementation team after the request has been sent. Do not wait for the case to appear in PRECIA on its own, and do not conclude that something has failed when the case is not yet visible.
+2. **AI results are not sent back to CARE.** PRECIA does not write examination results into the CARE **Diagnostic Reports** tab in this environment. The return direction has been tested separately by the technical team, but it is not connected to the PRECIA workflow, so users cannot rely on it yet.
+3. **No AI module is attached to the radiology unit.** On the case detail, the **AI Modules** section states that no slot is configured. This means the case from CARE is stored correctly, but no AI analysis runs on it.
+4. **The medical record number is filled with the CARE patient number.** The value in the MRN column is the patient identifier in CARE, not the hospital medical record number. It is consistent and can be used for searching, but do not treat it as the same as the medical record number in the registration system.
+5. **Priority is not taken from CARE.** Every request in the example above is **Routine** in CARE, while one of the cases in PRECIA is recorded as **Urgent**. Case priority is set at the moment the case is brought into PRECIA, so check the value again in PRECIA if priority matters to your workflow.
+6. **Genders PRECIA does not recognise are mapped to Other.** The CARE trial data contains gender values that have no equivalent in PRECIA. Such values are displayed as **Other** on the case detail.
+7. **The CARE interface is available only in English on this installation.** CARE screenshots therefore keep their English wording regardless of the language you select for this documentation. PRECIA wording follows your chosen language.
+8. **Every patient and examination in this environment is sample data.** There is no real patient data in it.
+
+## If the case does not appear in PRECIA
+
+Check in this order:
+
+1. **The request status in CARE.** Open the **Service Requests** tab on the encounter and confirm the status is **Active**. Requests in **Draft** are not picked up.
+2. **The examination category.** Confirm the selected examination sits in the **Imaging** category. Laboratory examinations do not reach the PRECIA radiology unit.
+3. **The unit you are viewing in PRECIA.** Confirm the **Unit** filter on the worklist points at **RAD - Radiologi** and not at another unit.
+4. **The organization of your PRECIA account.** A case is only visible to accounts inside the organization that owns it. If the worklist is empty although the unit is correct, contact your organization administrator.
+5. **The synchronisation has not been run.** As stated in limitation one above, moving cases is not yet automatic. Contact the PRECIA implementation team to run it.
