@@ -6,5 +6,6 @@ export default {
   khanza: 'Alur SIMRS Khanza',
   medicca: 'Alur Transaksi MEDICCA ke PRECIA',
   openemr: 'OpenEMR',
+  openhospital: 'Open Hospital',
   openmrs: 'Integrasi OpenMRS 3'
 }
