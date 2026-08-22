@@ -1,7 +1,8 @@
 export default {
-  index: 'Integrasi SIMRS',
+  index: 'Ringkasan',
   bahmni: 'Bahmni',
   care: 'CARE (ohcnetwork)',
   khanza: 'Alur SIMRS Khanza',
-  medicca: 'Alur Transaksi MEDICCA ke PRECIA'
+  medicca: 'Alur Transaksi MEDICCA ke PRECIA',
+  openemr: 'OpenEMR'
 }

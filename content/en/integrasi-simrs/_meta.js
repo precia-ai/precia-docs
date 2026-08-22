@@ -1,7 +1,8 @@
 export default {
-  index: 'SIMRS Integration',
+  index: 'Overview',
   bahmni: 'Bahmni',
   care: 'CARE (ohcnetwork)',
   khanza: 'Khanza SIMRS Flow',
-  medicca: 'MEDICCA to PRECIA Transaction Flow'
+  medicca: 'MEDICCA to PRECIA Transaction Flow',
+  openemr: 'OpenEMR'
 }
