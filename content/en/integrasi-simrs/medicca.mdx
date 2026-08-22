@@ -1,0 +1,165 @@
+---
+title: Transaction flow from SIMRS MEDICCA to PRECIA
+---
+
+# Transaction flow from SIMRS MEDICCA to PRECIA
+
+This page describes the journey of a single patient visit from SIMRS MEDICCA through to PRECIA: the one-time setup that must be done first, then the daily front-desk work that produces a transaction, and finally the place in PRECIA where that transaction is supposed to appear.
+
+Every step on this page was carried out directly against the MEDICCA and PRECIA development environments. Anything that does not yet work is reported as it stands, in the **Current limitations** section at the bottom of the page. Read that section before scheduling any hospital rollout, because the full round trip from MEDICCA through to an AI result returning to MEDICCA does not work yet.
+
+## Flow at a glance
+
+Moving data between MEDICCA and PRECIA is not something a member of staff does by hand. There is no "send to PRECIA" button anywhere in MEDICCA, and the front-desk officer never needs to open PRECIA at all.
+
+What happens is this:
+
+1. The front-desk officer saves one outpatient visit registration in MEDICCA.
+2. MEDICCA records that registration on its internal integration queue.
+3. A background process belonging to MEDICCA reads the queue, signs in to PRECIA using the organization service account, and creates a clinical transaction in PRECIA.
+4. The clinical transaction appears on the unit worklist in PRECIA, and from that point onward it follows the normal PRECIA clinical case workflow.
+
+One outpatient registration produces one clinical transaction. The clinic the officer selects determines which PRECIA unit receives that transaction.
+
+## Part 1. Setup in PRECIA
+
+This setup is done once by an organization admin in PRECIA, before MEDICCA is connected.
+
+### Step 1. Confirm the clinics are registered as units
+
+Every MEDICCA clinic that will send visits to PRECIA needs a matching unit in PRECIA. Without a matching unit, a transaction has nowhere to land.
+
+Open the **Units** menu in the sidebar. Your organization's units are listed with their unit code, service type, and active status.
+
+![PRECIA Units page showing three clinic unit cards for Dentistry, Internal Medicine, and General Practice, each marked with a blue box](/screenshots/en/integrasi-simrs/medicca/01-unit-poliklinik-di-precia.png)
+
+Check three things on each unit card:
+
+- The **unit name** matches the clinic name in MEDICCA, so staff recognize it without memorizing codes.
+- The **unit code** is short and consistent, for example UMUM, PDL, and GIGI.
+- The **status** reads **Active**. An inactive unit cannot receive transactions.
+
+If a clinic has no matching unit yet, press **Register Unit** and create it first.
+
+Besides the units, your organization also needs SIMRS connection settings using the **MEDICCA** adapter along with the hospital's callback address. Those settings live on the **SIMRS Integration** page and are described there. The connection settings can only be opened by an account holding read rights on the organization's SIMRS configuration, so some users will not see the contents even though they can open the page.
+
+## Part 2. Setup in MEDICCA
+
+A standard MEDICCA installation ships with no staff accounts at all, and the **Petugas Loket** (front-desk officer) access level is created with no table permissions at all. The two steps below must therefore be done first by a MEDICCA administrator, using the built-in administrator account defined in the application configuration file. Until both steps are done, nobody can use MEDICCA.
+
+### Step 2. Grant permissions to the front-desk access level
+
+Open the **PENGATURAN** (Settings) menu, then **HAK AKSES** (Access rights). The list of user levels appears. On the **Petugas Loket** row, press the access rights link to open the per-table permission matrix.
+
+Tick **Daftar** (List), **Tampilan** (View), and **Cari** (Search) on the supporting reference tables, then add **Tambah/Salin** (Add/Copy) and **Ubah** (Edit) on **REGISTRASI PASIEN** (Patient registration) and **HISTORI REGISTRASI** (Registration history). Press **Perbarui** (Update) to save.
+
+![MEDICCA permission matrix for the front-desk user level, with the HISTORI REGISTRASI row, the REGISTRASI PASIEN row, and the Perbarui button marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/02-hak-akses-petugas-loket.png)
+
+Note that there are two rows named **HISTORI REGISTRASI**. The first is outpatient registration and that is the one to tick. The second is emergency registration, left blank because the emergency module is not used in this flow.
+
+If this step is skipped, the officer's account still signs in successfully but the navigation bar is empty and every page refuses with a permission-denied message.
+
+### Step 3. Create the front-desk account
+
+Open the **PENGATURAN** menu, then **PETUGAS LOKET**, and press **Tambah Data Baru** (Add new record). Fill in **Nama Petugas** (Officer name), **NIK** (national ID number), **Username**, and **Password**, then set **Level** to **Petugas Loket**. Press **Tambah** (Add) to save.
+
+![MEDICCA add front-desk officer form, with the Username field, Password field, Level selector, and Tambah button marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/03-akun-petugas-loket.png)
+
+Two things the administrator should know:
+
+1. The **Level** selector offers only one value, **Petugas Loket**. No additional administrator can be created from this screen.
+2. The officer's unit is filled in automatically as LOKET and cannot be changed, because only staff assigned to the LOKET unit are recognized as application users.
+
+The password is stored hashed by the application, and the account can be used to sign in immediately. Note that the **Password** field on this form is displayed as plain text rather than dots, so fill it in when the screen is not visible to others.
+
+## Part 3. Creating the transaction in MEDICCA
+
+This part is the front-desk officer's daily work. An outpatient visit registration is the only MEDICCA action that produces a transaction in PRECIA.
+
+### Step 4. Sign in to MEDICCA
+
+Open your hospital's MEDICCA address. The root address redirects to the login page automatically. Fill in **Nama Pengguna** (Username) and **Kata Sandi** (Password) for the front-desk account, then press **Login**.
+
+![MEDICCA login page with the username field, password field, and Login button marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/04-masuk-ke-medicca.png)
+
+After a successful sign-in, the application opens the **REGISTRASI PASIEN** list straight away.
+
+### Step 5. Open the patient list
+
+The **REGISTRASI PASIEN** list holds every registered patient. Two actions on this page are relevant:
+
+- The **TAMBAH DATA PASIEN BARU** (Add new patient) button, to register a patient who has never attended before. Continue to Step 6.
+- The **RAWAT JLN** (Outpatient) link on a patient row, to create a visit registration directly for a patient who is already registered. Continue to Step 7.
+
+![MEDICCA patient registration list, with the active menu item, the Tambah Data Pasien Baru button, and the Rawat Jln link on a patient row marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/05-daftar-pasien.png)
+
+The **Kartu Pasien** (Patient card) link on each row only prints a patient identity card and has nothing to do with PRECIA. The **UGD** (Emergency) link cannot be used by a front-desk officer, as explained in the limitations section.
+
+### Step 6. Add a new patient if needed
+
+Press **TAMBAH DATA PASIEN BARU**. A form window opens over the list. Fill in the following fields:
+
+- **Nama Pasien** (Patient name), required.
+- **No BPJS** (national insurance number) and **No KTP** (national ID number), optional.
+- **Tempat Lahir** (Place of birth) and **Tgl Lahir** (Date of birth), required.
+- **Jenis Kelamin** (Sex), choose one.
+- **Alamat** (Address), required.
+- **Kelurahan** (Village), required and chosen through a search window. Press the magnifier icon beside the field, pick a village from the list, then press **Pilih** (Select).
+- **Agama** (Religion), choose one.
+
+![MEDICCA new patient form filled with example data, with the patient name field, the village search field, and the Tambah button marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/06-formulir-pasien-baru.png)
+
+Press **Tambah** to save. The medical record number is generated automatically by the system and does not need to be entered by hand. That medical record number and the patient name are what later travel through to the PRECIA transaction.
+
+### Step 7. Create the outpatient registration
+
+Go back to the patient list and press the **RAWAT JLN** link on the relevant patient row. The registration form opens with the patient identity already filled in and read-only on this screen. The officer's name is also filled in automatically from the signed-in account.
+
+Fields the officer needs to choose:
+
+- **Asal Rujukan** (Referral source), required.
+- **Jenis Pasien** (Patient type), required.
+- **Poliklinik** (Clinic), required. Seven outpatient clinics are offered: Umum (General), Penyakit Dalam (Internal Medicine), Gigi (Dentistry), Mata (Ophthalmology), Rehab Medik (Medical Rehabilitation), Kandungan (Obstetrics), and Anak (Paediatrics). Emergency does not appear on this form.
+- **Biaya Daftar** (Registration fee), required. The total is calculated automatically once a choice is made.
+
+![MEDICCA outpatient registration form, with the Poliklinik option group, the Biaya Daftar option group, and the Tambah button marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/07-formulir-registrasi-rawat-jalan.png)
+
+The **Poliklinik** choice is the most important field as far as PRECIA is concerned, because that clinic determines which PRECIA unit receives the transaction. Make sure it matches the purpose of the patient's visit.
+
+Press **Tambah** to save the registration. The application returns to the patient list. It is at this moment that MEDICCA records the registration on the integration queue bound for PRECIA. There is no extra button to press.
+
+### Step 8. Check the registration history
+
+Open the **HISTORI REGISTRASI** menu to confirm the registration was stored. The newest row shows the date, time, patient name, medical record number, clinic, care type, patient type, total fee, and the name of the officer who entered the data.
+
+![MEDICCA registration history page, with the Histori Registrasi menu item and the newest registration row marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/08-histori-registrasi.png)
+
+That is the end of the front-desk officer's work. There is no further step inside MEDICCA.
+
+## Part 4. Checking the transaction in PRECIA
+
+### Step 9. Open the transaction worklist
+
+Sign in to PRECIA with an account belonging to the same hospital organization, then open the **Clinical** menu. Pick the unit matching the destination clinic, or pick **General** to see all units combined. The **Transaction Worklist** appears together with a result counter in the top right corner.
+
+![PRECIA transaction worklist for the MEDICCA organization, with the zero results counter and the No transactions found message marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/09-daftar-kerja-transaksi-precia.png)
+
+Transactions originating from MEDICCA are recognizable by their transaction code, which always begins with the word MEDICCA. The **Search** field accepts a transaction code, a medical record number, or a patient name, so a particular registration can be found quickly.
+
+This needs to be stated plainly: at the time this documentation was written, that list is still empty and the counter reads **0 results**, exactly as shown in the screenshot. No MEDICCA registration has ever reached PRECIA successfully. The reasons are set out in the next section. The screenshot above shows the real state of the system, not a staged empty example.
+
+## Current limitations
+
+The limitations below applied at the time this documentation was written, and every one of them was checked directly rather than assumed.
+
+- **Registrations never reach PRECIA.** The transaction code MEDICCA builds joins a fixed eight-character prefix to a forty-eight character registration identifier, giving fifty-six characters in total. The PRECIA transaction code field accepts at most fifty characters, and the request is rejected with a validation error on the code field. Until the code construction is shortened, every real registration is rejected and stays behind in the queue. This is why the transaction worklist in Step 9 is still empty.
+- **The queue is not processed automatically.** There is no scheduler inside the MEDICCA package or on the server that runs the background sender or the result poller. Until that process is run manually, registrations simply accumulate in the queue.
+- **Delivery failures are invisible to the officer.** MEDICCA still reports the registration as saved even when the push to PRECIA fails, because the two are separate operations. The failure is recorded only in the server log and never appears on the officer's screen.
+- **The return direction is aimed at the wrong organization.** PRECIA pushes an AI result to a SIMRS only when a clinical validation is published, and the destination is determined by the SIMRS configuration of the organization that owns the transaction. The current MEDICCA configuration directs registrations to a different organization whose SIMRS adapter is not MEDICCA, so AI results would not come back to MEDICCA even once the code length problem is fixed. The clinic-to-unit mapping in that configuration also still points at units of that other organization.
+- **MEDICCA's own result receiver is ready.** The AI result endpoint in MEDICCA is live and protected by a shared secret. A request without the correct secret is rejected, and a request with the correct secret passes through to payload validation. The obstacle in the return direction is therefore organization targeting, not the receiver in MEDICCA.
+- **AI results cannot be viewed from MEDICCA.** Results that are received are stored in the MEDICCA database, but no MEDICCA page displays them. Results can only be read through PRECIA.
+- **Emergency registration is not part of this flow.** Every patient row shows a **UGD** link, but the front-desk access level has no rights on the emergency table, so pressing that link produces a refusal message and returns the officer to the login page. Emergency registrations also never enter the queue bound for PRECIA. Only outpatient registrations are sent.
+- **MEDICCA contains only the registration module.** There is no clinical order, encounter, specimen, or examination result module. Staff cannot raise an examination request or an AI reading request from inside MEDICCA. The only MEDICCA event relevant to PRECIA is the outpatient visit registration.
+- **The MEDICCA interface is available in Indonesian only.** The application offers no other language, so the MEDICCA screenshots on this page are in Indonesian and the on-screen labels are glossed in the text above.
+
+Until the points above are addressed, the MEDICCA flow stops at the visit registration. A front-desk officer can register a patient and create an outpatient registration, and nothing beyond that.
