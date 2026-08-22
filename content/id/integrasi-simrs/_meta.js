@@ -1,3 +1,4 @@
 export default {
-  index: 'Integrasi SIMRS'
+  index: 'Integrasi SIMRS',
+  openmrs: 'Integrasi OpenMRS 3'
 }
