@@ -4,5 +4,6 @@ export default {
   care: 'CARE (ohcnetwork)',
   khanza: 'Khanza SIMRS Flow',
   medicca: 'MEDICCA to PRECIA Transaction Flow',
-  openemr: 'OpenEMR'
+  openemr: 'OpenEMR',
+  openmrs: 'OpenMRS 3 Integration'
 }

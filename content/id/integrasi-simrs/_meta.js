@@ -4,5 +4,6 @@ export default {
   care: 'CARE (ohcnetwork)',
   khanza: 'Alur SIMRS Khanza',
   medicca: 'Alur Transaksi MEDICCA ke PRECIA',
-  openemr: 'OpenEMR'
+  openemr: 'OpenEMR',
+  openmrs: 'Integrasi OpenMRS 3'
 }

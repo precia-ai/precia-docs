@@ -1,0 +1,140 @@
+---
+title: OpenMRS 3 Integration
+---
+
+# OpenMRS 3 Integration
+
+This page explains how the integration between **OpenMRS 3** (the OpenMRS 3 Reference Application) and PRECIA works, from a hospital staff point of view. The flow is straightforward: staff raise a test order in OpenMRS 3 as usual, then the PRECIA connector reads that order list and creates a matching clinical case in PRECIA.
+
+What is documented here is **one direction only, from OpenMRS 3 into PRECIA**. Writing the AI result back into the OpenMRS medical record is not part of the flow shown in the screenshots below, and must not be assumed to be running.
+
+## Before you start
+
+Some of the preparation below is done once by the technical team, not by day-to-day staff:
+
+- **An OpenMRS 3 account** with permission to raise test orders.
+- **The PRECIA test types are already in the OpenMRS concept dictionary.** If searching for `PRECIA` returns nothing at the ordering step, contact the technical team. Test types cannot be added from the ordering screen.
+- **The organization and its units are already registered in PRECIA**, and the OpenMRS 3 connector has been enabled by the implementation team. Organization-level connection settings are managed on the SIMRS Integration page.
+- **The patient already has an active visit** in OpenMRS. Without an active visit, a test order cannot be signed.
+
+The OpenMRS 3 interface is in English and does not follow the PRECIA language setting. Button names in the steps below are written exactly as they appear on screen.
+
+## Signing in to OpenMRS 3
+
+### 1. Enter the username
+
+Open the OpenMRS 3 address provided by the technical team. The sign-in page asks for the username first. Fill in the **Username** field, then click **Continue**.
+
+![OpenMRS 3 sign-in page, the Username field and Continue button marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/01-masuk-openmrs.png)
+
+### 2. Enter the password
+
+Once the username is accepted, the same screen shows the password field. Fill in **Password**, then click **Log in**. The password field is always masked.
+
+![OpenMRS 3 password screen, the Password field and Log in button marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/02-kata-sandi.png)
+
+### 3. Choose the session location
+
+OpenMRS 3 asks for the working location for this session. The location determines where visits and test orders are recorded. Choose the appropriate location, **Outpatient Clinic** in this example, then click **Confirm**.
+
+![OpenMRS 3 session location list, the Outpatient Clinic option and the Confirm button marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/03-pilih-lokasi.png)
+
+## Opening the patient record
+
+### 4. Open patient search
+
+After the location is confirmed you land on the OpenMRS 3 working page. The patient search icon sits in the top bar on the right.
+
+![OpenMRS 3 landing page after sign-in, the patient search icon in the top bar marked with a blue box and an arrow](/screenshots/en/integrasi-simrs/openmrs/04-beranda.png)
+
+### 5. Search for the patient
+
+Type the patient name or identifier. The result card shows the name, sex, age, OpenMRS ID, and an **Active Visit** label when the patient is currently in an active visit. That label matters: without an active visit, the test order cannot be signed in the next steps. Click the patient card to open the record.
+
+![OpenMRS 3 patient search result, the patient card including the Active Visit label marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/05-cari-pasien.png)
+
+### 6. Open the Orders menu
+
+The patient record opens on the clinical summary. In the left navigation, select **Orders**.
+
+![OpenMRS 3 patient record, the Orders item in the left navigation and the patient identity marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/06-rekam-pasien.png)
+
+## Raising the test order
+
+### 7. Add a new order
+
+The **Orders** table lists test orders already recorded within the selected date range. Click the **Add** button at the top right of the table to raise a new one.
+
+![OpenMRS 3 Orders table in the patient record, the Add button at the top right of the table marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/07-daftar-order.png)
+
+### 8. Open the Lab orders section
+
+The **Order basket** panel opens on the right. It has two sections, **Drug orders** for prescriptions and **Lab orders** for diagnostic tests. Click **Add** on the **Lab orders** row.
+
+![OpenMRS 3 Order basket panel, the Add button on the Lab orders row marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/08-keranjang-order.png)
+
+### 9. Search for the PRECIA test type
+
+Type `PRECIA` in the **Search for a test type** field. The test types available for PRECIA analysis appear. Each result offers two buttons.
+
+Click **Order form**. Do not use **Add to basket** for this flow. **Add to basket** does put the test in the basket, but the line is marked *Incomplete* and the signing button stays disabled until the form is filled in.
+
+![OpenMRS 3 Add test order panel, the test type search field and the Order form button marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/09-cari-jenis-tes.png)
+
+### 10. Fill in the order form
+
+The order form shows the selected test type. Fill in **Reference number** with the hospital's internal reference, leave **Priority** at **Routine** for a standard request, then fill in **Additional instructions** with the clinical detail that needs to travel with the order. Click **Save order** to move the request into the basket.
+
+![OpenMRS 3 test order form, the Reference number field and the Save order button marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/10-formulir-order.png)
+
+### 11. Sign the order
+
+The request returns to the **Order basket** with a **New** label, and the **Sign and close** button becomes active. Click it to save the order into the patient record.
+
+Complete steps 7 through 11 in a single visit to the page. The basket is held only temporarily in the browser, so an unsigned order is lost if the page is reloaded.
+
+![OpenMRS 3 Order basket holding one order labelled New, the order line and the Sign and close button marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/11-tanda-tangan.png)
+
+### 12. Check the saved order
+
+Once signed, the order appears in the **Orders** table with its order number, order type, priority, and the name of the person who raised it. That order number is what later shows up on the PRECIA case. The screenshot below is taken from a demo patient record that already holds orders from earlier trials.
+
+![OpenMRS 3 Orders table holding a saved PRECIA test order, the whole table marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/12-order-tersimpan.png)
+
+## Finding the case in PRECIA
+
+The PRECIA connector reads the OpenMRS test order list and creates a matching case in PRECIA. On the trial environment used for these screenshots, that read is run by the technical team rather than by a continuously running service. A case therefore appears once the read has been run, not at the same second the order is signed.
+
+### 13. Choose the unit
+
+Sign in to PRECIA and open the **Clinical** menu. PRECIA asks which unit's worklist you want to see. Choose the target unit, **Kardiologi** with code `KARDIO` in this example.
+
+An OpenMRS test order carries no hospital unit code. The unit is decided by the connector based on the test type that was ordered, so the mapping from test type to unit has to be agreed with the implementation team before use.
+
+![PRECIA Clinical page, the Kardiologi (KARDIO) unit card on the unit selection screen marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/13-pilih-unit.png)
+
+### 14. Open the unit worklist
+
+The transaction worklist shows the cases belonging to that unit. A case coming from OpenMRS uses the OpenMRS order identifier as its **Code**, and shows the patient name together with the MRN, which matches the OpenMRS ID in OpenMRS.
+
+The case status is **Unprocessed**. That means PRECIA has accepted the case and it is waiting to be processed. AI analysis has not run in this example because the unit has no AI module slot configured.
+
+![PRECIA transaction worklist for the Kardiologi (KARDIO) unit, the case row coming from OpenMRS marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/14-daftar-kerja.png)
+
+### 15. Open the case detail
+
+Click the case row to open its detail. The detail page shows the transaction code, patient identity, unit, priority, and the notes sent by the connector. Those notes carry the OpenMRS order number, the reference number entered in step 10, and the OpenMRS encounter identifier, so a PRECIA case can always be traced back to the original order.
+
+On the **Transaction Details** card, the **AI Modules** section states that no slot has been configured. As long as that message is shown, the case will not change status on its own.
+
+![PRECIA case detail from the OpenMRS 3 integration, the transaction code and the notes holding the OpenMRS order number marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/15-detail-kasus.png)
+
+## Known limitations
+
+- **This integration runs in one direction.** Test orders flow from OpenMRS 3 into PRECIA. Writing the AI result back into the OpenMRS medical record is not shown in this flow and must not be promised to clinical users on the basis of this page.
+- **Cases stop at the Unprocessed status** while the target unit has no active AI module. The case stays visible and can be opened, but no AI result is produced.
+- **Add to basket alone is not enough.** An order must go through **Order form** and **Save order**, otherwise **Sign and close** stays disabled.
+- **The order basket is not stored permanently.** An unsigned order is lost when the page is reloaded.
+- **The PRECIA unit is decided by the connector**, based on the ordered test type, not on unit data coming from OpenMRS.
+- **An active visit is mandatory.** A patient without an active visit cannot receive a signed test order.
+- **The data in the screenshots is the OpenMRS demo dataset**, not real patient data.
