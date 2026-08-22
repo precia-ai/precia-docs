@@ -1,0 +1,195 @@
+---
+title: OpenEMR
+---
+
+# OpenEMR Integration
+
+This page explains how to raise a radiology procedure order in **OpenEMR** and how to confirm that the order shows up as a clinical case in PRECIA.
+
+OpenEMR is an electronic health record system hospitals use to record patient data, encounters, and procedure orders. In this integration, PRECIA is registered inside OpenEMR as one of the **procedure providers**. When a doctor or nurse raises a radiology procedure order and directs it to that provider, the PRECIA connector reads the order and creates a new clinical case in PRECIA with the same patient, unit, and procedure.
+
+Clinical staff work entirely inside OpenEMR. No data has to be retyped into PRECIA.
+
+The flow in short:
+
+1. A staff member creates a procedure order on the patient's encounter in OpenEMR.
+2. The order is directed to the **PRECIA AI Diagnostic Service** provider.
+3. The PRECIA connector reads the order and creates a clinical case in the matching unit.
+4. The case appears on the unit worklist in PRECIA, ready for the AI module.
+
+All screenshots on this page were taken in the PRECIA OpenEMR test environment. The view in your hospital's installation may differ slightly, depending on the OpenEMR version and the display settings in use.
+
+## Before you start
+
+Prepare the following:
+
+- **Your hospital's OpenEMR address** and an account that can open patient records and create procedure orders.
+- **A PRECIA account** in the same organization as that hospital, with permission to view unit worklists.
+- **A registered patient and encounter** in OpenEMR. A procedure order is always attached to an encounter, so the encounter has to exist first.
+
+## Setting up OpenEMR
+
+The setup below is done once by an OpenEMR administrator, normally together with the PRECIA implementation team. Clinical staff do not need to repeat it.
+
+### Confirming PRECIA is registered as a provider
+
+Open the **Procedures** menu, then select **Providers**. The **Procedure Providers** page lists the procedure providers OpenEMR knows about.
+
+Confirm that the **PRECIA AI Diagnostic Service** row is on the list. This is the row that is later selected in the **Sending To** field when a procedure order is created.
+
+![OpenEMR Procedure Providers page, the PRECIA AI Diagnostic Service row marked with a blue box](/screenshots/en/integrasi-simrs/openemr/01-penyedia-layanan.png)
+
+If the row is missing, contact the PRECIA implementation team. Adding a provider is an administrator task and is outside the scope of this guide.
+
+### Confirming the procedures are available
+
+Open the **Procedures** menu, then select **Configure Orders and Results**. This page holds the dictionary of procedures staff can choose from.
+
+Click the **+** sign in front of the **PRECIA Radiology** group to expand it. The group holds the procedures served by the PRECIA AI module, for example **Foto Toraks PA** with the code **CXR-PA**.
+
+![OpenEMR Configure Orders and Results page, the Foto Toraks PA row inside the PRECIA Radiology group marked with a blue box](/screenshots/en/integrasi-simrs/openemr/02-kamus-pemeriksaan.png)
+
+Only procedures listed in this dictionary can be selected on the order form. If your hospital needs additional procedures, the PRECIA implementation team adds them.
+
+## Creating a procedure order in OpenEMR
+
+This section is the day to day work of clinical staff.
+
+### 1. Log in to OpenEMR
+
+Open your hospital's OpenEMR address. Fill in **Username** and **Password**, then click **Login**.
+
+![OpenEMR login page, the Username field, Password field, and Login button marked with blue boxes](/screenshots/en/integrasi-simrs/openemr/03-masuk-openemr.png)
+
+### 2. Search for the patient
+
+Once you are in, use the **Search by any demographics** field in the top right corner. Type the patient's name, for example `Budi`, then press Enter.
+
+![OpenEMR home view, the patient search field in the top right corner marked with a blue box and an arrow](/screenshots/en/integrasi-simrs/openemr/04-cari-pasien.png)
+
+The field accepts a name, a medical record number, and other demographic details, so you can search with whatever information you have.
+
+### 3. Open the patient record
+
+OpenEMR opens a **Patient Finder** tab with the matching patients. Check the date of birth and the medical record number in the **External ID** column, then click the patient's name to open the record.
+
+![OpenEMR Patient Finder tab, the Santoso, Budi patient row marked with a blue box](/screenshots/en/integrasi-simrs/openemr/05-hasil-pencarian.png)
+
+### 4. Open the encounter
+
+A procedure order is always attached to an encounter. At the top of the patient record, click **Select Encounter**, then pick the current encounter, for example **2026-08-22 Office Visit**.
+
+![OpenEMR patient record, the Select Encounter button and the Office Visit encounter option marked with blue boxes](/screenshots/en/integrasi-simrs/openemr/06-buka-kunjungan.png)
+
+Once the encounter is selected, the **Open Encounter** label at the top of the screen changes to that encounter's date.
+
+### 5. Open the order form
+
+On the encounter page, click the **Orders** menu, then select **Procedure Order**.
+
+![OpenEMR encounter page, the Orders menu and the Procedure Order option marked with blue boxes](/screenshots/en/integrasi-simrs/openemr/07-buka-formulir.png)
+
+### 6. Fill in the order details
+
+The **Order for ...** form opens. Fill in the following:
+
+- **Sending To**: select **PRECIA AI Diagnostic Service**. This field sets the destination of the order. If your hospital has only one provider, the field is already filled in.
+- **Performer Type**: select **Radiology**. This choice determines the destination unit in PRECIA.
+- **Status**: select **Pending**.
+- **Priority**: select **Normal**, or another priority as the patient's condition requires.
+- **Service Location**: select the service location handling the procedure.
+- **Clinical History**: write a short clinical note, for example the patient's complaint and the reason the procedure is requested.
+- **Default Procedure Type**: select **Imaging** for imaging procedures.
+
+![OpenEMR Procedure Order form, the Performer Type field and the Sending To field marked with blue boxes](/screenshots/en/integrasi-simrs/openemr/08-isi-formulir.png)
+
+### 7. Select the procedure
+
+Scroll down to **Procedure Order Details**, then click the **Procedure Test** field that reads "Click to select the desired procedure".
+
+The **Find Procedure Order** window opens. Type part of the procedure name, for example `Toraks`, click **Search**, then click the procedure name in the results.
+
+![OpenEMR Find Procedure Order window, the Foto Toraks PA search result marked with a blue box](/screenshots/en/integrasi-simrs/openemr/09-pilih-pemeriksaan.png)
+
+### 8. Review and save
+
+The search window closes and the procedure name is placed in the **Procedure Test** field. Review every entry, then click **Save and Continue** to save the order.
+
+![Completed OpenEMR Procedure Order form, the Procedure Test field holding Foto Toraks PA and the Save and Continue button marked with blue boxes](/screenshots/en/integrasi-simrs/openemr/10-formulir-terisi.png)
+
+**Do not press the Transmit Order button.** That button sends the order over the laboratory messaging path, which the PRECIA integration does not use. Saving with **Save and Continue** or **Save and Exit** is enough.
+
+### 9. Confirm the order is saved
+
+Go back to the encounter **Summary** tab. The saved order appears as its own block, showing the **Order ID**, the **Order Status**, and the provider name in the **Lab** field.
+
+![OpenEMR encounter summary, the PRECIA AI Diagnostic Service order block with its Order ID and Order Status marked with a blue box](/screenshots/en/integrasi-simrs/openemr/11-permintaan-tersimpan.png)
+
+The work in OpenEMR ends here.
+
+## Viewing the matching case in PRECIA
+
+Once the order is saved, the PRECIA connector reads it and creates a new clinical case. In the test environment the connector is run by the technical team, so the case does not always appear immediately. See [Current limitations](#current-limitations).
+
+### 1. Open the unit list
+
+Log in to PRECIA, then open the **Clinical** menu. The **Clinical Workflows** page lists the units in your organization. Click the **Radiologi** unit.
+
+![PRECIA Clinical Workflows page, the Radiologi unit card marked with a blue box](/screenshots/en/integrasi-simrs/openemr/12-daftar-unit.png)
+
+### 2. Open the unit worklist
+
+The unit worklist shows the clinical cases belonging to that unit. Cases coming from OpenEMR use a code prefixed with `OPENEMR`, followed by the patient number and the encounter number in OpenEMR. The example in the screenshot is `OPENEMR-1-2`.
+
+Check the patient name and the medical record number in the **Patient** column to confirm the case matches the order you just created.
+
+![PRECIA Radiologi unit Transaction Worklist, the OPENEMR-1-2 case row for Budi Santoso marked with a blue box](/screenshots/en/integrasi-simrs/openemr/13-daftar-kasus.png)
+
+### 3. Open the case detail
+
+Click the case row to open its detail. The detail page shows the case code, the patient name, the medical record number, the destination unit, and the priority.
+
+The **Notes** section holds the procedure requested in OpenEMR together with a reference to the original order, so a case in PRECIA can always be traced back to the order in OpenEMR.
+
+![PRECIA case detail page, the case code with the patient name and the Notes section holding the OpenEMR order reference marked with blue boxes](/screenshots/en/integrasi-simrs/openemr/14-detail-kasus.png)
+
+From this point the case is handled like any other clinical case in PRECIA: upload supporting files, run the AI module, then send it to a validator.
+
+## How the data is mapped
+
+The table below explains where each field on the PRECIA case comes from.
+
+| Field in PRECIA | Source in OpenEMR |
+|---|---|
+| Case code | The patient number and the encounter number combined, prefixed with `OPENEMR` |
+| Patient name, date of birth, gender | Patient demographics |
+| Medical record number | The **External ID** field on the patient record |
+| Destination unit | The **Performer Type** field on the order, for example **Radiology** maps to the **Radiologi** unit |
+| Case notes | The selected procedure name and a reference to the original order |
+| Priority | The **Priority** field on the order |
+
+## Current limitations
+
+This section records what is not available yet, so the integration is not relied on for more than it does.
+
+1. **Orders do not reach PRECIA automatically.** A continuously running connector service is not deployed. In the test environment, reading orders out of OpenEMR is performed by the technical team, so a new case appears in PRECIA only after that process is run.
+
+2. **OpenEMR sends no automatic notification.** OpenEMR has no mechanism to notify another system when a new order is raised. The connector has to check for new orders periodically, so there is always a delay between saving the order in OpenEMR and the case appearing in PRECIA.
+
+3. **OpenEMR settings are not yet on the SIMRS Integration page.** The adapter list on the [SIMRS Integration](/integrasi-simrs) page does not include OpenEMR. The unit mapping, for example **Radiology** to the **Radiologi** unit, currently lives in the connector rather than in the organization settings in PRECIA. Mapping changes have to be requested from the technical team.
+
+4. **Cases are recorded without a SIMRS origin marker.** Cases created by the connector come in through the ordinary case recording path, so the audit history does not show that the case originated in OpenEMR. Duplicate protection is not active either, so running the connector twice can produce more than one case for a single order.
+
+5. **The Transmit Order button is not used.** That button belongs to the laboratory messaging path built into OpenEMR. The PRECIA integration does not use that path, and pressing it does not speed up processing.
+
+6. **Sending AI results back into OpenEMR is not covered by this guide.** This guide covers the inbound direction only, from OpenEMR into PRECIA. AI module output is reviewed in PRECIA.
+
+## Troubleshooting
+
+| Symptom | Common cause | Action |
+|---|---|---|
+| The **Sending To** field does not list PRECIA | The provider is not registered in OpenEMR | Check the **Procedure Providers** page, then contact the PRECIA implementation team |
+| The **Find Procedure Order** search returns nothing | The procedure is not in the order dictionary | Check the **Configure Orders and Results** page under the **PRECIA Radiology** group |
+| The order is saved but no case appears in PRECIA | The connector has not been run, or **Performer Type** was not set to **Radiology** | Reopen the order in OpenEMR and check the entries, then contact the technical team |
+| The case appears in the wrong unit | The **Performer Type** value does not match the unit mapping | Correct the entry on the order, then ask the technical team to check the unit mapping |
+| The case appears more than once | The connector was run repeatedly for the same order | Cancel the extra cases in PRECIA and report it to the technical team |

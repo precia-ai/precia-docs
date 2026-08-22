@@ -1,3 +1,4 @@
 export default {
-  index: 'SIMRS Integration'
+  index: 'Overview',
+  openemr: 'OpenEMR'
 }

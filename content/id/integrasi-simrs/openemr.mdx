@@ -1,0 +1,195 @@
+---
+title: OpenEMR
+---
+
+# Integrasi OpenEMR
+
+Halaman ini menjelaskan cara membuat permintaan pemeriksaan radiologi di **OpenEMR** dan cara memastikan permintaan tersebut muncul sebagai kasus klinis di PRECIA.
+
+OpenEMR adalah sistem rekam medis elektronik yang dipakai rumah sakit untuk mencatat data pasien, kunjungan, dan permintaan pemeriksaan. Pada integrasi ini, PRECIA didaftarkan di dalam OpenEMR sebagai salah satu **penyedia layanan pemeriksaan**. Ketika dokter atau perawat membuat permintaan pemeriksaan radiologi dan mengarahkannya ke penyedia layanan tersebut, konektor PRECIA membaca permintaan itu dan membuat kasus klinis baru di PRECIA dengan data pasien, unit, dan jenis pemeriksaan yang sama.
+
+Petugas klinis bekerja sepenuhnya di dalam OpenEMR. Tidak ada data yang perlu diketik ulang di PRECIA.
+
+Alur ringkasnya sebagai berikut:
+
+1. Petugas membuat permintaan pemeriksaan (Procedure Order) pada kunjungan pasien di OpenEMR.
+2. Permintaan diarahkan ke penyedia layanan **PRECIA AI Diagnostic Service**.
+3. Konektor PRECIA membaca permintaan tersebut dan membuat kasus klinis di unit yang sesuai.
+4. Kasus tampil pada daftar kerja unit di PRECIA dan siap diproses modul AI.
+
+Seluruh gambar pada halaman ini diambil dari lingkungan uji coba OpenEMR milik PRECIA. Tampilan pada instalasi rumah sakit Anda dapat berbeda sedikit, tergantung versi OpenEMR dan pengaturan tampilan yang dipakai.
+
+## Sebelum mulai
+
+Siapkan hal berikut:
+
+- **Alamat OpenEMR** rumah sakit Anda beserta akun yang dapat membuka rekam medis pasien dan membuat permintaan pemeriksaan.
+- **Akun PRECIA** pada organisasi yang sama dengan rumah sakit tersebut, dengan hak akses untuk melihat daftar kerja unit.
+- **Pasien dan kunjungan yang sudah terdaftar** di OpenEMR. Permintaan pemeriksaan selalu melekat pada satu kunjungan, sehingga kunjungan harus dibuat lebih dahulu.
+
+## Menyiapkan OpenEMR
+
+Penyiapan berikut dilakukan sekali saja oleh administrator OpenEMR, biasanya bersama tim implementasi PRECIA. Setelah selesai, petugas klinis tidak perlu mengulanginya.
+
+### Memastikan PRECIA terdaftar sebagai penyedia layanan
+
+Buka menu **Procedures**, lalu pilih **Providers**. Halaman **Procedure Providers** menampilkan daftar penyedia layanan pemeriksaan yang dikenal OpenEMR.
+
+Pastikan baris **PRECIA AI Diagnostic Service** ada pada daftar tersebut. Baris inilah yang nanti dipilih pada kolom **Sending To** saat membuat permintaan pemeriksaan.
+
+![Halaman Procedure Providers pada OpenEMR, baris PRECIA AI Diagnostic Service ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/01-penyedia-layanan.png)
+
+Jika baris tersebut belum ada, hubungi tim implementasi PRECIA. Penambahan penyedia layanan dilakukan oleh administrator dan berada di luar cakupan panduan ini.
+
+### Memastikan jenis pemeriksaan tersedia
+
+Buka menu **Procedures**, lalu pilih **Configure Orders and Results**. Halaman ini berisi kamus jenis pemeriksaan yang dapat dipilih petugas.
+
+Klik tanda **+** di depan grup **PRECIA Radiology** untuk membuka isinya. Grup tersebut memuat jenis pemeriksaan yang dilayani modul AI PRECIA, misalnya **Foto Toraks PA** dengan kode **CXR-PA**.
+
+![Halaman Configure Orders and Results pada OpenEMR, baris Foto Toraks PA di dalam grup PRECIA Radiology ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/02-kamus-pemeriksaan.png)
+
+Hanya jenis pemeriksaan yang terdaftar di kamus ini yang dapat dipilih pada formulir permintaan. Jika rumah sakit Anda memerlukan jenis pemeriksaan lain, tim implementasi PRECIA yang menambahkannya.
+
+## Membuat permintaan pemeriksaan di OpenEMR
+
+Bagian ini adalah pekerjaan harian petugas klinis.
+
+### 1. Masuk ke OpenEMR
+
+Buka alamat OpenEMR rumah sakit Anda. Isi **Username** dan **Password**, lalu klik **Login**.
+
+![Halaman masuk OpenEMR, kolom Username, kolom Password, dan tombol Login ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/03-masuk-openemr.png)
+
+### 2. Mencari pasien
+
+Setelah masuk, gunakan kolom pencarian **Search by any demographics** di sudut kanan atas. Ketik nama pasien, misalnya `Budi`, lalu tekan Enter.
+
+![Tampilan awal OpenEMR, kolom pencarian pasien di sudut kanan atas ditandai kotak biru dan panah](/screenshots/id/integrasi-simrs/openemr/04-cari-pasien.png)
+
+Kolom ini menerima nama, nomor rekam medis, dan data demografi lain, sehingga Anda dapat mencari dengan keterangan apa pun yang tersedia.
+
+### 3. Membuka rekam medis pasien
+
+OpenEMR membuka tab **Patient Finder** berisi pasien yang cocok. Periksa tanggal lahir dan nomor rekam medis pada kolom **External ID**, lalu klik nama pasien untuk membuka rekam medisnya.
+
+![Tab Patient Finder pada OpenEMR, baris pasien Santoso, Budi ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/05-hasil-pencarian.png)
+
+### 4. Membuka kunjungan
+
+Permintaan pemeriksaan selalu melekat pada satu kunjungan. Pada bagian atas rekam medis, klik tombol **Select Encounter**, lalu pilih kunjungan yang sedang berjalan, misalnya **2026-08-22 Office Visit**.
+
+![Rekam medis pasien pada OpenEMR, tombol Select Encounter dan pilihan kunjungan Office Visit ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/06-buka-kunjungan.png)
+
+Setelah kunjungan terpilih, keterangan **Open Encounter** di bagian atas layar berubah menjadi tanggal kunjungan tersebut.
+
+### 5. Membuka formulir permintaan
+
+Pada halaman kunjungan, klik menu **Orders**, lalu pilih **Procedure Order**.
+
+![Halaman kunjungan pada OpenEMR, menu Orders dan pilihan Procedure Order ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/07-buka-formulir.png)
+
+### 6. Mengisi keterangan permintaan
+
+Formulir **Order for ...** terbuka. Isi bagian berikut:
+
+- **Sending To**: pilih **PRECIA AI Diagnostic Service**. Kolom ini menentukan tujuan permintaan. Jika rumah sakit Anda hanya memiliki satu penyedia layanan, kolom ini sudah terisi otomatis.
+- **Performer Type**: pilih **Radiology**. Pilihan ini menentukan unit tujuan kasus di PRECIA.
+- **Status**: pilih **Pending**.
+- **Priority**: pilih **Normal**, atau prioritas lain sesuai kondisi pasien.
+- **Service Location**: pilih lokasi layanan yang menangani pemeriksaan.
+- **Clinical History**: tulis keterangan klinis singkat, misalnya keluhan pasien dan alasan pemeriksaan diminta.
+- **Default Procedure Type**: pilih **Imaging** untuk pemeriksaan pencitraan.
+
+![Formulir Procedure Order pada OpenEMR, kolom Performer Type dan kolom Sending To ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/08-isi-formulir.png)
+
+### 7. Memilih jenis pemeriksaan
+
+Gulir ke bagian **Procedure Order Details**, lalu klik kolom **Procedure Test** yang bertuliskan "Click to select the desired procedure".
+
+Jendela **Find Procedure Order** terbuka. Ketik sebagian nama pemeriksaan, misalnya `Toraks`, klik **Search**, lalu klik nama pemeriksaan pada hasil pencarian.
+
+![Jendela Find Procedure Order pada OpenEMR, hasil pencarian Foto Toraks PA ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/09-pilih-pemeriksaan.png)
+
+### 8. Memeriksa isian dan menyimpan
+
+Jendela pencarian tertutup dan nama pemeriksaan masuk ke kolom **Procedure Test**. Periksa kembali seluruh isian, lalu klik **Save and Continue** untuk menyimpan permintaan.
+
+![Formulir Procedure Order yang sudah terisi, kolom Procedure Test berisi Foto Toraks PA dan tombol Save and Continue ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/10-formulir-terisi.png)
+
+**Jangan menekan tombol Transmit Order.** Tombol tersebut mengirim permintaan melalui jalur pertukaran pesan laboratorium yang tidak dipakai integrasi PRECIA. Menyimpan permintaan dengan **Save and Continue** atau **Save and Exit** sudah cukup.
+
+### 9. Memastikan permintaan tersimpan
+
+Kembali ke tab **Summary** kunjungan. Permintaan yang tersimpan tampil sebagai satu blok tersendiri, lengkap dengan **Order ID**, **Order Status**, dan nama penyedia layanan pada kolom **Lab**.
+
+![Ringkasan kunjungan pada OpenEMR, blok permintaan PRECIA AI Diagnostic Service dengan Order ID dan Order Status ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/11-permintaan-tersimpan.png)
+
+Pekerjaan di OpenEMR selesai pada langkah ini.
+
+## Melihat kasus yang sama di PRECIA
+
+Setelah permintaan tersimpan, konektor PRECIA membacanya dan membuat kasus klinis baru. Pada lingkungan uji coba, konektor dijalankan oleh tim teknis, sehingga kasus tidak selalu muncul seketika. Lihat bagian [Batasan saat ini](#batasan-saat-ini).
+
+### 1. Membuka daftar unit
+
+Masuk ke PRECIA, lalu buka menu **Klinis**. Halaman **Alur Kerja Klinis** menampilkan daftar unit pada organisasi Anda. Klik unit **Radiologi**.
+
+![Halaman Alur Kerja Klinis pada PRECIA, kartu unit Radiologi ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/12-daftar-unit.png)
+
+### 2. Membuka daftar kerja unit
+
+Daftar kerja unit menampilkan kasus klinis milik unit tersebut. Kasus yang berasal dari OpenEMR memakai kode dengan awalan `OPENEMR`, diikuti nomor pasien dan nomor kunjungan pada OpenEMR. Contoh pada gambar adalah `OPENEMR-1-2`.
+
+Periksa nama pasien dan nomor rekam medis pada kolom **Pasien** untuk memastikan kasus sesuai dengan permintaan yang baru dibuat.
+
+![Daftar Kerja Transaksi unit Radiologi pada PRECIA, baris kasus OPENEMR-1-2 atas nama Budi Santoso ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/13-daftar-kasus.png)
+
+### 3. Membuka detail kasus
+
+Klik baris kasus untuk membuka detailnya. Halaman detail menampilkan kode kasus, nama pasien, nomor rekam medis, unit tujuan, dan prioritas.
+
+Bagian **Catatan** memuat jenis pemeriksaan yang diminta di OpenEMR beserta rujukan ke permintaan aslinya, sehingga kasus di PRECIA selalu dapat ditelusuri kembali ke permintaan di OpenEMR.
+
+![Halaman detail kasus pada PRECIA, kode kasus dengan nama pasien dan bagian Catatan berisi rujukan permintaan OpenEMR ditandai kotak biru](/screenshots/id/integrasi-simrs/openemr/14-detail-kasus.png)
+
+Mulai dari titik ini, kasus diproses seperti kasus klinis lain di PRECIA: unggah berkas pendukung, jalankan modul AI, lalu kirim ke validator.
+
+## Bagaimana data dipetakan
+
+Tabel berikut menjelaskan asal setiap data pada kasus PRECIA.
+
+| Data di PRECIA | Asal di OpenEMR |
+|---|---|
+| Kode kasus | Gabungan nomor pasien dan nomor kunjungan, dengan awalan `OPENEMR` |
+| Nama pasien, tanggal lahir, jenis kelamin | Data demografi pasien |
+| Nomor rekam medis | Kolom **External ID** pada data pasien |
+| Unit tujuan | Kolom **Performer Type** pada permintaan, misalnya **Radiology** dipetakan ke unit **Radiologi** |
+| Catatan kasus | Nama pemeriksaan yang dipilih dan rujukan ke permintaan asli |
+| Prioritas | Kolom **Priority** pada permintaan |
+
+## Batasan saat ini
+
+Bagian ini mencatat hal yang belum tersedia, agar tidak menimbulkan salah harapan saat integrasi dipakai.
+
+1. **Perpindahan permintaan ke PRECIA belum otomatis.** Layanan konektor yang berjalan terus-menerus belum dipasang. Pada lingkungan uji coba, pembacaan permintaan dari OpenEMR dijalankan oleh tim teknis, sehingga kasus baru muncul di PRECIA setelah proses tersebut dijalankan.
+
+2. **OpenEMR tidak mengirim pemberitahuan otomatis.** OpenEMR tidak memiliki mekanisme yang memberitahukan sistem lain saat ada permintaan baru. Konektor harus memeriksa permintaan baru secara berkala, sehingga selalu ada jeda antara penyimpanan permintaan di OpenEMR dan kemunculan kasus di PRECIA.
+
+3. **Pengaturan integrasi OpenEMR belum tersedia di halaman Integrasi SIMRS.** Pilihan adapter pada halaman [Integrasi SIMRS](/integrasi-simrs) belum memuat OpenEMR. Pemetaan unit, misalnya **Radiology** ke unit **Radiologi**, saat ini disimpan pada konektor, bukan pada pengaturan organisasi di PRECIA. Perubahan pemetaan harus diminta ke tim teknis.
+
+4. **Kasus tercatat tanpa penanda asal SIMRS.** Kasus yang dibuat konektor masuk melalui jalur pencatatan kasus biasa, sehingga pada riwayat audit tidak tampak keterangan bahwa kasus berasal dari OpenEMR. Perlindungan terhadap kasus ganda juga belum aktif, sehingga menjalankan konektor dua kali dapat menghasilkan lebih dari satu kasus untuk satu permintaan.
+
+5. **Tombol Transmit Order tidak dipakai.** Tombol tersebut milik jalur pertukaran pesan laboratorium bawaan OpenEMR. Integrasi PRECIA tidak memakai jalur itu, dan menekannya tidak mempercepat pemrosesan.
+
+6. **Pengembalian hasil AI ke OpenEMR tidak dibahas pada panduan ini.** Panduan ini hanya mencakup arah masuk, yaitu dari OpenEMR ke PRECIA. Hasil pembacaan modul AI dilihat di PRECIA.
+
+## Pemecahan masalah
+
+| Gejala | Penyebab yang sering terjadi | Tindakan |
+|---|---|---|
+| Kolom **Sending To** tidak memuat PRECIA | Penyedia layanan belum terdaftar di OpenEMR | Periksa halaman **Procedure Providers**, lalu hubungi tim implementasi PRECIA |
+| Pencarian pada jendela **Find Procedure Order** tidak memberi hasil | Jenis pemeriksaan belum ada di kamus order | Periksa halaman **Configure Orders and Results** pada grup **PRECIA Radiology** |
+| Permintaan tersimpan, tetapi kasus tidak muncul di PRECIA | Konektor belum dijalankan, atau **Performer Type** tidak diisi **Radiology** | Buka kembali permintaan di OpenEMR dan periksa isian, lalu hubungi tim teknis |
+| Kasus muncul di unit yang salah | Nilai **Performer Type** tidak sesuai pemetaan unit | Perbaiki isian pada permintaan, lalu minta tim teknis memeriksa pemetaan unit |
+| Kasus muncul lebih dari satu kali | Konektor dijalankan berulang untuk permintaan yang sama | Batalkan kasus berlebih di PRECIA dan laporkan ke tim teknis |
