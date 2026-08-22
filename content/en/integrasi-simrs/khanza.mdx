@@ -1,0 +1,128 @@
+---
+title: Transaction flow from SIMRS Khanza to PRECIA
+---
+
+# Transaction flow from SIMRS Khanza to PRECIA
+
+This page describes the journey of a single case, starting from a patient registration already recorded in SIMRS Khanza until its clinical transaction appears in PRECIA. It is written for hospital staff who will run or monitor the integration, not for developers.
+
+The Khanza adapter works on a pull model. A companion service on the Khanza side contacts PRECIA at regular intervals; PRECIA never calls Khanza. In other words, every send operation runs from the hospital side, and PRECIA only receives.
+
+All steps below are demonstrated with a real case in the demo environment, namely visit number (No.Rawat) 2026/07/28/000001 for patient ADI KAZAMA with medical record number 000051.
+
+## Flow at a glance
+
+1. A patient registration is recorded in Khanza and receives a visit number.
+2. That case is placed in the send queue through the Khanza bridge service. There is no button inside the Khanza application for this step; it is explained in its own section below.
+3. The Khanza companion service checks the queue every 30 seconds, signs in to PRECIA with the organization service account, and creates the clinical transaction.
+4. The transaction appears in the PRECIA worklist, complete with a note carrying the original visit number, so the case can always be traced back to Khanza.
+
+## Before you start
+
+The following preparation is done once by the organization admin together with the implementation team.
+
+**Set the organization adapter to Khanza.** Open the **Settings** menu, select **SIMRS Integration**, then choose **Khanza** in the **Adapter** field. Every field on that page is explained in [SIMRS Integration](/integrasi-simrs).
+
+![SIMRS Integration page with the Adapter field set to Khanza marked with a blue box](/screenshots/en/integrasi-simrs/khanza/01-pengaturan-adapter.png)
+
+**Make sure the PRECIA service account exists.** The companion service on the Khanza side uses one PRECIA account belonging to the organization to create transactions. That account is prepared by the implementation team and is not used by staff to sign in to the application.
+
+**Agree on the destination unit.** The unit a transaction is created in is decided by the service configuration on the Khanza side, not by the unit map stored in PRECIA. One Khanza installation sends all of its cases to the same unit. In the demo environment that unit is Cardiology.
+
+## Step 1. Open the Khanza client
+
+Open the Khanza client address provided by the implementation team in a browser. That address takes you straight into the Khanza application view.
+
+Before any operator signs in, note two things. The status field in the bottom left still reads **Log Out**, and module buttons such as **Registrasi**, **IGD/UGD** and **Rawat Jalan** are still dimmed and cannot be used.
+
+![Khanza client start screen, the Program menu and the Log Out status field in the bottom left marked with blue boxes](/screenshots/en/integrasi-simrs/khanza/02-buka-klien-khanza.png)
+
+In the demo environment the Khanza client responds to the keyboard only. All steps below therefore use keyboard shortcuts. The full explanation is in [Limitations you should know](#limitations-you-should-know).
+
+## Step 2. Sign in as an operator
+
+Open the **Program** menu, then select **Log In**. With the keyboard, press `Alt+P` to open the menu bar, press the left arrow to move to the **Program** menu, press the down arrow to highlight **Log In**, then press `Enter`.
+
+The **Silahkan Anda Login** (please sign in) box appears in the middle of the screen. Fill **ID Admin** with the operator staff number, press `Tab`, fill **Password**, then press `Enter` to trigger the **Log-in** button.
+
+![Khanza sign-in box, the ID Admin field, the Password field and the Log-in button marked with blue boxes](/screenshots/en/integrasi-simrs/khanza/03-dialog-login.png)
+
+## Step 3. Confirm the operator is signed in
+
+Once the credentials are accepted, the main screen returns with three changes that are easy to recognise. The status field in the bottom left changes from **Log Out** to the operator staff number, the previously dimmed module buttons become active, and the **Log In** button on the button bar becomes **Log Out**.
+
+![Khanza main screen after the operator signs in, the status field with the staff number and the now active Registrasi button marked with blue boxes](/screenshots/en/integrasi-simrs/khanza/04-berhasil-masuk.png)
+
+If the status field still reads **Log Out**, the credentials were not accepted. Repeat Step 2 and make sure the staff number and the password are typed correctly.
+
+## Step 4. Open Registrasi and note the visit number
+
+Press `Alt+R` to open the **Registrasi** (registration) module. The **Registrasi Periksa Hari Ini** window lists the registrations for the current date.
+
+The most important column is **No.Rawat**, the visit number. That value is the only key used in every following step, both when the case is sent to PRECIA and when the result is traced back. The **Periode** (period) filter at the bottom of the window sets the date range shown and defaults to the current date.
+
+In the screenshot below the table is empty and the counter reads **Record : 0**. The reason is that the example case on this page was registered on 28 July 2026, not on the date the screenshot was taken, while the **Periode** filter cannot be changed from the demo client, so the date range cannot be moved. The visit number of an older case can still be used for sending; only its row cannot be displayed on screen. This limitation is described in [Limitations you should know](#limitations-you-should-know).
+
+![Khanza Registrasi Periksa Hari Ini window, the window title, the No.Rawat column and the Periode filter marked with blue boxes](/screenshots/en/integrasi-simrs/khanza/05-daftar-registrasi.png)
+
+For the example on this page, the visit number used is 2026/07/28/000001.
+
+## Sending the case to PRECIA
+
+There is no **Send to PRECIA** button inside the Khanza application. Sending is performed by the Khanza bridge service, which is called from the hospital system by the integration team. Because no screen is involved, this step has no screenshot.
+
+The send request carries three values:
+
+| Value | Description |
+| --- | --- |
+| `no_rawat` | The visit number noted in Step 4, for example 2026/07/28/000001. |
+| `ai_module_code` | The requested AI module code. In the demo environment the code used is `ai-ecg-digitization`. |
+| `sumber_data` | The examination data source, filled with `radiologi` or `laboratorium`. |
+
+A successful send is confirmed with the message **Kasus terdaftar untuk dikirim ke PRECIA** (case registered for sending to PRECIA). If the same visit number and module code are sent again, the service answers with **Kasus ini sudah pernah diajukan ke PRECIA** (this case has already been submitted to PRECIA) and creates no duplicate, so resending is safe.
+
+The same service also offers a case status check. In this verification the observed answer carried the send status per AI module, so the integration team can confirm the case really was sent without opening PRECIA. The documented service contract states that the same answer also carries the AI result once one is available, but that part was not observed on the demo environment.
+
+Once the case is queued, the Khanza companion service checks the queue every 30 seconds, signs in to PRECIA and creates the transaction. In the most recent test run the transaction was created 8 seconds after the case entered the queue. All of this runs without staff intervention.
+
+## Step 5. Find the transaction in the PRECIA worklist
+
+Sign in to PRECIA with an account in the same organization, open the **Clinical** menu, then select the integration destination unit.
+
+The new transaction appears in the **Transaction Worklist** with a code built from the visit number, with slashes replaced by hyphens, plus the AI module code. For this example the code is `2026-07-28-000001-ai-ecg-digitization`. Its status is **Unprocessed**, because no examination file has been uploaded yet.
+
+![PRECIA Transaction Worklist for the Cardiology unit, the row of the transaction that came from Khanza marked with a blue box](/screenshots/en/integrasi-simrs/khanza/06-daftar-kerja-precia.png)
+
+If the transaction has not appeared yet, wait one queue cycle and press **Refresh**. Also make sure the selected unit is the integration destination unit, because every case from Khanza lands in the same unit.
+
+## Step 6. Check the transaction detail
+
+Click the transaction row to open its detail. The detail page shows the transaction code at the top, the patient identity copied from Khanza, the destination unit, and the **Notes** field.
+
+The **Notes** field carries the visit number, the AI module code and the data source verbatim, in the form `no_rawat=2026/07/28/000001;ai_module_code=ai-ecg-digitization;sumber_data=radiologi`. This field is what you use to match a PRECIA transaction back to its Khanza registration.
+
+![PRECIA transaction detail, the transaction code, the Notes field with the visit number and the Unit card marked with blue boxes](/screenshots/en/integrasi-simrs/khanza/07-detail-transaksi.png)
+
+This example shows three AI module slots still waiting for files. AI processing only starts after clinical staff upload the examination files to the transaction.
+
+## After the transaction is created
+
+An integration transaction is treated exactly like a manually created one. Clinical staff upload the examination files, the AI modules run, then a doctor reviews and validates the result. Each of those stages is described in the [Clinical Cases](/kasus-klinis) section.
+
+The return direction, sending the AI result back to Khanza, also uses the pull model. The Khanza companion service pulls the result from PRECIA once it is available. The limitations that apply today are described in the next section.
+
+## Limitations you should know
+
+**There is no send button inside Khanza.** The Khanza application has no menu item or button to send a case to PRECIA. Sending always goes through the bridge service called by the hospital integration team.
+
+**The demo client responds to the keyboard only.** In the demo environment, mouse clicks inside the Khanza application window are not processed because of an internal error in the application display component. The keyboard still works fully, which is why every step on this page is written with keyboard shortcuts. This limitation applies to that demo installation, not to Khanza in general.
+
+**Creating a new registration from the demo client is not possible yet.** Filling in the doctor and the unit on the registration form requires lookup boxes that can only be opened with the mouse. Since the mouse does not work on the demo client, use an existing registration to try this flow.
+
+**The Periode filter cannot be changed from the demo client.** For the same reason, the Registrasi window only shows registrations on the current date. The visit number of an older case can still be used for sending; only its row cannot be displayed on the demo screen.
+
+**The destination unit does not follow the PRECIA unit map.** The unit map stored in the SIMRS Integration settings is used for configuration checks, not to route cases. The destination unit is taken from the service configuration on the Khanza side, so even a case with the radiology data source still lands in the unit configured there. In the demo environment every case lands in the Cardiology unit.
+
+**The AI result page in Khanza cannot be opened by an operator yet.** The page that displays AI results on the Khanza side requires a separate sign-in session, different from the operator client, so it cannot be turned into a staff work step today.
+
+**The return direction was not exercised in this verification.** The available evidence covers the Khanza to PRECIA direction. Sending an AI result back to Khanza has not been run end to end in the demo environment.
