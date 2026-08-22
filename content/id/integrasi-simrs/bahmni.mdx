@@ -1,0 +1,143 @@
+---
+title: Bahmni
+---
+
+# Integrasi Bahmni
+
+Halaman ini menjelaskan cara kerja integrasi antara **Bahmni** dan PRECIA dari sudut pandang petugas rumah sakit. Bahmni adalah sistem rekam medis elektronik yang dipakai untuk pendaftaran pasien, kunjungan poliklinik, dan pencatatan hasil pemeriksaan awal.
+
+Alur yang dijelaskan di sini berjalan satu arah. Petugas bekerja seperti biasa di Bahmni, lalu kasus yang sama muncul otomatis pada Daftar Kerja Transaksi PRECIA tanpa perlu diketik ulang. Anda tidak perlu membuka dua sistem sekaligus untuk membuat satu kasus.
+
+Antarmuka Bahmni hanya tersedia dalam bahasa Inggris. Nama tombol dan nama kolom pada panduan ini ditulis sesuai tampilan asli agar mudah dicocokkan di layar.
+
+## Persiapan
+
+Sebelum mengikuti langkah pada halaman ini, pastikan hal berikut sudah tersedia.
+
+1. **Akun Bahmni** beserta lokasi kerja. Lokasi menentukan poliklinik tempat kunjungan dicatat, dan pada lingkungan demo lokasi tersebut bernama `Bahmni Clinic`.
+2. **Akun PRECIA** pada organisasi yang sama dengan rumah sakit Anda. Akun PRECIA dari organisasi lain tidak dapat melihat kasus yang berasal dari Bahmni Anda.
+3. **Unit tujuan sudah terdaftar di PRECIA.** Setiap kasus dari Bahmni dipetakan ke satu unit PRECIA berdasarkan lokasi kunjungan. Pada contoh di halaman ini, lokasi `Bahmni Clinic` dipetakan ke unit `OPD, Poliklinik Rawat Jalan`.
+
+Tidak ada pengaturan yang perlu Anda isi sendiri di halaman **Integrasi SIMRS** PRECIA untuk Bahmni. Pemetaan lokasi ke unit dan penyalinan data disiapkan oleh tim implementasi. Lihat juga bagian [Batasan saat ini](#batasan-saat-ini).
+
+### Langkah 1: Masuk ke Bahmni
+
+Buka alamat Bahmni rumah sakit Anda. Halaman **BAHMNI EMR LOGIN** akan muncul. Isi **Username** dan **Password**, lalu pilih lokasi kerja pada kolom **Location**. Klik tombol **Login**.
+
+![Halaman login Bahmni, kolom Username, Password, dan Location ditandai kotak biru serta tombol Login ditunjuk panah biru](/screenshots/id/integrasi-simrs/bahmni/01-masuk-bahmni.png)
+
+Kolom **Location** wajib diisi. Bahmni memakai lokasi tersebut sebagai penanda tempat kunjungan, dan penanda itulah yang dipakai PRECIA untuk menentukan unit tujuan kasus.
+
+### Langkah 2: Membuka modul Registration
+
+Setelah berhasil masuk, Bahmni menampilkan halaman berisi kotak aplikasi. Klik kotak **Registration**.
+
+![Halaman utama Bahmni, kotak aplikasi Registration ditandai kotak biru dan ditunjuk panah biru](/screenshots/id/integrasi-simrs/bahmni/02-menu-registration.png)
+
+Modul **Registration** dipakai untuk mendaftarkan pasien baru, membuka kunjungan, dan mencatat hasil pemeriksaan awal. Ketiga hal itu yang menghasilkan data untuk PRECIA.
+
+## Membuat transaksi di Bahmni
+
+### Langkah 3: Membuka formulir pasien baru
+
+Modul Registration terbuka pada tampilan pencarian pasien. Untuk pasien yang belum pernah terdaftar, klik menu **Create New** di bagian atas layar.
+
+![Tampilan pencarian pasien Bahmni, menu Create New ditandai kotak biru dan ditunjuk panah biru](/screenshots/id/integrasi-simrs/bahmni/03-buat-pasien-baru.png)
+
+Untuk pasien lama, gunakan kolom **ID**, **Name**, atau **Phone Number** pada tampilan pencarian ini, lalu lanjutkan ke Langkah 5.
+
+### Langkah 4: Mengisi identitas pasien
+
+Isi formulir **NEW PATIENT** dengan identitas pasien. Kolom yang bertanda bintang merah wajib diisi.
+
+![Formulir pasien baru Bahmni yang sudah terisi, blok Patient Identifier dan Patient Name ditandai kotak biru, blok Gender, Age, dan Date of Birth ditandai kotak biru, tombol Start OPD visit ditunjuk panah biru](/screenshots/id/integrasi-simrs/bahmni/04-isi-data-pasien.png)
+
+Hal yang perlu diperhatikan pada formulir ini:
+
+- **Patient Identifier** berisi awalan nomor rekam medis, misalnya `ABC`. Nomor urutnya dibuat otomatis oleh Bahmni saat data disimpan, jadi kolom nomor tidak perlu diisi manual.
+- **Patient Name**, **Gender**, dan **Date of Birth** adalah tiga data yang ikut terbawa ke PRECIA. Pastikan ketiganya benar, karena nama pasien dan tanggal lahir inilah yang muncul pada Daftar Kerja Transaksi PRECIA.
+- Kolom **Age** terisi sendiri setelah **Date of Birth** diisi.
+
+Setelah semua data terisi, klik tombol **Start OPD visit** di kanan bawah. Bahmni menyimpan pasien, memberi nomor rekam medis, dan membuka kunjungan rawat jalan.
+
+### Langkah 5: Mengisi hasil pemeriksaan awal
+
+Setelah kunjungan terbuka, Bahmni menampilkan formulir **Registration Details**. Isi hasil pemeriksaan awal pada kolom yang tersedia.
+
+![Formulir Registration Details Bahmni, kolom Height dan Weight ditandai kotak biru, kolom Systolic dan Diastolic blood pressure ditandai kotak biru, kolom Pulse ditandai kotak biru](/screenshots/id/integrasi-simrs/bahmni/05-isi-observasi.png)
+
+Kelompok isian yang dipakai pada contoh ini:
+
+- **Nutritional Values**: tinggi badan (`Height`) dan berat badan (`Weight`).
+- **Vitals**: tekanan darah sistolik (`Systolic blood pressure`), tekanan darah diastolik (`Diastolic blood pressure`), dan denyut nadi (`Pulse`).
+
+Anda tidak harus mengisi seluruh kolom. Kolom yang dikosongkan tidak akan ikut terkirim ke PRECIA.
+
+### Langkah 6: Menyimpan kunjungan
+
+Gulir layar ke bagian paling bawah, lalu klik **Save**. Tombol **Save and go to Dashboard** melakukan hal yang sama sekaligus membuka rekam medis pasien.
+
+![Bagian bawah halaman kunjungan Bahmni, tombol Save dan Save and go to Dashboard ditandai kotak biru dan ditunjuk panah biru](/screenshots/id/integrasi-simrs/bahmni/06-simpan-kunjungan.png)
+
+Langkah ini yang menentukan. **Membuka kunjungan saja tidak mengirimkan apa pun ke PRECIA.** Data baru dikirim setelah formulir pemeriksaan disimpan pada langkah ini.
+
+### Langkah 7: Memastikan data tersimpan
+
+Setelah disimpan, panel **Latest** di sisi kanan layar menampilkan hasil pemeriksaan yang baru dicatat. Bahmni juga menghitung sendiri indeks massa tubuh (`BMI`) dan statusnya (`BMI Status`) dari tinggi dan berat badan.
+
+![Halaman kunjungan Bahmni setelah disimpan, panel Latest berisi nilai HT, WT, BMI, dan BMI Status ditandai kotak biru dan ditunjuk panah biru](/screenshots/id/integrasi-simrs/bahmni/07-hasil-tersimpan.png)
+
+Jika panel **Latest** sudah menampilkan nilai yang Anda isi, penyimpanan berhasil dan pekerjaan di sisi Bahmni selesai.
+
+## Melihat kasus yang sama di PRECIA
+
+### Langkah 8: Membuka Daftar Kerja Transaksi
+
+Masuk ke PRECIA, lalu buka menu **Klinis** di menu samping. Pada kartu **Daftar Kerja Transaksi**, pilih unit tujuan pada kolom **Unit**.
+
+![Halaman Alur Kerja Klinis PRECIA, kolom filter Unit ditandai kotak biru dan baris transaksi dari Bahmni ditandai kotak biru](/screenshots/id/integrasi-simrs/bahmni/08-daftar-kasus-precia.png)
+
+Kasus yang berasal dari Bahmni mudah dikenali:
+
+- **Kode** transaksi selalu diawali `BAHMNI-`.
+- **Pasien** menampilkan nama dan nomor rekam medis yang sama dengan Bahmni, misalnya `MRN: ABC200003`.
+- **Tanggal Lahir** sama dengan yang diisi pada Langkah 4.
+- **Status** awalnya `Belum Diproses`.
+
+Jika baris belum muncul, klik **Muat Ulang**.
+
+### Langkah 9: Membuka detail kasus
+
+Klik baris transaksi untuk membuka detail kasus.
+
+![Halaman detail transaksi PRECIA, judul kode transaksi beserta nama pasien dan MRN ditandai kotak biru, blok Catatan berisi hasil pemeriksaan dari Bahmni ditandai kotak biru, kartu Tenaga Medis berisi pembuat transaksi ditandai kotak biru](/screenshots/id/integrasi-simrs/bahmni/09-detail-kasus-precia.png)
+
+Tiga bagian yang perlu diperiksa:
+
+1. **Judul kasus** memuat kode transaksi, nama pasien, dan nomor rekam medis. Cocokkan dengan data di Bahmni.
+2. **Catatan** memuat nomor kunjungan Bahmni, nama lokasi, dan seluruh hasil pemeriksaan yang Anda isi pada Langkah 5, termasuk nilai `BMI` yang dihitung Bahmni.
+3. **Tenaga Medis** menampilkan **Dibuat oleh** berisi akun konektor, bukan nama Anda. Ini normal, karena kasus dibuat oleh sistem penghubung, bukan diketik manual oleh petugas PRECIA.
+
+Sejak titik ini kasus diperlakukan sama seperti kasus PRECIA lainnya. Anda dapat mengunggah dokumen pendukung, mengirim kasus ke validator, atau membatalkannya.
+
+## Batasan saat ini
+
+Integrasi Bahmni masih berstatus uji coba. Batasan berikut berlaku apa adanya dan bukan kesalahan pemakaian.
+
+- **Bahmni belum tersedia sebagai pilihan pada halaman Integrasi SIMRS PRECIA.** Daftar adapter pada halaman tersebut belum memuat Bahmni, sehingga koneksi tidak dapat diatur sendiri oleh admin organisasi. Seluruh penyiapan dikerjakan oleh tim implementasi.
+- **Penyalinan data belum berjalan terus menerus.** Layanan penghubung dijalankan oleh tim implementasi pada saat uji coba, bukan sebagai layanan permanen. Di luar waktu tersebut, kunjungan baru di Bahmni tidak akan muncul di PRECIA sampai layanan dijalankan kembali.
+- **Kasus tidak muncul seketika.** Ada jeda antara penyimpanan di Bahmni dan kemunculan kasus di PRECIA. Gunakan tombol **Muat Ulang** pada Daftar Kerja Transaksi, jangan menyimpan ulang di Bahmni, karena penyimpanan ulang dapat menghasilkan kasus ganda.
+- **Hasil pemeriksaan masuk sebagai teks pada kolom Catatan.** Nilai tinggi badan, berat badan, tekanan darah, dan denyut nadi tidak menjadi kolom terpisah di PRECIA dan belum dapat dipakai untuk pencarian atau pengurutan.
+- **Kasus dari Bahmni belum memiliki slot modul AI.** Pada detail kasus, bagian **Modul AI** menampilkan keterangan bahwa belum ada slot yang dikonfigurasi. Analisis AI perlu disiapkan terpisah pada unit tujuan.
+- **Hasil PRECIA belum dikirim balik otomatis ke Bahmni.** Arah sebaliknya, yaitu menampilkan hasil analisis PRECIA pada rekam medis Bahmni, masih dalam tahap uji dan belum menjadi bagian dari alur kerja harian.
+- **Hanya kunjungan yang formulir pemeriksaannya disimpan yang terkirim.** Pasien yang sudah terdaftar dan kunjungannya sudah dibuka, tetapi formulir pemeriksaannya belum disimpan, tidak akan muncul di PRECIA.
+
+## Bila kasus tidak muncul di PRECIA
+
+Periksa berurutan:
+
+1. Pastikan Anda sudah menekan **Save** pada Langkah 6, bukan hanya membuka kunjungan.
+2. Pastikan panel **Latest** di Bahmni sudah menampilkan nilai yang Anda isi.
+3. Pastikan filter **Unit** pada Daftar Kerja Transaksi PRECIA menunjuk unit yang benar, lalu klik **Muat Ulang**.
+4. Pastikan akun PRECIA yang Anda pakai berada pada organisasi rumah sakit yang sama.
+5. Jika keempat hal di atas sudah benar, hubungi tim implementasi PRECIA. Kemungkinan besar layanan penghubung sedang tidak berjalan, seperti dijelaskan pada bagian Batasan saat ini.

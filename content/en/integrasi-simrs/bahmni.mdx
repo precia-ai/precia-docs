@@ -1,0 +1,143 @@
+---
+title: Bahmni
+---
+
+# Bahmni Integration
+
+This page explains how the integration between **Bahmni** and PRECIA works from a hospital staff point of view. Bahmni is an electronic medical record system used for patient registration, outpatient visits, and recording initial examination findings.
+
+The flow described here runs in one direction. Staff work in Bahmni as usual, and the same case then appears automatically on the PRECIA Transaction Worklist without being typed again. You do not need to keep two systems open to create one case.
+
+The Bahmni interface is only available in English. Button and field names in this guide are written exactly as they appear on screen so they are easy to match.
+
+## Before you start
+
+Before following the steps on this page, make sure the following are in place.
+
+1. **A Bahmni account** and a work location. The location determines which clinic the visit is recorded under, and in the demo environment that location is named `Bahmni Clinic`.
+2. **A PRECIA account** in the same organization as your hospital. A PRECIA account from a different organization cannot see cases originating from your Bahmni.
+3. **The destination unit is already registered in PRECIA.** Every case from Bahmni is mapped to one PRECIA unit based on the visit location. In the example on this page, the location `Bahmni Clinic` is mapped to the unit `OPD, Poliklinik Rawat Jalan`.
+
+There is nothing for you to fill in on the PRECIA **SIMRS Integration** page for Bahmni. The location to unit mapping and the data transfer are prepared by the implementation team. See also [Current limitations](#current-limitations).
+
+### Step 1: Sign in to Bahmni
+
+Open your hospital's Bahmni address. The **BAHMNI EMR LOGIN** page appears. Fill in **Username** and **Password**, then choose your work location in the **Location** field. Click **Login**.
+
+![Bahmni login page, the Username, Password, and Location fields marked with blue boxes and the Login button pointed at by a blue arrow](/screenshots/en/integrasi-simrs/bahmni/01-masuk-bahmni.png)
+
+The **Location** field is required. Bahmni uses that location as the marker for where the visit took place, and that marker is what PRECIA uses to decide which unit the case belongs to.
+
+### Step 2: Open the Registration module
+
+After signing in, Bahmni shows a page of application tiles. Click the **Registration** tile.
+
+![Bahmni home page, the Registration application tile marked with a blue box and pointed at by a blue arrow](/screenshots/en/integrasi-simrs/bahmni/02-menu-registration.png)
+
+The **Registration** module is used to register new patients, open visits, and record initial examination findings. Those three actions are what produce data for PRECIA.
+
+## Creating the transaction in Bahmni
+
+### Step 3: Open the new patient form
+
+The Registration module opens on the patient search view. For a patient who has never been registered, click the **Create New** menu at the top of the screen.
+
+![Bahmni patient search view, the Create New menu marked with a blue box and pointed at by a blue arrow](/screenshots/en/integrasi-simrs/bahmni/03-buat-pasien-baru.png)
+
+For an existing patient, use the **ID**, **Name**, or **Phone Number** fields on this search view, then continue from Step 5.
+
+### Step 4: Fill in the patient details
+
+Fill in the **NEW PATIENT** form with the patient's details. Fields marked with a red asterisk are required.
+
+![Completed Bahmni new patient form, the Patient Identifier and Patient Name block marked with a blue box, the Gender, Age, and Date of Birth block marked with a blue box, the Start OPD visit button pointed at by a blue arrow](/screenshots/en/integrasi-simrs/bahmni/04-isi-data-pasien.png)
+
+Points to watch on this form:
+
+- **Patient Identifier** holds the medical record number prefix, for example `ABC`. Bahmni generates the sequence number itself when the record is saved, so the number field does not need to be filled in manually.
+- **Patient Name**, **Gender**, and **Date of Birth** are the three details that travel to PRECIA. Make sure all three are correct, because this patient name and date of birth are what appear on the PRECIA Transaction Worklist.
+- The **Age** field fills itself in once **Date of Birth** is entered.
+
+Once everything is filled in, click **Start OPD visit** at the bottom right. Bahmni saves the patient, assigns a medical record number, and opens the outpatient visit.
+
+### Step 5: Record the initial examination findings
+
+Once the visit is open, Bahmni shows the **Registration Details** form. Enter the initial examination findings in the fields provided.
+
+![Bahmni Registration Details form, the Height and Weight fields marked with a blue box, the Systolic and Diastolic blood pressure fields marked with a blue box, the Pulse field marked with a blue box](/screenshots/en/integrasi-simrs/bahmni/05-isi-observasi.png)
+
+The groups of fields used in this example:
+
+- **Nutritional Values**: height (`Height`) and weight (`Weight`).
+- **Vitals**: systolic blood pressure (`Systolic blood pressure`), diastolic blood pressure (`Diastolic blood pressure`), and pulse rate (`Pulse`).
+
+You do not have to fill in every field. Fields left blank are not sent to PRECIA.
+
+### Step 6: Save the visit
+
+Scroll to the very bottom of the page, then click **Save**. The **Save and go to Dashboard** button does the same thing and additionally opens the patient chart.
+
+![Bottom of the Bahmni visit page, the Save and Save and go to Dashboard buttons marked with a blue box and pointed at by a blue arrow](/screenshots/en/integrasi-simrs/bahmni/06-simpan-kunjungan.png)
+
+This is the decisive step. **Opening a visit on its own sends nothing to PRECIA.** Data is only sent once the examination form is saved here.
+
+### Step 7: Confirm the data was saved
+
+After saving, the **Latest** panel on the right of the screen shows the findings that were just recorded. Bahmni also calculates the body mass index (`BMI`) and its status (`BMI Status`) from the height and weight itself.
+
+![Bahmni visit page after saving, the Latest panel containing the HT, WT, BMI, and BMI Status values marked with a blue box and pointed at by a blue arrow](/screenshots/en/integrasi-simrs/bahmni/07-hasil-tersimpan.png)
+
+If the **Latest** panel already shows the values you entered, the save succeeded and the work on the Bahmni side is done.
+
+## Finding the same case in PRECIA
+
+### Step 8: Open the Transaction Worklist
+
+Sign in to PRECIA, then open the **Clinical** menu in the sidebar. On the **Transaction Worklist** card, choose the destination unit in the **Unit** field.
+
+![PRECIA Clinical Workflows page, the Unit filter marked with a blue box and the transaction row originating from Bahmni marked with a blue box](/screenshots/en/integrasi-simrs/bahmni/08-daftar-kasus-precia.png)
+
+Cases originating from Bahmni are easy to recognize:
+
+- The transaction **Code** always begins with `BAHMNI-`.
+- **Patient** shows the same name and medical record number as Bahmni, for example `MRN: ABC200003`.
+- **Birth Date** matches what was entered in Step 4.
+- **Status** starts as `Unprocessed`.
+
+If the row has not appeared yet, click **Refresh**.
+
+### Step 9: Open the case detail
+
+Click the transaction row to open the case detail.
+
+![PRECIA transaction detail page, the transaction code heading with the patient name and MRN marked with a blue box, the Notes block containing the Bahmni examination findings marked with a blue box, the Medical Staff card showing who created the transaction marked with a blue box](/screenshots/en/integrasi-simrs/bahmni/09-detail-kasus-precia.png)
+
+Three areas to check:
+
+1. **The case heading** carries the transaction code, the patient name, and the medical record number. Match these against Bahmni.
+2. **Notes** carries the Bahmni visit number, the location name, and every finding you entered in Step 5, including the `BMI` value Bahmni calculated.
+3. **Medical Staff** shows **Created by** holding the connector account rather than your name. This is normal, because the case was created by the bridging system and not typed manually by a PRECIA user.
+
+From this point the case is treated exactly like any other PRECIA case. You can upload supporting documents, send the case to a validator, or cancel it.
+
+## Current limitations
+
+The Bahmni integration is still at trial stage. The limitations below apply as stated and are not usage errors.
+
+- **Bahmni is not yet an option on the PRECIA SIMRS Integration page.** The adapter list on that page does not include Bahmni, so the connection cannot be configured by an organization admin. All setup is handled by the implementation team.
+- **The data transfer does not run continuously.** The bridging service is run by the implementation team during trials rather than as a permanent service. Outside those periods, new visits in Bahmni will not appear in PRECIA until the service is started again.
+- **Cases do not appear instantly.** There is a delay between saving in Bahmni and the case appearing in PRECIA. Use the **Refresh** button on the Transaction Worklist rather than saving again in Bahmni, because saving again can produce duplicate cases.
+- **Examination findings arrive as text in the Notes field.** Height, weight, blood pressure, and pulse values do not become separate fields in PRECIA and cannot yet be used for searching or sorting.
+- **Cases from Bahmni have no AI module slots.** On the case detail, the **AI Modules** section states that no slots are configured. AI analysis has to be set up separately on the destination unit.
+- **PRECIA results are not sent back to Bahmni automatically.** The reverse direction, showing PRECIA analysis results in the Bahmni patient chart, is still being tested and is not yet part of the daily workflow.
+- **Only visits whose examination form was saved are transferred.** A patient who has been registered and whose visit has been opened, but whose examination form has not been saved, will not appear in PRECIA.
+
+## If the case does not appear in PRECIA
+
+Check in order:
+
+1. Confirm that you pressed **Save** in Step 6 and did not merely open the visit.
+2. Confirm that the **Latest** panel in Bahmni already shows the values you entered.
+3. Confirm that the **Unit** filter on the PRECIA Transaction Worklist points at the correct unit, then click **Refresh**.
+4. Confirm that the PRECIA account you are using belongs to the same hospital organization.
+5. If all four are correct, contact the PRECIA implementation team. Most likely the bridging service is not running, as described under Current limitations.
