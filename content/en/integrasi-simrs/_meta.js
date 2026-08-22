@@ -6,5 +6,6 @@ export default {
   khanza: 'Khanza SIMRS Flow',
   medicca: 'MEDICCA to PRECIA Transaction Flow',
   openemr: 'OpenEMR',
+  openhospital: 'Open Hospital',
   openmrs: 'OpenMRS 3 Integration'
 }

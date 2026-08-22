@@ -1,0 +1,104 @@
+---
+title: Open Hospital
+---
+
+# Open Hospital Integration
+
+This page explains how to create a laboratory examination request in **Open Hospital** and how to check that request appears as a clinical case in PRECIA.
+
+Open Hospital is an open source hospital information system developed by Informatici Senza Frontiere. Staff access it through a web application with separate modules for patients, visits, and laboratory examinations. In this integration, an examination request created by staff in the **Laboratory** module is read by the PRECIA connector and turned into one clinical case in the matching unit.
+
+Unlike GNU Health and OpenEMR, Open Hospital is **already available as an option in the Adapter field** on the Settings > SIMRS Integration page, registered as a **callback connector**.
+
+The flow in short:
+
+1. Staff register the patient (if not already registered) and request a laboratory examination in Open Hospital.
+2. The PRECIA connector reads that request and creates a clinical case in the matching unit.
+3. The case appears in the unit worklist in PRECIA and is ready for the AI module.
+
+Every image on this page was taken from PRECIA's Open Hospital trial environment (`openhospital-dev.precia.site`, sample hospital **St. Luke HOSPITAL - Angal**). Your hospital's installation may look slightly different depending on the Open Hospital version and the modules enabled.
+
+## Before you start
+
+Prepare the following:
+
+- The **address of your hospital's Open Hospital instance**, with an account that can open patient records and the Laboratory module.
+- A **PRECIA account** in the same organization as that hospital, with access to view the unit worklist.
+- Confirm with the PRECIA implementation team that your organization's connection settings already select the **Open Hospital** adapter on the [SIMRS Integration](/integrasi-simrs) page and have passed their self test.
+
+## 1. Checking the connection settings in PRECIA
+
+Each organization's SIMRS connection settings are stored on the **Settings > SIMRS Integration** page in PRECIA.
+
+![SIMRS Integration page in PRECIA, the Adapter field holding Open Hospital and the Endpoint URL field marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/01-pengaturan-koneksi.png)
+
+Confirm that the **Adapter** field holds **Open Hospital** and the **Endpoint URL** field holds your hospital's connector address, for example `https://openhospital-dev.precia.site/precia-integration/ai-results/callback` on the trial environment. This setting is managed by the organization admin or the PRECIA implementation team. As clinical staff, you do not need to fill in anything on this page, only confirm the setting is correct before starting work.
+
+## 2. Signing in to Open Hospital
+
+Open your hospital's Open Hospital address in a browser. Fill in **Username** and **Password**, then click **LOGIN**.
+
+![Open Hospital sign-in page, the Username field, the Password field, and the LOGIN button marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/02-halaman-masuk.png)
+
+## 3. Registering the patient
+
+If the patient is not yet registered, open the **Patients** menu, then select **New patient**. Fill in the patient demographics on the form that opens, then write a short clinical complaint in the **Complain** field at the bottom.
+
+![Open Hospital New patient form filled in, the First Name field, the Second Name field, and the SUBMIT button marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/03-formulir-pasien-baru.png)
+
+Click **SUBMIT** to save the patient record. If the patient is already registered, skip this step and search for that patient through the **Patients** menu instead.
+
+## 4. Requesting a laboratory examination
+
+On the **Patient Dashboard**, open the **Laboratory** section in the left panel. In the **Exam** field, choose the examination type that matches the AI module to be used, for example **ECG 12 Lead** for ejection fraction analysis.
+
+![Laboratory section on the Open Hospital Patient Dashboard, the Exam field holding ECG 12 Lead and the REQUEST button marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/04-pilih-pemeriksaan.png)
+
+Click **REQUEST** to save the request.
+
+## 5. Confirming the request was saved
+
+The saved request appears in the **Requested exams for the patient** table with status **DRAFT**.
+
+![Requested exams for the patient table in Open Hospital, the ECG 12 Lead row with DRAFT status marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/05-permintaan-tersimpan.png)
+
+Work in Open Hospital is done at this step.
+
+## 6. Checking the same case in PRECIA
+
+The PRECIA connector reads that request and creates a new clinical case in the matching unit. Sign in to PRECIA, open the **Clinical** menu, then pick the destination unit, for example **Kardiologi** (Cardiology), to see that unit's worklist. Click the newly appeared case to open its detail page.
+
+![Case detail page in PRECIA, the code laboratory-1, the Kardiologi unit, the Notes section holding raw data from Open Hospital, and the Medical Staff section holding Created by Open Hospital dev connector marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
+
+A case from Open Hospital can be recognized by three things:
+
+- The transaction **code** has the shape `<source type>-<sequence number>`, for example `laboratory-1`.
+- The **Notes** section holds the raw request data from Open Hospital, including `source_system: "openhospital"`, the examination code and description, and the request date.
+- The **Medical Staff** section lists **Created by** as the connector service account (`Open Hospital dev connector`, address `simrs-svc+openhospital-dev@precia.ai`), not a member of staff.
+
+In the sample case, the destination unit is **Kardiologi**, matching the ECG examination that was requested.
+
+From here the case is processed like any other PRECIA case: upload supporting files if not already present, run the AI module, then send it to a validator.
+
+## How data is mapped
+
+The table below explains where each piece of data on the PRECIA case comes from, based on the sample case `laboratory-1`.
+
+| Data in PRECIA | Source in Open Hospital |
+|---|---|
+| Case code | `<source_type>-<source_code>`, for example `laboratory-1` for the first laboratory examination |
+| Patient name, date of birth, gender | Patient demographics |
+| Medical record number | **PAT.ID** on the patient record |
+| Destination unit | The examination type requested, for example **ECG 12 Lead** maps to the **Kardiologi** unit |
+| Case notes | The raw request data (`source_system`, `source_type`, `source_code`, `source_data`), including the examination code and description |
+| Created by | The Open Hospital connector service account |
+
+## Current limitations
+
+This section records what is not yet available, so the integration does not raise expectations it cannot meet.
+
+1. **Delivery to PRECIA has not yet been proven to run without human involvement.** The SIMRS Integration page lists Open Hospital as a callback connector, but on the trial environment, reading the request from Open Hospital and creating the case in PRECIA was run by the technical team. There is no evidence yet that this process runs on its own as a continuously active service.
+2. **Sending the AI result back to Open Hospital has only been verified through the API, not through the web interface.** Open Hospital exposes an endpoint (`precia-integration/ai-results/...`) that stores the AI result after the validation is published in PRECIA, and that endpoint has been confirmed to return the correct result data. This documentation has not yet found a place in the Open Hospital web interface where that result is shown to staff.
+3. **A case is recorded without an explicit SIMRS-origin marker in the audit trail.** A case created by the connector goes through the ordinary case-recording path, so the audit trail does not show that a case came from Open Hospital. The Notes field on the detail page is currently the only marker available.
+4. **AI modules must be configured on the destination unit first.** Until the unit AI policy is set, the AI Modules panel on the detail page reports that no slots are configured, and the case stops at the Unprocessed status.
+5. **The Trigger AI button in PRECIA still has to be pressed manually.** A case appearing in PRECIA does not automatically run the AI module. Staff or a PRECIA operator still need to upload a file (if not already present) and press the AI processing button on the case detail page.
