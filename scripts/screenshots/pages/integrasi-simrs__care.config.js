@@ -3,6 +3,57 @@
  *
  * Two systems are captured in one spec file.
  *
+ * ---------------------------------------------------------------------
+ * STEPS 10-15 ADDED 2026-08-23, NOT YET CAPTURED, READ THIS FIRST
+ * ---------------------------------------------------------------------
+ * precia.site was unreachable when steps 10-15 were written (host down
+ * since 11:45, blinking on and off since). Every selector below was read
+ * from source, not from a live page, and every `annotate` box is an
+ * estimate sized to what the component is expected to render, not a
+ * measurement. Before trusting a capture from these steps:
+ *
+ *   1. Run each step once, inspect the raw (pre-annotation) PNG, and
+ *      correct the annotate coordinates the same way probe.js is used
+ *      elsewhere in this directory to measure real element positions.
+ *   2. Step 10-11 assume the ECG orderable's title contains the
+ *      substring "ECG" and is reachable through the "Select Activity
+ *      Definition" combobox's search tab (CommandInput, selector
+ *      `input[cmdk-input]`, see care_fe
+ *      src/components/Common/ResourceDefinitionCategoryPicker.tsx). This
+ *      searches by title directly instead of assuming a category, since
+ *      whether the ECG orderable was filed under "Imaging" or a separate
+ *      category (e.g. "Cardiology") was not verified. If the search tab
+ *      does not exist on this CARE version, fall back to browsing
+ *      categories the way steps 04-05 do for Chest X-ray.
+ *   3. STEPS 13-15 ARE CONFIRMED BLOCKED AT THE DATA LEVEL, NOT JUST AN
+ *      OPEN QUESTION. Read via direct DB query on app-dev by precia-tracker
+ *      on 2026-08-23 (~12:40 local): CARE-dev has 8 transactions with
+ *      source=simrs, ALL still status=unprocessed. Zero have reached
+ *      ai_completed. Zero have any SimrsDelivery row at all, so CARE has
+ *      never received a write-back on this environment. Running
+ *      `node run.js --only=integrasi-simrs__care` right now will not fail
+ *      loudly on steps 13-15; it will "succeed" against an empty result
+ *      (careOriginRow / the report list) and produce a misleading blank or
+ *      placeholder screenshot. DO NOT run 13-15 until one of the 8 pending
+ *      transactions has actually been pushed through AI processing and
+ *      doctor validation, and the write-back dispatcher has run for it.
+ *      That is a pipeline action outside the scope of this docs capture
+ *      (needs someone with trigger access, not a docs agent) - confirm
+ *      with team lead before assuming it has happened. Once it has, it is
+ *      probably worth pinning fixed ids the way steps 02-09 do, rather
+ *      than keeping the dynamic search, so repeat runs stay stable.
+ *   4. Whether the `role: 'CARE'` demo account (scoped to worklist reads
+ *      in "RAD - Radiologi", per the existing steps 08-09 note) can also
+ *      see AI module slots routed to a different unit (an ECG module is
+ *      unlikely to be enabled on a radiology unit) was not verified. If
+ *      step 13 comes back empty for an ECG-derived case, either the ECG
+ *      AI module's target unit needs to be added to this account's
+ *      access, or a second role needs resolving for that unit.
+ *
+ * Everything above step 10 (steps 01-09) was already captured and is
+ * unaffected by this addition.
+ * ---------------------------------------------------------------------
+ *
  * Steps 01 to 07 run against the CARE web interface at
  * https://care-dev.precia.site. CARE is not a PRECIA page, so `role` is
  * deliberately omitted and the framework login helper is never used. The
@@ -119,6 +170,50 @@ async function openImagingCategory(page) {
   await openActivityPicker(page)
   await page.getByText('Imaging', { exact: true }).click()
   await page.waitForTimeout(1500)
+}
+
+/**
+ * Open the activity picker and search it by title instead of browsing
+ * categories, used for the ECG orderable whose category was not verified.
+ * See the file-header note dated 2026-08-23 for why this searches instead
+ * of clicking through "Imaging" the way openImagingCategory does.
+ */
+async function searchOrderable(page, term) {
+  await openActivityPicker(page)
+  const searchInput = page.locator('input[cmdk-input]')
+  await searchInput.fill(term)
+  await page.waitForTimeout(1200)
+}
+
+/**
+ * PRECIA "By AI Module" worklist tab, filtered to completed slots, scoped
+ * to whatever unit(s) the logged-in role can see. Mirrors the helper in
+ * kasus-klinis__worklist-per-modul.config.js (same class-based selectors,
+ * confirmed stable there against a live page).
+ */
+const AI_MODULE_TAB_GROUP_SELECTOR =
+  'div.inline-flex.rounded-lg.border.border-border.bg-muted\\/30.p-1'
+const AI_MODULE_FILTER_SELECTOR =
+  'div.rounded-xl.border.border-border\\/70.bg-muted\\/20.p-4.mb-4 select'
+
+async function openCompletedAiModuleSlots(page) {
+  await page.waitForSelector(AI_MODULE_TAB_GROUP_SELECTOR, { timeout: 20000 })
+  await page.locator(`${AI_MODULE_TAB_GROUP_SELECTOR} button`).nth(1).click()
+  await page.waitForSelector(AI_MODULE_FILTER_SELECTOR)
+  const selects = page.locator(AI_MODULE_FILTER_SELECTOR)
+  // Index 1 is "Status Slot" in kasus-klinis__worklist-per-modul.config.js;
+  // not reverified here for the CARE-scoped page, see header note point 4.
+  const slotsResponse = page.waitForResponse(
+    (res) => res.url().includes('/slots/') && res.url().includes('status=completed')
+  )
+  await selects.nth(1).selectOption('completed')
+  await slotsResponse.catch(() => {})
+  await page.waitForTimeout(800)
+}
+
+/** First worklist row whose visible text carries the CARE- transaction prefix. */
+function careOriginRow(page) {
+  return page.locator('table tbody tr').filter({ hasText: 'CARE-' }).first()
 }
 
 module.exports = [
@@ -274,6 +369,139 @@ module.exports = [
       { type: 'box', x: 298, y: 116, width: 684, height: 68 },
       // Notes, carrying the CARE ServiceRequest reference
       { type: 'box', x: 296, y: 420, width: 424, height: 72 }
+    ]
+  },
+  // -----------------------------------------------------------------
+  // Steps 10-12: ordering ECG 12-lead in CARE, mirroring steps 03-07
+  // for Chest X-ray but via title search (see searchOrderable above).
+  // Coordinates below are estimates, unverified against a live page.
+  // -----------------------------------------------------------------
+  {
+    id: 'integrasi-simrs__care__10-mencari-pemeriksaan-ecg',
+    section: 'integrasi-simrs',
+    pageSlug: 'care',
+    stepSlug: '10-mencari-pemeriksaan-ecg',
+    route: `${ENCOUNTER_BASE}/questionnaire/service_request`,
+    preActions: async (page) => {
+      await searchOrderable(page, 'ECG')
+    },
+    annotate: [
+      // Search input inside the activity picker
+      { type: 'box', x: 336, y: 300, width: 700, height: 44 },
+      // First matching result row (assumed to be the ECG orderable)
+      { type: 'box', x: 331, y: 360, width: 700, height: 42 }
+    ]
+  },
+  {
+    id: 'integrasi-simrs__care__11-mengirim-permintaan-ecg',
+    section: 'integrasi-simrs',
+    pageSlug: 'care',
+    stepSlug: '11-mengirim-permintaan-ecg',
+    route: `${ENCOUNTER_BASE}/questionnaire/service_request`,
+    preActions: async (page) => {
+      await searchOrderable(page, 'ECG')
+      // Click the first result. Text match is a best guess at the title
+      // ("ECG 12-Lead (PRECIA AI)", mirroring "Chest X-ray (PRECIA AI)")
+      // and needs confirming against the live catalog.
+      await page.getByText('ECG', { exact: false }).first().click()
+      await page.waitForTimeout(2500)
+    },
+    annotate: [
+      // The chosen orderable, now a row on the form
+      { type: 'box', x: 326, y: 288, width: 872, height: 50 },
+      // Submit button (never clicked, same as step 06)
+      { type: 'box', x: 1143, y: 490, width: 87, height: 38 }
+    ]
+  },
+  {
+    id: 'integrasi-simrs__care__12-daftar-permintaan-ecg',
+    section: 'integrasi-simrs',
+    pageSlug: 'care',
+    stepSlug: '12-daftar-permintaan-ecg',
+    route: `${ENCOUNTER_BASE}/service_requests`,
+    preActions: async (page) => {
+      await openCare(page, `${ENCOUNTER_BASE}/service_requests`)
+    },
+    annotate: [
+      // Row for the ECG request, expected Active/Routine like step 07.
+      // This box assumes the ECG row lands directly under the Chest
+      // X-ray row from step 07; re-measure once both requests exist.
+      { type: 'box', x: 425, y: 300, width: 988, height: 64 }
+    ]
+  },
+  // -----------------------------------------------------------------
+  // Step 13: AI result visible in PRECIA, on the "By AI Module" tab
+  // rather than the plain worklist, because that tab is what actually
+  // exposes per-slot AI status/confidence (see kasus-klinis
+  // __worklist-per-modul.config.js). No fixed transaction id: this
+  // depends on at least one CARE-origin transaction already being
+  // ai_completed on dev when the capture runs (see header note point 3).
+  // -----------------------------------------------------------------
+  {
+    id: 'integrasi-simrs__care__13-hasil-ai-modul-precia',
+    section: 'integrasi-simrs',
+    pageSlug: 'care',
+    stepSlug: '13-hasil-ai-modul-precia',
+    route: '/clinical',
+    role: 'CARE',
+    fullPage: true,
+    preActions: async (page) => {
+      await openCompletedAiModuleSlots(page)
+      const row = careOriginRow(page)
+      await row.waitFor({ state: 'visible', timeout: 20000 })
+      await row.locator('button').first().click()
+      await page.waitForTimeout(900)
+    },
+    annotate: [
+      // The CARE-origin row, its transaction code carrying the CARE- prefix
+      { type: 'box', x: 300, y: 460, width: 1100, height: 60 },
+      // Expanded AI result panel below the row (classification, confidence)
+      { type: 'box', x: 316, y: 520, width: 1080, height: 220 }
+    ]
+  },
+  // -----------------------------------------------------------------
+  // Steps 14-15: the write-back, on CARE's own Diagnostic Reports tab
+  // for the same encounter used throughout this file. No fixed report
+  // id, see header note point 3: the dispatcher must have already
+  // pushed the report before this can find anything.
+  // -----------------------------------------------------------------
+  {
+    id: 'integrasi-simrs__care__14-laporan-diagnostik-care',
+    section: 'integrasi-simrs',
+    pageSlug: 'care',
+    stepSlug: '14-laporan-diagnostik-care',
+    route: `${ENCOUNTER_BASE}/diagnostic_reports`,
+    preActions: async (page) => {
+      await openCare(page, `${ENCOUNTER_BASE}/diagnostic_reports`)
+      await page.waitForSelector('ul.grid.gap-2 li', { timeout: 20000 })
+      await page.waitForTimeout(700)
+    },
+    annotate: [
+      // "Diagnostic Reports" tab in the encounter tab bar
+      { type: 'box', x: 780, y: 158, width: 190, height: 32 },
+      // First report card in the left panel list
+      { type: 'box', x: 20, y: 96, width: 340, height: 96 }
+    ]
+  },
+  {
+    id: 'integrasi-simrs__care__15-detail-laporan-diagnostik-care',
+    section: 'integrasi-simrs',
+    pageSlug: 'care',
+    stepSlug: '15-detail-laporan-diagnostik-care',
+    route: `${ENCOUNTER_BASE}/diagnostic_reports`,
+    preActions: async (page) => {
+      await openCare(page, `${ENCOUNTER_BASE}/diagnostic_reports`)
+      await page.waitForSelector('ul.grid.gap-2 li', { timeout: 20000 })
+      await page.locator('ul.grid.gap-2 li').first().click()
+      await page.waitForTimeout(1200)
+    },
+    annotate: [
+      // Status badge on the detail card (Preliminary/Final)
+      { type: 'box', x: 1180, y: 96, width: 140, height: 30 },
+      // Notes field: PRECIA writes "PRECIA <module code>" as its first
+      // line, followed by confidence, model version, validation status,
+      // the PRECIA transaction id and job id (see care.py _note()).
+      { type: 'box', x: 380, y: 420, width: 700, height: 160 }
     ]
   }
 ]
