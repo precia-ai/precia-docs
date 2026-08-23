@@ -120,6 +120,26 @@ Tiga bagian yang perlu diperiksa:
 
 Sejak titik ini kasus diperlakukan sama seperti kasus PRECIA lainnya. Anda dapat mengunggah dokumen pendukung, mengirim kasus ke validator, atau membatalkannya.
 
+## Melihat hasil AI ditulis balik ke Bahmni
+
+Langkah-langkah di atas mengikuti satu kasus yang berkelanjutan, tetapi unit tujuan kasus tersebut belum memiliki modul AI, sehingga tidak pernah sampai pada hasil yang dipublikasikan. Dua langkah berikut berpindah ke kasus lain yang sudah selesai (transaksi `BAHMNI-3d2845c5-...`, pasien Ratna Proofdev, MRN `ABC200005`) untuk menunjukkan apa yang terjadi setelah kasus seperti milik Anda mencapai tahap tersebut: PRECIA menuliskan hasil AI kembali ke rekam medis Bahmni dengan sendirinya.
+
+### Langkah 10: Memeriksa validasi yang sudah dipublikasikan di PRECIA
+
+Masuk ke PRECIA, lalu buka menu **Validasi** di menu samping. Daftar kerja di sebelah kiri memuat setiap kasus yang sudah memiliki keputusan tercatat. Klik baris untuk kasus tersebut.
+
+![Halaman Validasi PRECIA, baris daftar kerja untuk transaksi BAHMNI-3d2845c5-... ditandai kotak biru, detail keputusan yang sudah dipublikasikan di sebelah kanan ditandai kotak biru](/screenshots/id/integrasi-simrs/bahmni/10-validasi-dipublikasikan.png)
+
+Panel detail di sebelah kanan menampilkan keputusan (**Diterima**), status (**Dipublikasikan**), waktu validasi dan waktu publikasi, catatan klinis, serta hasil AI yang ditinjau validator beserta tingkat keyakinannya. Setelah sebuah keputusan dipublikasikan, PRECIA mengirimkannya ke Bahmni dengan sendirinya: jejak audit platform menunjukkan pengiriman dimulai 29 milidetik setelah publikasi, terlalu cepat untuk dipicu oleh manusia.
+
+### Langkah 11: Membaca hasil AI di rekam medis Bahmni
+
+Buka pasien yang sama di Bahmni (cari dengan MRN `ABC200005` pada Registration, memakai pencarian yang sama seperti Langkah 3), lalu beralih ke aplikasi **Clinical** untuk membuka rekam medis pasien. Bagian berjudul **PRECIA AI Results** terletak di bagian atas rekam medis.
+
+![Rekam medis Bahmni untuk pasien Ratna Proofdev, panel PRECIA AI Results ditandai kotak biru](/screenshots/id/integrasi-simrs/bahmni/11-hasil-ai-di-rekam-medis.png)
+
+Panel ini memuat tiga nilai yang ditulis oleh konektor: kesan hasil AI (temuan validator dalam bentuk teks bebas), tingkat keyakinan, dan nama modul AI. Identitas pasien pada rekam medis ini sama dengan kasus yang tampak pada Langkah 10, dan kecocokan inilah yang membuktikan hasilnya benar-benar sampai ke rekam medis yang tepat, bukan sekadar ditandai terkirim di sisi PRECIA.
+
 ## Batasan saat ini
 
 Integrasi Bahmni masih berstatus uji coba. Batasan berikut berlaku apa adanya dan bukan kesalahan pemakaian.
@@ -129,7 +149,7 @@ Integrasi Bahmni masih berstatus uji coba. Batasan berikut berlaku apa adanya da
 - **Kasus tidak muncul seketika.** Ada jeda antara penyimpanan di Bahmni dan kemunculan kasus di PRECIA. Gunakan tombol **Muat Ulang** pada Daftar Kerja Transaksi, jangan menyimpan ulang di Bahmni, karena penyimpanan ulang dapat menghasilkan kasus ganda.
 - **Hasil pemeriksaan masuk sebagai teks pada kolom Catatan.** Nilai tinggi badan, berat badan, tekanan darah, dan denyut nadi tidak menjadi kolom terpisah di PRECIA dan belum dapat dipakai untuk pencarian atau pengurutan.
 - **Kasus dari Bahmni belum memiliki slot modul AI.** Pada detail kasus, bagian **Modul AI** menampilkan keterangan bahwa belum ada slot yang dikonfigurasi. Analisis AI perlu disiapkan terpisah pada unit tujuan.
-- **Hasil PRECIA belum dikirim balik otomatis ke Bahmni.** Arah sebaliknya, yaitu menampilkan hasil analisis PRECIA pada rekam medis Bahmni, masih dalam tahap uji dan belum menjadi bagian dari alur kerja harian.
+- **Modul AI masih harus dipicu secara manual.** Kasus yang muncul di PRECIA tidak menjalankan analisis AI dengan sendirinya. Petugas atau operator PRECIA tetap perlu menekan tombol pemrosesan AI pada halaman detail kasus, batasan yang sama seperti pada setiap SIMRS di situs ini. Namun setelah validator mempublikasikan keputusan, penulisan balik ke Bahmni itu sendiri berjalan otomatis, tidak perlu dijalankan oleh siapa pun. Lihat [Melihat hasil AI ditulis balik ke Bahmni](#melihat-hasil-ai-ditulis-balik-ke-bahmni).
 - **Hanya kunjungan yang formulir pemeriksaannya disimpan yang terkirim.** Pasien yang sudah terdaftar dan kunjungannya sudah dibuka, tetapi formulir pemeriksaannya belum disimpan, tidak akan muncul di PRECIA.
 
 ## Bila kasus tidak muncul di PRECIA
