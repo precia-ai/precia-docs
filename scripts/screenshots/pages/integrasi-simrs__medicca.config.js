@@ -3,8 +3,8 @@
  *
  * Spec ini menangkap dua sistem sekaligus:
  *
- *   1. Sisi PRECIA (langkah 01 dan 09). Memakai `role` sehingga helper login
- *      standar dipakai, dengan akun yang benar benar berada di dalam
+ *   1. Sisi PRECIA (langkah 01, 09 dan 10). Memakai `role` sehingga helper
+ *      login standar dipakai, dengan akun yang benar benar berada di dalam
  *      organisasi tenant MEDICCA, bukan organisasi platform. Tanpa itu
  *      tangkapan layar akan menampilkan data organisasi lain dan menyesatkan
  *      pembaca.
@@ -34,9 +34,23 @@
  * nyata saat preActions selesai, bukan dari koordinat tetap. Fungsi measure()
  * melempar galat bila tidak ada satu pun elemen yang terukur, sehingga
  * screenshot tanpa anotasi tidak mungkin dihasilkan.
+ *
+ * Langkah 09 dan 10 (daftar kerja dan detail transaksi di PRECIA) memakai
+ * kasus nyata yang diverifikasi ulang pada 23 Agustus 2026: pasien
+ * DEWI LESTARI CONTOH (No RM 000004, Poliklinik Umum), didaftarkan lewat
+ * skrip verifikasi terpisah yang benar-benar menekan tombol simpan (generator
+ * ini sendiri tidak pernah menyimpan, lihat catatan data di atas), lalu
+ * transaksinya muncul otomatis di PRECIA dalam hitungan detik lewat worker
+ * MEDICCA yang berjalan terus-menerus. Ini bukti pertama alur MEDICCA sampai
+ * ke PRECIA sejak perbaikan panjang kode transaksi dan penargetan organisasi;
+ * sebelumnya daftar kerja ini selalu kosong. TX_CODE dan TX_ID di bawah
+ * merujuk transaksi itu; ganti keduanya bila kasus itu suatu saat dibersihkan
+ * dari data dev.
  */
 const MEDICCA_BASE = process.env.MEDICCA_BASE_URL || 'https://medicca-dev.precia.site'
 const MEDICCA_LOGIN_URL = `${MEDICCA_BASE}/login.php`
+const TX_CODE = '{2308202613124489A4962D9641FCE2D2BC5895164EF479}'
+const TX_ID = '5d85b627-8a1d-4f62-9585-d3cdd26a3e93'
 const VIEWPORT = { width: 1440, height: 900 }
 const PRECIA_ROLE = 'MDOC'
 
@@ -234,11 +248,19 @@ module.exports = [
 
   // --- Bagian 4. Memeriksa hasilnya di PRECIA ---
   preciaSpec('09-daftar-kerja-transaksi-precia', '/clinical?unit=general', async (page, id) => {
-    await page.waitForSelector('span.inline-flex.rounded-full', { timeout: 20000 })
-    await page.waitForTimeout(1500)
+    const row = page.locator('tbody tr', { hasText: TX_CODE })
+    await row.first().waitFor({ timeout: 20000 })
+    await page.waitForTimeout(1000)
+    await measure(page, id, ['span.inline-flex.rounded-full', row])
+  }),
+
+  preciaSpec('10-detail-transaksi-precia', `/clinical/transactions/${TX_ID}`, async (page, id) => {
+    await page.locator('h1').first().waitFor({ timeout: 20000 })
+    await page.waitForTimeout(1200)
     await measure(page, id, [
-      'span.inline-flex.rounded-full',
-      'div.flex.flex-col.items-center.justify-center.rounded-lg.border.bg-card'
+      page.locator('h1').first(),
+      page.locator('p', { hasText: 'Kunjungan' }).first(),
+      page.locator('div.rounded-lg.border', { hasText: 'Poliklinik Umum' }).last()
     ])
   })
 ]
