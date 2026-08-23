@@ -19,6 +19,63 @@
  *   setiap kali dokumentasi digenerate ulang tidak lahir order baru di data
  *   demo. Spec 12 memotret tabel Orders yang sudah berisi order hasil uji
  *   coba sebelumnya.
+ *
+ * ---------------------------------------------------------------------
+ * SPEC 16-18 DITAMBAHKAN 2026-08-23, BELUM PERNAH DIJALANKAN, BACA DULU
+ * ---------------------------------------------------------------------
+ * Ditulis sementara app-dev.precia.site sedang berkedip (lihat catatan yang
+ * sama di integrasi-simrs__care.config.js hari ini), jadi tidak satu pun
+ * selector di bawah pernah diverifikasi terhadap DOM nyata. Sebelum
+ * dipercaya sebagai final: jalankan sekali, periksa PNG mentahnya, lalu
+ * ukur ulang koordinat `annotate` dengan cara yang sama probe.js dipakai di
+ * tempat lain pada direktori ini.
+ *
+ * BEDA dengan spec 13-15 di atas, spec 16-18 TIDAK dibiarkan menunggu
+ * kasus apa pun tiba. precia-tracker mengonfirmasi lewat query DB langsung
+ * pada 2026-08-23 (~12:40 waktu lokal) bahwa dua transaksi asal OpenMRS 3
+ * di app-dev SUDAH mencapai status doctor_reviewed dengan baris
+ * SimrsDelivery berstatus succeeded, artinya seluruh rantai (AI selesai,
+ * divalidasi dokter, tersinkron balik ke OpenMRS) sudah benar-benar
+ * terjadi untuk keduanya:
+ *   - 53f56457-c07c-4fcb-9d9d-21ea52a61f6a (delivery sukses 2026-08-22
+ *     16:14:56 UTC) - dipakai di bawah sebagai ROUND_TRIP_TRANSACTION_ID.
+ *   - eb0d127b-0917-4dc8-8289-61418f3fa2e1 (delivery sukses 2026-08-22
+ *     15:49:47 UTC) - cadangan bila transaksi pertama ternyata sudah
+ *     berubah/dihapus saat capture dijalankan.
+ * Kolom `code` transaksi OpenMRS 3 berisi UUID itu sendiri (bukan format
+ * "OPENMRS3-xxx" seperti CARE), jadi kedua id di atas langsung dipakai
+ * sebagai id transaksi PRECIA, bukan hasil pencarian dinamis.
+ *
+ * KARENA kasusnya sudah selesai (bukan sedang menunggu divalidasi), spec
+ * 17 TIDAK melakukan aksi validasi apa pun (beda dari pola
+ * integrasi-simrs__openhospital-bukti-round-trip.config.js yang menekan
+ * tombol Record decision/Publish validation secara langsung). Spec 17
+ * hanya memotret status yang sudah ada, mengikuti pola
+ * integrasi-simrs__khanza-bukti-round-trip.config.js.
+ *
+ * Halaman persis tempat status validasi dan catatan tervalidasi tampil
+ * BELUM diverifikasi. Spec 16 dan 17 sama-sama memotret halaman detail
+ * transaksi PRECIA (route yang sama dan sudah terbukti jalan di spec 15),
+ * dengan asumsi kartu Modul AI dan riwayat validasi sama-sama tampil di
+ * situ setelah status berubah dari "Belum Diproses". Bila ternyata
+ * validasi hanya tampil di halaman lain (misalnya /validation, seperti
+ * dipakai integrasi-simrs__openhospital-bukti-round-trip.config.js),
+ * pisahkan spec 17 ke route itu dan ukur ulang.
+ *
+ * Spec 18 (sisi OpenMRS) TIDAK memakai PATIENT_UUID/PATIENT_QUERY yang
+ * sudah ada di atas, karena belum dikonfirmasi kedua transaksi round trip
+ * ini memakai pasien demo yang sama (Betty Williams) dengan spec 01-15.
+ * Spec 18 justru membaca nama pasien dari halaman detail transaksi PRECIA
+ * (spec 16) lebih dulu di dalam preActions-nya sendiri, baru mencari nama
+ * itu di OpenMRS lewat alur pencarian yang sama dipakai spec 05, supaya
+ * seluruh urutan tetap berjalan tanpa pengawasan dalam satu kali run,
+ * bukan bergantung pada UUID pasien yang ditebak. Tab yang difoto adalah
+ * "Results", bukan "Orders" seperti spec 07-12: order yang sudah selesai
+ * dan diisi hasil biasanya tampil di tab terpisah dari order yang masih
+ * berjalan, tapi nama tab persis di versi OpenMRS 3 ini belum
+ * dikonfirmasi. Dicari lewat teks ("Results"), bukan lewat path URL yang
+ * ditebak, supaya lebih tahan bila nama workspace-nya berbeda.
+ * ---------------------------------------------------------------------
  */
 const O3 = process.env.OPENMRS_BASE_URL || 'https://openmrs-dev.precia.site'
 const O3_LOGIN = `${O3}/openmrs/spa/login`
@@ -26,6 +83,12 @@ const PATIENT_UUID = '5b338deb-f8aa-4631-b464-c9763fcaca56'
 const PATIENT_QUERY = 'Betty%20Williams'
 const UNIT_UUID = '095dd538-c619-4d28-821e-dd54cd475c36'
 const TRANSACTION_UUID = '2eee5073-7854-4254-8823-c3555b36f7c1'
+
+// Transaksi round trip yang sudah terbukti selesai (doctor_reviewed, delivery
+// succeeded), dikonfirmasi lewat DB pada 2026-08-23. Lihat catatan SPEC 16-18
+// di atas. Cadangan dipakai bila yang utama sudah berubah saat capture jalan.
+const ROUND_TRIP_TRANSACTION_ID = '53f56457-c07c-4fcb-9d9d-21ea52a61f6a'
+const ROUND_TRIP_TRANSACTION_ID_FALLBACK = 'eb0d127b-0917-4dc8-8289-61418f3fa2e1'
 
 const REFERENCE_NUMBER = 'PRECIA-DEMO-261444'
 const INSTRUCTIONS =
@@ -107,6 +170,36 @@ async function o3FillOrderForm(page) {
   await page.fill('#labReferenceNumberInput', REFERENCE_NUMBER)
   await page.fill('#additionalInstructionsInput', INSTRUCTIONS)
   await page.waitForTimeout(1200)
+}
+
+/**
+ * Baca nama pasien dari kartu identitas pada halaman detail transaksi PRECIA
+ * yang sedang terbuka (pola yang sama dipakai spec 15: nama pasien tampil di
+ * kartu identitas dekat kode transaksi). Dipakai spec 18 supaya pencarian di
+ * OpenMRS tidak bergantung pada UUID pasien yang ditebak. Selector belum
+ * diverifikasi terhadap DOM nyata, lihat catatan SPEC 16-18 di atas.
+ */
+async function readPreciaPatientName(page) {
+  const identityCard = page.locator('h1, h2').first()
+  const text = (await identityCard.textContent()) || ''
+  return text.trim()
+}
+
+/**
+ * Sisi OpenMRS dari spec 18: cari pasien lewat nama yang dibaca dari PRECIA,
+ * buka rekamnya, lalu buka tab "Results" (dicari lewat teks, bukan path URL
+ * yang ditebak, lihat catatan SPEC 16-18 di atas).
+ */
+async function o3OpenResultsForPatientNamed(page, patientName) {
+  await o3Login(page)
+  await page.goto(`${O3}/openmrs/spa/search?query=${encodeURIComponent(patientName)}`, {
+    waitUntil: 'networkidle'
+  })
+  await page.waitForTimeout(6000)
+  await page.locator('a, [role="link"]').filter({ hasText: patientName }).first().click()
+  await page.waitForTimeout(6000)
+  await page.getByText('Results', { exact: true }).first().click()
+  await page.waitForTimeout(6000)
 }
 
 module.exports = [
@@ -337,6 +430,73 @@ module.exports = [
     annotate: [
       { type: 'box', x: 299, y: 114, width: 494, height: 44 },
       { type: 'box', x: 299, y: 421, width: 412, height: 72 }
+    ]
+  },
+  // -----------------------------------------------------------------
+  // Spec 16-18: bukti round trip sampai hasil AI tervalidasi dan
+  // tersinkron balik ke OpenMRS, untuk transaksi yang sudah benar-benar
+  // selesai (bukan simulasi). Lihat catatan SPEC 16-18 di atas file ini.
+  // -----------------------------------------------------------------
+  {
+    id: 'integrasi-simrs__openmrs__16-hasil-ai',
+    section: 'integrasi-simrs',
+    pageSlug: 'openmrs',
+    stepSlug: '16-hasil-ai',
+    route: `/clinical/transactions/${ROUND_TRIP_TRANSACTION_ID}`,
+    role: 'OPENMRS3',
+    preActions: async (page) => {
+      await page.waitForTimeout(6000)
+    },
+    annotate: [
+      // Perkiraan awal, ukur ulang: kartu Modul AI berisi hasil (confidence,
+      // temuan), menggantikan keterangan "belum ada slot" pada spec 15.
+      { type: 'box', x: 299, y: 560, width: 800, height: 220 }
+    ]
+  },
+  {
+    id: 'integrasi-simrs__openmrs__17-validasi-dokter',
+    section: 'integrasi-simrs',
+    pageSlug: 'openmrs',
+    stepSlug: '17-validasi-dokter',
+    route: `/clinical/transactions/${ROUND_TRIP_TRANSACTION_ID}`,
+    role: 'OPENMRS3',
+    fullPage: true,
+    preActions: async (page) => {
+      await page.waitForTimeout(6000)
+      // TODO: belum dikonfirmasi status/riwayat validasi tampil di halaman
+      // ini. Bila tidak, pindahkan ke route /validation seperti pola
+      // integrasi-simrs__openhospital-bukti-round-trip.config.js dan cari
+      // kasusnya lewat teks (nama pasien atau kode transaksi), lalu ukur
+      // ulang seluruh spec ini dari nol.
+    },
+    annotate: [
+      // Perkiraan awal, ukur ulang: badge status (mis. "Ditinjau Dokter")
+      // beserta catatan/keputusan validasi.
+      { type: 'box', x: 299, y: 800, width: 800, height: 160 }
+    ]
+  },
+  {
+    id: 'integrasi-simrs__openmrs__18-hasil-tersinkron-openmrs',
+    section: 'integrasi-simrs',
+    pageSlug: 'openmrs',
+    stepSlug: '18-hasil-tersinkron-openmrs',
+    route: `/clinical/transactions/${ROUND_TRIP_TRANSACTION_ID}`,
+    role: 'OPENMRS3',
+    preActions: async (page) => {
+      // Dua tahap dalam satu preActions supaya seluruh urutan tetap
+      // berjalan tanpa pengawasan dalam satu kali run: baca nama pasien
+      // dari PRECIA dulu (halaman ini sudah dimuat oleh route di atas),
+      // baru pindah ke OpenMRS dan cari nama itu. Lihat readPreciaPatientName
+      // dan o3OpenResultsForPatientNamed di atas file ini.
+      await page.waitForTimeout(4000)
+      const patientName = await readPreciaPatientName(page)
+      await o3OpenResultsForPatientNamed(page, patientName)
+    },
+    annotate: [
+      // Perkiraan awal, ukur ulang: baris hasil bernilai PRECIA AI pada tab
+      // Results, mengikuti referensi visual
+      // public/screenshots/_evidence/dev/openmrs3-18-openmrs-results-precia-ai-value.png
+      { type: 'box', x: 274, y: 300, width: 1100, height: 150 }
     ]
   }
 ]
