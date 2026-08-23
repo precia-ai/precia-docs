@@ -69,7 +69,7 @@ module.exports = [
       await page.waitForTimeout(2500)
       await page.locator(`text=${CASE_TEXT}`).first().click()
       await page.waitForTimeout(2500)
-      await page.selectOption('#start-decision', { index: 0 }).catch(() => {})
+      await page.selectOption('#start-decision', { value: 'accepted' }).catch(() => {})
       await page.fill(
         '#start-notes',
         'Hasil AI konsisten dengan gambaran EKG. Pasien dirujuk untuk ekokardiografi konfirmasi.'
