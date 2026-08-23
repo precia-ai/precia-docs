@@ -6,7 +6,7 @@ title: Transaction flow from SIMRS MEDICCA to PRECIA
 
 This page describes the journey of a single patient visit from SIMRS MEDICCA through to PRECIA: the one-time setup that must be done first, then the daily front-desk work that produces a transaction, and finally the place in PRECIA where that transaction is supposed to appear.
 
-Every step on this page was carried out directly against the MEDICCA and PRECIA development environments. Anything that does not yet work is reported as it stands, in the **Current limitations** section at the bottom of the page. Read that section before scheduling any hospital rollout, because the full round trip from MEDICCA through to an AI result returning to MEDICCA does not work yet.
+Every step on this page was carried out directly against the MEDICCA and PRECIA development environments, most recently re-verified on 23 August 2026. Anything that does not yet work is reported as it stands, in the **Current limitations** section at the bottom of the page. Read that section before scheduling any hospital rollout: the direction from MEDICCA into PRECIA now works end to end, but the return direction, an AI result flowing back into MEDICCA, has not been exercised to completion.
 
 ## Flow at a glance
 
@@ -14,14 +14,14 @@ Moving data between MEDICCA and PRECIA is not something a member of staff does b
 
 What happens is this:
 
-1. The front-desk officer saves one outpatient visit registration in MEDICCA. This part is proven to work.
-2. MEDICCA records that registration on its internal integration queue. This part is proven to work: every saved registration adds one queue row.
-3. A background process belonging to MEDICCA reads the queue, signs in to PRECIA using the configured service account, and attempts to create a clinical transaction in PRECIA. Only the sign-in to PRECIA is proven. Creating the transaction has never succeeded, because PRECIA rejects the request.
-4. The clinical transaction is supposed to appear on the unit worklist in PRECIA, and from that point onward follow the normal PRECIA clinical case workflow. This state has never been reached on the development environment, so this stage is design intent rather than an observation.
+1. The front-desk officer saves one outpatient visit registration in MEDICCA.
+2. MEDICCA records that registration on its internal integration queue.
+3. A dedicated worker service, a long-running process that ships alongside the MEDICCA application rather than a script anyone has to run by hand, drains that queue on a fixed interval. It signs in to PRECIA using a service account that belongs to the hospital's own organization, then creates a clinical transaction.
+4. The clinical transaction appears on the worklist of the PRECIA unit that matches the clinic the officer selected.
 
-Of the four points above, the first two and the sign-in part of the third are proven to work. Creating the transaction in PRECIA, its appearance on the worklist, and the return of an AI result to MEDICCA have never been carried through to completion. The reasons are set out in [Current limitations](#current-limitations).
+All four points above are proven to work end to end, verified with a real registration on 23 August 2026: the case reached the correct organization and the correct unit in PRECIA within seconds of the registration being saved, with no manual step in between. What is not yet proven is the return direction, an AI result flowing back from PRECIA into MEDICCA. The reasons are set out in [Current limitations](#current-limitations).
 
-By design, one outpatient registration produces one clinical transaction, and the clinic the officer selects determines which PRECIA unit receives that transaction. That clinic-to-unit relationship cannot be demonstrated today, because the mapping currently in effect still points at units of another organization.
+By design, one outpatient registration produces one clinical transaction, and the clinic the officer selects determines which PRECIA unit receives that transaction. That clinic-to-unit relationship is now demonstrated directly: a registration placed in the Poliklinik Umum clinic reached the Poliklinik Umum unit in PRECIA, under the correct organization, in the verification below.
 
 ## Part 1. Setup in PRECIA
 
@@ -126,7 +126,7 @@ Fields the officer needs to choose:
 
 ![MEDICCA outpatient registration form, with the Poliklinik option group, the Biaya Daftar option group, and the Tambah button marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/07-formulir-registrasi-rawat-jalan.png)
 
-The **Poliklinik** choice is the most important field as far as PRECIA is concerned, because that clinic is designed to determine which PRECIA unit receives the transaction. Note that this cannot be demonstrated today, because the clinic-to-unit mapping in the active configuration still points at units of another organization, as set out in [Current limitations](#current-limitations). Even so, make sure the choice matches the purpose of the patient's visit.
+The **Poliklinik** choice is the most important field as far as PRECIA is concerned, because that clinic determines which PRECIA unit receives the transaction. Make sure the choice matches the purpose of the patient's visit.
 
 Press **Tambah** to save the registration. The application returns to the patient list. It is at this moment that MEDICCA records the registration on the integration queue bound for PRECIA. There is no extra button to press.
 
@@ -144,28 +144,32 @@ That is the end of the front-desk officer's work. There is no further step insid
 
 Sign in to PRECIA with an account belonging to the same hospital organization, then open the **Clinical** menu. Pick the unit matching the destination clinic, or pick **All units** in the **Unit** filter to see every unit combined. Note that **General** in that filter is not a combined option: it is the name of one of the clinic units, Poliklinik Umum, unit code UMUM. The **Transaction Worklist** appears together with a result counter in the top right corner.
 
-![PRECIA transaction worklist for the MEDICCA organization, with the zero results counter and the No transactions found message marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/09-daftar-kerja-transaksi-precia.png)
+![PRECIA transaction worklist for the MEDICCA organization, with the result counter and the row for patient DEWI LESTARI CONTOH marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/09-daftar-kerja-transaksi-precia.png)
 
-The screenshot above was taken in the **RS Uji Coba MEDICCA** organization, code MEDICCA-DEV, the tenant organization that holds the three clinic units from Step 1.
+The screenshot above was taken in the **RS Uji Coba MEDICCA** organization, the tenant organization that holds the clinic units from Step 1, and shows a real registration created for this verification: patient DEWI LESTARI CONTOH, medical record number 000004, Poliklinik Umum. The registration was saved in MEDICCA and reached this worklist on its own, through the worker service described in [Flow at a glance](#flow-at-a-glance), with no PRECIA action in between.
 
-Transactions originating from MEDICCA are recognizable by their transaction code, which always begins with the word MEDICCA. The **Search** field accepts a transaction code, a medical record number, or a patient name, so a particular registration can be found quickly.
+Transactions originating from MEDICCA are recognizable by their transaction code, which is MEDICCA's own registration identifier wrapped in curly braces, for example `{2308202613124489A4962D9641FCE2D2BC5895164EF479}`. The **Search** field accepts a transaction code, a medical record number, or a patient name, so a particular registration can be found quickly.
 
-This needs to be stated plainly: at the time this documentation was written, that list is still empty and the counter reads **0 results**, exactly as shown in the screenshot. No MEDICCA registration has ever reached PRECIA successfully. The screenshot above shows the real state of the RS Uji Coba MEDICCA worklist, not a staged empty example.
+### Step 10. Check the transaction detail
 
-That empty list is not, however, evidence about the destination the MEDICCA connector actually writes to. The MEDICCA application currently signs in to PRECIA as the platform super admin rather than as a service account of RS Uji Coba MEDICCA, and it maps clinics to units belonging to a different organization. So even once the transaction code length problem is fixed, a transaction would not necessarily appear on this organization's worklist. The reasons are set out in the next section.
+Click the row to open its detail page. The detail page shows the transaction code at the top, the patient identity copied from MEDICCA, and the destination unit.
+
+![PRECIA transaction detail for the MEDICCA case, the transaction code, the notes field and the Poliklinik Umum unit card marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/10-detail-transaksi-precia.png)
+
+The **notes** field reads "Kunjungan Poliklinik Umum via MEDICCA", built automatically from the clinic name at registration time. The transaction was created by a MEDICCA-specific service account, not a shared or platform-level account, confirming the connector now authenticates as this hospital's own organization rather than any other tenant.
+
+This example shows the transaction still waiting for examination files, the same as any newly created case. AI processing only starts after clinical staff upload the examination files, then a doctor reviews and validates the result. Each of those stages is described in the [Clinical Cases](/kasus-klinis) section and is identical regardless of which SIMRS the transaction came from.
 
 ## Current limitations
 
-The limitations below applied at the time this documentation was written, and every one of them was checked directly rather than assumed.
+The limitations below applied at the time this documentation was last re-verified, 23 August 2026, and every one of them was checked directly rather than assumed.
 
-- **Registrations never reach PRECIA.** The transaction code MEDICCA builds joins a fixed eight-character prefix to a forty-eight character registration identifier, giving fifty-six characters in total. The PRECIA transaction code field accepts at most fifty characters, and the request is rejected with a validation error on the code field. Until the code construction is shortened, every real registration is rejected and stays behind in the queue. This is why the transaction worklist in Step 9 is still empty.
-- **The queue is not processed automatically.** There is no scheduler inside the MEDICCA package or on the server that runs the background sender or the result poller. Until that process is run manually, registrations simply accumulate in the queue.
+- **The return direction has not been exercised.** PRECIA pushes an AI result to a SIMRS only when a clinical validation is published. Now that the connector authenticates as this organization's own service account rather than the platform super admin, a callback aimed at this organization's SIMRS configuration should in principle be deliverable, but no AI result has actually been carried from upload through AI processing, doctor validation, and a completed callback back to MEDICCA during this verification. Treat the return direction as unproven until it is.
+- **MEDICCA's own result receiver is designed to fail closed.** Reading the code directly: the callback endpoint refuses every request unless `PRECIA_CALLBACK_SECRET` is configured on the MEDICCA deployment, with no fallback shared secret. Whether that secret is currently set on the development deployment was not re-tested in this pass, because it depends on a completed round trip, which is exactly what has not yet been exercised.
 - **Delivery failures are invisible to the officer.** MEDICCA still reports the registration as saved even when the push to PRECIA fails, because the two are separate operations. The failure is recorded only in the server log and never appears on the officer's screen.
-- **The return direction is aimed at the wrong organization.** PRECIA pushes an AI result to a SIMRS only when a clinical validation is published, and the destination is determined by the SIMRS configuration of the organization that owns the transaction. The MEDICCA application signs in to PRECIA as the platform super admin rather than as a hospital organization service account, and its current configuration directs registrations to a different organization whose SIMRS adapter is not MEDICCA, so AI results would not come back to MEDICCA even once the code length problem is fixed. The clinic-to-unit mapping in that configuration also still points at units of that other organization.
-- **MEDICCA's own result receiver is ready.** The AI result endpoint in MEDICCA is live and protected by a shared secret. A request without the correct secret is rejected, and a request with the correct secret passes through to payload validation. The obstacle in the return direction is therefore organization targeting, not the receiver in MEDICCA.
 - **AI results cannot be viewed from MEDICCA.** Results that are received are stored in the MEDICCA database, but no MEDICCA page displays them. Results can only be read through PRECIA.
 - **Emergency registration is not part of this flow.** Every patient row shows a **UGD** link, but the front-desk access level has no rights on the emergency table, so pressing that link produces a refusal message and returns the officer to the login page. Emergency registrations also never enter the queue bound for PRECIA. Only outpatient registrations are sent.
 - **MEDICCA contains only the registration module.** There is no clinical order, encounter, specimen, or examination result module. Staff cannot raise an examination request or an AI reading request from inside MEDICCA. The only MEDICCA event relevant to PRECIA is the outpatient visit registration.
 - **The MEDICCA interface is available in Indonesian only.** The application offers no other language, so the MEDICCA screenshots on this page are in Indonesian and the on-screen labels are glossed in the text above.
 
-Until the points above are addressed, the MEDICCA flow stops at the visit registration. A front-desk officer can register a patient and create an outpatient registration, and nothing beyond that.
+An earlier version of this page reported that registrations never reached PRECIA at all, because MEDICCA's transaction code exceeded PRECIA's fifty-character limit, and that the connector signed in as the platform super admin and targeted a different organization's units. Both were fixed since then and are no longer current: the code format changed to fit within the limit, and the connector now signs in as a MEDICCA-specific service account scoped to this organization, as demonstrated in Part 4 above. What remains open is the return direction, not the outbound one.
