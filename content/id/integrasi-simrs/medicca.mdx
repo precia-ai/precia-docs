@@ -16,7 +16,7 @@ Yang terjadi adalah sebagai berikut:
 
 1. Petugas loket menyimpan satu registrasi kunjungan rawat jalan di MEDICCA.
 2. MEDICCA mencatat registrasi itu pada antrean integrasi internalnya.
-3. Sebuah layanan worker khusus, proses yang berjalan terus menerus bersama aplikasi MEDICCA, bukan skrip yang harus dijalankan tangan, mengosongkan antrean tersebut pada interval tetap. Layanan ini masuk ke PRECIA memakai akun layanan milik organisasi rumah sakit itu sendiri, lalu membuat transaksi klinis.
+3. Sebuah layanan worker khusus, proses yang berjalan terus menerus bersama aplikasi MEDICCA, bukan skrip yang harus dijalankan secara manual, mengosongkan antrean tersebut pada interval tetap. Layanan ini masuk ke PRECIA memakai akun layanan milik organisasi rumah sakit itu sendiri, lalu membuat transaksi klinis.
 4. Transaksi klinis muncul pada daftar kerja unit PRECIA yang sesuai dengan poliklinik yang dipilih petugas.
 
 Keempat butir di atas sudah terbukti berjalan sampai selesai, diverifikasi dengan registrasi nyata pada 23 Agustus 2026: kasusnya sampai ke organisasi dan unit yang benar di PRECIA dalam hitungan detik setelah registrasi disimpan, tanpa satu pun langkah manual di antaranya. Yang belum terbukti adalah arah baliknya, hasil AI mengalir kembali dari PRECIA ke MEDICCA. Penyebabnya diuraikan pada bagian [Batasan yang berlaku hari ini](#batasan-yang-berlaku-hari-ini).
