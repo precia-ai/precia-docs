@@ -1,0 +1,104 @@
+---
+title: Open Hospital
+---
+
+# Integrasi Open Hospital
+
+Halaman ini menjelaskan cara membuat permintaan pemeriksaan laboratorium di **Open Hospital** dan cara memastikan permintaan tersebut muncul sebagai kasus klinis di PRECIA.
+
+Open Hospital adalah sistem informasi rumah sakit sumber terbuka yang dikembangkan Informatici Senza Frontiere. Petugas mengaksesnya lewat aplikasi web dengan modul terpisah untuk pasien, kunjungan, dan pemeriksaan laboratorium. Pada integrasi ini, permintaan pemeriksaan yang dibuat petugas pada modul **Laboratory** dibaca oleh konektor PRECIA dan dijadikan satu kasus klinis pada unit yang sesuai.
+
+Berbeda dari GNU Health dan OpenEMR, Open Hospital **sudah tersedia sebagai pilihan pada kolom Adapter** di halaman Pengaturan > Integrasi SIMRS, dengan jenis **konektor callback**.
+
+Alur ringkasnya sebagai berikut:
+
+1. Petugas mendaftarkan pasien (jika belum ada) dan meminta pemeriksaan laboratorium di Open Hospital.
+2. Konektor PRECIA membaca permintaan tersebut dan membuat kasus klinis di unit yang sesuai.
+3. Kasus tampil pada daftar kerja unit di PRECIA dan siap diproses modul AI.
+
+Seluruh gambar pada halaman ini diambil dari lingkungan uji coba Open Hospital milik PRECIA (`openhospital-dev.precia.site`, rumah sakit contoh **St. Luke HOSPITAL - Angal**). Tampilan pada instalasi rumah sakit Anda dapat berbeda sedikit, tergantung versi Open Hospital dan modul yang diaktifkan.
+
+## Sebelum mulai
+
+Siapkan hal berikut:
+
+- **Alamat Open Hospital** rumah sakit Anda beserta akun yang dapat membuka data pasien dan modul Laboratory.
+- **Akun PRECIA** pada organisasi yang sama dengan rumah sakit tersebut, dengan hak akses untuk melihat daftar kerja unit.
+- Pastikan kepada tim implementasi PRECIA bahwa pengaturan koneksi organisasi Anda sudah dipilih dengan adapter **Open Hospital** pada halaman [Integrasi SIMRS](/integrasi-simrs) dan sudah lolos uji mandiri.
+
+## 1. Memeriksa pengaturan koneksi di PRECIA
+
+Pengaturan koneksi SIMRS setiap organisasi tersimpan pada halaman **Pengaturan > Integrasi SIMRS** di PRECIA.
+
+![Halaman Integrasi SIMRS di PRECIA, kolom Adapter berisi Open Hospital dan kolom URL Endpoint ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/01-pengaturan-koneksi.png)
+
+Pastikan kolom **Adapter** berisi **Open Hospital** dan kolom **URL Endpoint** berisi alamat konektor rumah sakit Anda, misalnya `https://openhospital-dev.precia.site/precia-integration/ai-results/callback` pada lingkungan uji coba. Pengaturan ini dikelola admin organisasi atau tim implementasi PRECIA. Sebagai petugas klinis, Anda tidak perlu mengisi apa pun di halaman ini, cukup memastikan pengaturannya sudah benar sebelum mulai bekerja.
+
+## 2. Masuk ke Open Hospital
+
+Buka alamat Open Hospital rumah sakit Anda di peramban. Isi **Username** dan **Password**, lalu klik **LOGIN**.
+
+![Halaman masuk Open Hospital, kolom Username, kolom Password, dan tombol LOGIN ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/02-halaman-masuk.png)
+
+## 3. Mendaftarkan pasien
+
+Jika pasien belum terdaftar, buka menu **Patients**, lalu pilih **New patient**. Isi data demografi pasien pada formulir yang terbuka, lalu tulis keluhan klinis singkat pada kolom **Complain** di bagian bawah.
+
+![Formulir New patient Open Hospital terisi, kolom First Name dan Second Name serta tombol SUBMIT ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/03-formulir-pasien-baru.png)
+
+Klik **SUBMIT** untuk menyimpan data pasien. Jika pasien sudah terdaftar sebelumnya, lewati langkah ini dan langsung cari pasien tersebut lewat menu **Patients**.
+
+## 4. Meminta pemeriksaan laboratorium
+
+Pada halaman **Patient Dashboard**, buka bagian **Laboratory** di panel kiri. Pada kolom **Exam**, pilih jenis pemeriksaan yang sesuai dengan modul AI yang akan dipakai, misalnya **ECG 12 Lead** untuk analisis fraksi ejeksi.
+
+![Bagian Laboratory pada Patient Dashboard Open Hospital, kolom Exam berisi ECG 12 Lead dan tombol REQUEST ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/04-pilih-pemeriksaan.png)
+
+Klik **REQUEST** untuk menyimpan permintaan.
+
+## 5. Memastikan permintaan tersimpan
+
+Permintaan yang tersimpan tampil pada tabel **Requested exams for the patient** dengan status **DRAFT**.
+
+![Tabel Requested exams for the patient pada Open Hospital, baris ECG 12 Lead dengan status DRAFT ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/05-permintaan-tersimpan.png)
+
+Pekerjaan di Open Hospital selesai pada langkah ini.
+
+## 6. Melihat kasus yang sama di PRECIA
+
+Konektor PRECIA membaca permintaan tersebut dan membuat kasus klinis baru pada unit yang sesuai. Masuk ke PRECIA, buka menu **Klinis**, lalu pilih unit tujuan, misalnya **Kardiologi**, untuk melihat daftar kerja unit tersebut. Klik kasus yang baru muncul untuk membuka detailnya.
+
+![Halaman detail kasus di PRECIA, kode kasus laboratory-1, unit Kardiologi, bagian Catatan berisi data mentah dari Open Hospital, dan bagian Tenaga Medis berisi Dibuat oleh Open Hospital dev connector ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
+
+Kasus dari Open Hospital dapat dikenali dari tiga hal:
+
+- **Kode** transaksi berbentuk `<jenis sumber>-<nomor urut>`, misalnya `laboratory-1`.
+- Bagian **Catatan** memuat data mentah permintaan dari Open Hospital, termasuk `source_system: "openhospital"`, kode dan deskripsi pemeriksaan, serta tanggal permintaan.
+- Bagian **Tenaga Medis** mencantumkan **Dibuat oleh** berisi akun layanan konektor (`Open Hospital dev connector`, alamat `simrs-svc+openhospital-dev@precia.ai`), bukan nama petugas.
+
+Pada kasus contoh, unit tujuannya adalah **Kardiologi**, sesuai jenis pemeriksaan ECG yang diminta.
+
+Mulai dari titik ini, kasus diproses seperti kasus klinis lain di PRECIA: unggah berkas pendukung jika belum ada, jalankan modul AI, lalu kirim ke validator.
+
+## Bagaimana data dipetakan
+
+Tabel berikut menjelaskan asal setiap data pada kasus PRECIA, berdasarkan kasus contoh `laboratory-1`.
+
+| Data di PRECIA | Asal di Open Hospital |
+|---|---|
+| Kode kasus | `<source_type>-<source_code>`, misalnya `laboratory-1` untuk pemeriksaan laboratorium pertama |
+| Nama pasien, tanggal lahir, jenis kelamin | Data demografi pasien |
+| Nomor rekam medis | **PAT.ID** pada data pasien |
+| Unit tujuan | Jenis pemeriksaan yang diminta, misalnya **ECG 12 Lead** dipetakan ke unit **Kardiologi** |
+| Catatan kasus | Data mentah permintaan (`source_system`, `source_type`, `source_code`, `source_data`), termasuk kode dan deskripsi pemeriksaan |
+| Dibuat oleh | Akun layanan konektor Open Hospital |
+
+## Batasan saat ini
+
+Bagian ini mencatat hal yang belum tersedia, agar tidak menimbulkan salah harapan saat integrasi dipakai.
+
+1. **Perpindahan permintaan ke PRECIA belum terbukti berjalan tanpa campur tangan manusia.** Halaman Integrasi SIMRS menyebut Open Hospital sebagai konektor callback, tetapi pada lingkungan uji coba, pembacaan permintaan dari Open Hospital dan pembuatan kasus di PRECIA dijalankan oleh tim teknis. Belum ada bukti bahwa proses ini berjalan sendiri sebagai layanan yang terus aktif.
+2. **Pengiriman hasil AI kembali ke Open Hospital baru terverifikasi lewat API, belum lewat tampilan web.** Open Hospital menyediakan endpoint (`precia-integration/ai-results/...`) yang menyimpan hasil AI setelah validasi diterbitkan di PRECIA, dan endpoint ini sudah terbukti mengembalikan data hasil yang benar. Namun panduan ini belum menemukan tempat pada antarmuka web Open Hospital yang menampilkan hasil tersebut kepada petugas.
+3. **Kasus tercatat tanpa penanda asal SIMRS pada riwayat audit.** Kasus yang dibuat konektor masuk melalui jalur pencatatan kasus biasa, sehingga pada riwayat audit tidak tampak keterangan bahwa kasus berasal dari Open Hospital secara eksplisit. Kolom Catatan pada halaman detail adalah satu-satunya penanda yang tersedia saat ini.
+4. **Modul AI harus dikonfigurasi lebih dahulu pada unit tujuan.** Selama kebijakan AI unit belum diatur, panel Modul AI pada halaman detail menampilkan keterangan bahwa belum ada slot yang dikonfigurasi, dan kasus berhenti pada status Belum Diproses.
+5. **Tombol Trigger AI tetap perlu ditekan secara manual di PRECIA.** Munculnya kasus di PRECIA tidak otomatis menjalankan modul AI. Petugas atau operator PRECIA masih perlu mengunggah berkas (jika belum ada) dan menekan tombol proses AI pada halaman detail kasus.

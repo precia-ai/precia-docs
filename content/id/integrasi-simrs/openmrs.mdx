@@ -1,0 +1,140 @@
+---
+title: Integrasi OpenMRS 3
+---
+
+# Integrasi OpenMRS 3
+
+Halaman ini menjelaskan cara kerja integrasi antara **OpenMRS 3** (OpenMRS 3 Reference Application) dan PRECIA, dari sisi petugas rumah sakit. Alurnya sederhana: petugas membuat permintaan pemeriksaan (order) di OpenMRS 3 seperti biasa, lalu konektor PRECIA membaca daftar permintaan tersebut dan membuat kasus klinis yang sepadan di PRECIA.
+
+Yang didokumentasikan di halaman ini adalah **satu arah saja, dari OpenMRS 3 ke PRECIA**. Pengiriman hasil analisis AI kembali ke rekam medis OpenMRS tidak termasuk dalam alur yang ditunjukkan pada tangkapan layar di bawah, dan tidak boleh dianggap sudah berjalan.
+
+## Sebelum mulai
+
+Sebagian persiapan berikut dikerjakan sekali oleh tim teknis, bukan oleh petugas harian:
+
+- **Akun OpenMRS 3** dengan hak membuat permintaan pemeriksaan.
+- **Jenis pemeriksaan PRECIA sudah terdaftar** di kamus konsep OpenMRS. Kalau pencarian dengan kata kunci `PRECIA` tidak menghasilkan apa pun pada langkah pemesanan, hubungi tim teknis. Jenis pemeriksaan tidak bisa ditambahkan dari layar pemesanan.
+- **Organisasi dan unit sudah terdaftar di PRECIA**, dan konektor OpenMRS 3 sudah diaktifkan oleh tim implementasi. Pengaturan koneksi tingkat organisasi dilakukan di halaman Integrasi SIMRS.
+- **Pasien sudah memiliki kunjungan aktif** di OpenMRS. Tanpa kunjungan aktif, permintaan pemeriksaan tidak dapat ditandatangani.
+
+Antarmuka OpenMRS 3 berbahasa Inggris dan tidak mengikuti pilihan bahasa PRECIA. Nama tombol pada langkah-langkah di bawah ditulis apa adanya sesuai yang tampil di layar.
+
+## Masuk ke OpenMRS 3
+
+### 1. Isi nama pengguna
+
+Buka alamat OpenMRS 3 yang diberikan tim teknis. Halaman masuk meminta nama pengguna lebih dulu. Isi kolom **Username**, lalu klik tombol **Continue**.
+
+![Halaman masuk OpenMRS 3, kolom Username dan tombol Continue ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/01-masuk-openmrs.png)
+
+### 2. Isi kata sandi
+
+Setelah nama pengguna diterima, layar yang sama menampilkan kolom kata sandi. Isi kolom **Password**, lalu klik **Log in**. Isi kolom kata sandi selalu tersamar.
+
+![Layar kata sandi OpenMRS 3, kolom Password dan tombol Log in ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/02-kata-sandi.png)
+
+### 3. Pilih lokasi sesi
+
+OpenMRS 3 meminta lokasi kerja untuk sesi ini. Lokasi menentukan tempat pencatatan kunjungan dan permintaan pemeriksaan. Pilih lokasi yang sesuai, pada contoh ini **Outpatient Clinic**, lalu klik **Confirm**.
+
+![Daftar lokasi sesi OpenMRS 3, pilihan Outpatient Clinic dan tombol Confirm ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/03-pilih-lokasi.png)
+
+## Membuka rekam pasien
+
+### 4. Buka pencarian pasien
+
+Setelah lokasi dikonfirmasi, Anda masuk ke halaman kerja OpenMRS 3. Ikon pencarian pasien berada di bilah atas sebelah kanan.
+
+![Halaman awal OpenMRS 3 setelah masuk, ikon pencarian pasien di bilah atas ditandai kotak biru dan panah](/screenshots/id/integrasi-simrs/openmrs/04-beranda.png)
+
+### 5. Cari pasien
+
+Ketik nama atau nomor identitas pasien. Kartu hasil pencarian menampilkan nama, jenis kelamin, umur, OpenMRS ID, dan label **Active Visit** apabila pasien sedang dalam kunjungan aktif. Label ini penting: tanpa kunjungan aktif, permintaan pemeriksaan tidak dapat ditandatangani pada langkah berikutnya. Klik kartu pasien untuk membuka rekamnya.
+
+![Hasil pencarian pasien OpenMRS 3, kartu pasien beserta label Active Visit ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/05-cari-pasien.png)
+
+### 6. Buka menu Orders
+
+Rekam pasien terbuka dengan ringkasan klinis. Pada navigasi kiri, pilih menu **Orders**.
+
+![Rekam pasien OpenMRS 3, menu Orders di navigasi kiri dan identitas pasien ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/06-rekam-pasien.png)
+
+## Membuat permintaan pemeriksaan
+
+### 7. Tambah permintaan baru
+
+Tabel **Orders** menampilkan permintaan pemeriksaan yang sudah tercatat pada rentang tanggal terpilih. Klik tombol **Add** di sudut kanan atas tabel untuk membuat permintaan baru.
+
+![Tabel Orders pada rekam pasien OpenMRS 3, tombol Add di sudut kanan atas tabel ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/07-daftar-order.png)
+
+### 8. Buka bagian Lab orders
+
+Panel **Order basket** terbuka di sisi kanan layar. Panel ini berisi dua bagian, yaitu **Drug orders** untuk resep dan **Lab orders** untuk pemeriksaan penunjang. Klik **Add** pada baris **Lab orders**.
+
+![Panel Order basket OpenMRS 3, tombol Add pada baris Lab orders ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/08-keranjang-order.png)
+
+### 9. Cari jenis pemeriksaan PRECIA
+
+Ketik `PRECIA` pada kolom **Search for a test type**. Jenis pemeriksaan yang tersedia untuk analisis PRECIA akan muncul. Pada setiap hasil terdapat dua tombol.
+
+Klik **Order form**. Jangan memakai **Add to basket** untuk alur ini. Tombol **Add to basket** memang memasukkan pemeriksaan ke keranjang, tetapi barisnya berstatus *Incomplete* dan tombol tanda tangan tetap nonaktif sampai formulir diisi.
+
+![Panel Add test order OpenMRS 3, kolom pencarian jenis pemeriksaan dan tombol Order form ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/09-cari-jenis-tes.png)
+
+### 10. Isi formulir permintaan
+
+Formulir permintaan menampilkan jenis pemeriksaan yang dipilih. Isi **Reference number** dengan nomor rujukan internal rumah sakit, biarkan **Priority** pada nilai **Routine** untuk permintaan biasa, lalu isi **Additional instructions** dengan keterangan klinis yang perlu diketahui. Klik **Save order** untuk memasukkan permintaan ke keranjang.
+
+![Formulir permintaan pemeriksaan OpenMRS 3, kolom Reference number dan tombol Save order ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/10-formulir-order.png)
+
+### 11. Tanda tangani permintaan
+
+Permintaan kembali ke **Order basket** dengan label **New** dan tombol **Sign and close** menjadi aktif. Klik tombol tersebut untuk menyimpan permintaan ke rekam pasien.
+
+Selesaikan langkah 7 sampai 11 dalam satu kali buka halaman. Isi keranjang hanya tersimpan sementara di peramban, sehingga permintaan yang belum ditandatangani akan hilang apabila halaman dimuat ulang.
+
+![Order basket OpenMRS 3 berisi satu permintaan berlabel New, baris permintaan dan tombol Sign and close ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/11-tanda-tangan.png)
+
+### 12. Periksa permintaan yang tersimpan
+
+Setelah ditandatangani, permintaan muncul di tabel **Orders** lengkap dengan nomor order, jenis order, prioritas, dan nama pemesan. Nomor order inilah yang nanti ikut tercatat pada kasus di PRECIA. Tangkapan layar berikut diambil dari rekam pasien demo yang sudah berisi permintaan dari uji coba sebelumnya.
+
+![Tabel Orders OpenMRS 3 berisi permintaan pemeriksaan PRECIA yang sudah tersimpan, seluruh tabel ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/12-order-tersimpan.png)
+
+## Melihat kasus di PRECIA
+
+Konektor PRECIA membaca daftar permintaan pemeriksaan OpenMRS, lalu membuat kasus yang sepadan di PRECIA. Pada lingkungan uji coba yang dipakai untuk tangkapan layar ini, pembacaan tersebut dijalankan oleh tim teknis, bukan oleh layanan yang berjalan terus menerus. Kasus karena itu muncul setelah pembacaan dijalankan, bukan pada detik yang sama saat permintaan ditandatangani.
+
+### 13. Pilih unit
+
+Masuk ke PRECIA, lalu buka menu **Klinis**. PRECIA meminta unit yang ingin dilihat daftar kerjanya. Pilih unit tujuan, pada contoh ini **Kardiologi**.
+
+Permintaan pemeriksaan OpenMRS tidak membawa kode unit rumah sakit. Penentuan unit dilakukan oleh konektor berdasarkan jenis pemeriksaan yang dipesan, jadi pemetaan jenis pemeriksaan ke unit perlu disepakati dengan tim implementasi sebelum dipakai.
+
+![Halaman Klinis PRECIA, kartu unit Kardiologi pada layar Pilih Unit ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/13-pilih-unit.png)
+
+### 14. Buka daftar kerja unit
+
+Daftar kerja transaksi menampilkan kasus milik unit tersebut. Kasus yang berasal dari OpenMRS memakai pengenal permintaan OpenMRS sebagai **Kode**, dan menampilkan nama pasien beserta MRN yang sama dengan OpenMRS ID di OpenMRS.
+
+Status kasus adalah **Belum Diproses**. Status ini berarti kasus sudah diterima PRECIA dan menunggu pemrosesan. Analisis AI belum berjalan pada contoh ini karena unit tersebut belum memiliki slot modul AI yang dikonfigurasi.
+
+![Daftar Kerja Transaksi PRECIA untuk unit Kardiologi, baris kasus dari OpenMRS ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/14-daftar-kerja.png)
+
+### 15. Buka detail kasus
+
+Klik baris kasus untuk membuka detailnya. Halaman detail menampilkan kode transaksi, identitas pasien, unit, prioritas, dan catatan yang dikirim konektor. Catatan tersebut memuat nomor order OpenMRS, nomor rujukan yang Anda isi pada langkah 10, dan pengenal encounter OpenMRS, sehingga kasus di PRECIA selalu dapat ditelusuri kembali ke permintaan aslinya.
+
+Pada kartu **Detail Transaksi**, bagian Modul AI menampilkan keterangan bahwa belum ada slot yang dikonfigurasi. Selama keterangan itu masih muncul, kasus tidak akan berpindah status secara otomatis.
+
+![Detail kasus PRECIA hasil integrasi OpenMRS 3, kode transaksi dan catatan berisi nomor order OpenMRS ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/15-detail-kasus.png)
+
+## Batasan yang perlu diketahui
+
+- **Integrasi ini satu arah.** Permintaan pemeriksaan mengalir dari OpenMRS 3 ke PRECIA. Pengiriman hasil analisis AI kembali ke rekam medis OpenMRS tidak ditunjukkan pada alur ini dan tidak boleh dijanjikan kepada pengguna klinis atas dasar halaman ini.
+- **Kasus berhenti pada status Belum Diproses** selama unit tujuan belum memiliki modul AI yang aktif. Kasus tetap terlihat dan tetap dapat dibuka, tetapi tidak ada hasil AI yang dihasilkan.
+- **Tombol Add to basket saja tidak cukup.** Permintaan wajib melalui **Order form** dan **Save order**, jika tidak maka tombol **Sign and close** tetap nonaktif.
+- **Keranjang permintaan tidak tersimpan permanen.** Permintaan yang belum ditandatangani hilang saat halaman dimuat ulang.
+- **Unit PRECIA ditentukan oleh konektor**, berdasarkan jenis pemeriksaan yang dipesan, bukan berdasarkan data unit dari OpenMRS.
+- **Kunjungan aktif adalah syarat mutlak.** Pasien tanpa kunjungan aktif tidak dapat menerima permintaan pemeriksaan yang ditandatangani.
+- **Data pada tangkapan layar adalah data demo bawaan OpenMRS**, bukan data pasien sungguhan.

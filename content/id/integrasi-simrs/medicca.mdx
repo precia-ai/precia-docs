@@ -1,0 +1,171 @@
+---
+title: Alur transaksi dari SIMRS MEDICCA ke PRECIA
+---
+
+# Alur transaksi dari SIMRS MEDICCA ke PRECIA
+
+Halaman ini menjelaskan perjalanan satu kunjungan pasien dari SIMRS MEDICCA sampai ke PRECIA, mulai dari penyiapan yang wajib dikerjakan sekali di awal, kemudian tindakan harian petugas loket yang menghasilkan transaksi, sampai tempat transaksi tersebut seharusnya muncul di PRECIA.
+
+Seluruh langkah pada halaman ini dijalankan langsung pada lingkungan pengembangan MEDICCA dan PRECIA. Hasil yang belum berfungsi juga dilaporkan apa adanya pada bagian **Batasan yang berlaku hari ini** di bagian bawah halaman. Bacalah bagian tersebut sebelum menjadwalkan pemakaian di rumah sakit, karena rangkaian bolak balik penuh dari MEDICCA sampai hasil AI kembali ke MEDICCA belum berfungsi.
+
+## Ringkasan alur
+
+Perpindahan data antara MEDICCA dan PRECIA tidak dikerjakan oleh petugas. Tidak ada tombol "kirim ke PRECIA" di dalam MEDICCA, dan petugas loket tidak perlu membuka PRECIA sama sekali.
+
+Yang terjadi adalah sebagai berikut:
+
+1. Petugas loket menyimpan satu registrasi kunjungan rawat jalan di MEDICCA. Bagian ini sudah terbukti berjalan.
+2. MEDICCA mencatat registrasi itu pada antrean integrasi internalnya. Bagian ini sudah terbukti berjalan, yaitu setiap penyimpanan registrasi menambah satu baris antrean.
+3. Sebuah proses latar milik MEDICCA membaca antrean tersebut, masuk ke PRECIA memakai akun layanan yang dikonfigurasi, lalu mencoba membuat transaksi klinis di PRECIA. Yang sudah terbukti hanya sampai proses latar berhasil masuk ke PRECIA. Pembuatan transaksinya belum pernah berhasil, karena permintaannya ditolak PRECIA.
+4. Transaksi klinis seharusnya muncul pada daftar kerja unit di PRECIA, dan sejak titik itu penanganannya mengikuti alur kasus klinis PRECIA yang biasa. Keadaan ini belum pernah tercapai pada lingkungan pengembangan, sehingga tahap tersebut merupakan rancangan, bukan hasil pengamatan.
+
+Jadi dari empat butir di atas, dua butir pertama beserta bagian otentikasi pada butir ketiga sudah terbukti berjalan. Pembuatan transaksi di PRECIA, kemunculannya pada daftar kerja, dan pengembalian hasil AI ke MEDICCA belum pernah berhasil dijalankan sampai selesai. Penyebabnya diuraikan pada bagian [Batasan yang berlaku hari ini](#batasan-yang-berlaku-hari-ini).
+
+Menurut rancangannya, satu registrasi rawat jalan menghasilkan satu transaksi klinis, dan poliklinik yang dipilih petugas menentukan unit PRECIA yang menerima transaksi tersebut. Hubungan poliklinik ke unit itu belum dapat dibuktikan hari ini, karena pemetaan yang aktif pada konfigurasi masih mengarah ke unit organisasi lain.
+
+## Bagian 1. Penyiapan di PRECIA
+
+Penyiapan ini dikerjakan sekali oleh admin organisasi di PRECIA, sebelum MEDICCA dihubungkan.
+
+### Langkah 1. Pastikan poliklinik sudah terdaftar sebagai unit
+
+Setiap poliklinik MEDICCA yang akan mengirim kunjungan ke PRECIA harus punya unit padanannya di PRECIA. Tanpa unit padanan, transaksi tidak punya tempat untuk masuk.
+
+Buka menu **Unit** di menu samping. Daftar unit organisasi Anda akan tampil beserta kode unit, jenis layanan, dan status aktif.
+
+![Halaman Unit di PRECIA menampilkan tiga kartu unit poliklinik Gigi, Penyakit Dalam, dan Umum yang masing masing ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/01-unit-poliklinik-di-precia.png)
+
+Periksa tiga hal pada setiap kartu unit:
+
+- **Nama unit** sesuai dengan nama poliklinik di MEDICCA, sehingga petugas mengenalinya tanpa perlu menghafal kode.
+- **Kode unit** singkat dan konsisten, misalnya UMUM, PDL, dan GIGI.
+- **Status** berlabel **Aktif**. Unit yang nonaktif tidak dapat menerima transaksi.
+
+Kalau ada poliklinik yang belum punya unit padanan, tekan **Daftarkan Unit** dan buat unitnya lebih dahulu.
+
+Selain unit, organisasi Anda juga perlu punya pengaturan koneksi SIMRS dengan adapter **MEDICCA** beserta alamat callback rumah sakit. Pengaturan itu berada pada halaman **Integrasi SIMRS** dan dijelaskan tersendiri pada halaman tersebut. Pengaturan koneksi hanya dapat dibuka oleh akun yang punya hak baca konfigurasi SIMRS organisasi, sehingga sebagian pengguna tidak akan melihat isinya walaupun dapat membuka halamannya.
+
+## Bagian 2. Penyiapan di MEDICCA
+
+Pemasangan standar MEDICCA datang tanpa satu pun akun pegawai, dan level akses **Petugas Loket** dibuat tanpa satu pun hak akses tabel. Karena itu dua langkah berikut wajib dikerjakan lebih dahulu oleh administrator MEDICCA memakai akun administrator bawaan yang didefinisikan pada berkas konfigurasi aplikasi. Selama kedua langkah ini belum dikerjakan, tidak ada seorang pun yang dapat memakai MEDICCA.
+
+### Langkah 2. Berikan hak akses pada level Petugas Loket
+
+Buka menu **PENGATURAN** kemudian **HAK AKSES**. Daftar level pengguna muncul. Pada baris **Petugas Loket**, tekan tautan pengaturan hak akses untuk membuka matriks izin per tabel.
+
+Centang hak **Daftar**, **Tampilan**, dan **Cari** untuk tabel rujukan pendukung, lalu tambahkan hak **Tambah/Salin** dan **Ubah** untuk **REGISTRASI PASIEN** dan **HISTORI REGISTRASI**. Tekan **Perbarui** untuk menyimpan.
+
+![Matriks hak akses level Petugas Loket di MEDICCA, baris HISTORI REGISTRASI, baris REGISTRASI PASIEN, dan tombol Perbarui ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/02-hak-akses-petugas-loket.png)
+
+Perhatikan bahwa terdapat dua baris bernama **HISTORI REGISTRASI**. Baris pertama adalah registrasi rawat jalan dan itulah yang perlu dicentang. Baris kedua adalah registrasi UGD, yang dibiarkan kosong karena modul UGD tidak dipakai pada alur ini.
+
+Bila langkah ini dilewati, akun petugas tetap berhasil masuk tetapi menu samping kosong dan setiap halaman menolak dengan pesan tidak memiliki izin akses.
+
+### Langkah 3. Buat akun petugas loket
+
+Buka menu **PENGATURAN** kemudian **PETUGAS LOKET**, lalu tekan **Tambah Data Baru**. Isi **Nama Petugas**, **NIK**, **Username**, dan **Password**, kemudian pilih **Level** dengan nilai **Petugas Loket**. Tekan **Tambah** untuk menyimpan.
+
+![Formulir tambah petugas loket MEDICCA, kolom Username, kolom Password, pilihan Level, dan tombol Tambah ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/03-akun-petugas-loket.png)
+
+Dua hal yang perlu diketahui administrator:
+
+1. Pilihan **Level** hanya menyediakan satu nilai, yaitu **Petugas Loket**. Administrator tambahan tidak dapat dibuat dari layar ini.
+2. Unit petugas terisi otomatis dengan nilai LOKET dan tidak dapat diubah, karena hanya pegawai berunit LOKET yang dikenali sebagai pengguna aplikasi.
+
+Kata sandi disimpan dalam bentuk teracak oleh aplikasi, dan akun langsung dapat dipakai untuk masuk. Perlu dicatat bahwa kolom **Password** pada formulir ini ditampilkan sebagai teks biasa, bukan titik titik, sehingga isilah pada saat layar tidak terlihat orang lain.
+
+## Bagian 3. Membuat transaksi di MEDICCA
+
+Bagian ini adalah pekerjaan harian petugas loket. Registrasi kunjungan rawat jalan adalah satu satunya tindakan MEDICCA yang menghasilkan transaksi di PRECIA.
+
+### Langkah 4. Masuk ke MEDICCA
+
+Buka alamat MEDICCA rumah sakit Anda. Alamat akar otomatis diarahkan ke halaman login. Isi **Nama Pengguna** dan **Kata Sandi** akun petugas loket, lalu tekan **Login**.
+
+![Halaman login MEDICCA dengan kolom Nama Pengguna, kolom Kata Sandi, dan tombol Login ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/04-masuk-ke-medicca.png)
+
+Setelah berhasil masuk, aplikasi langsung membuka daftar **REGISTRASI PASIEN**.
+
+### Langkah 5. Buka daftar pasien
+
+Daftar **REGISTRASI PASIEN** memuat seluruh pasien yang sudah terdaftar. Dari halaman ini tersedia dua tindakan yang relevan:
+
+- Tombol **TAMBAH DATA PASIEN BARU** untuk mendaftarkan pasien yang belum pernah datang. Lanjutkan ke Langkah 6.
+- Tautan **RAWAT JLN** pada baris pasien untuk langsung membuat registrasi kunjungan bagi pasien yang sudah terdaftar. Lanjutkan ke Langkah 7.
+
+![Daftar Registrasi Pasien MEDICCA, menu aktif, tombol Tambah Data Pasien Baru, dan tautan Rawat Jln pada baris pasien ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/05-daftar-pasien.png)
+
+Tautan **Kartu Pasien** pada setiap baris hanya mencetak kartu identitas pasien dan tidak berhubungan dengan PRECIA. Tautan **UGD** tidak dapat dipakai petugas loket, sebagaimana dijelaskan pada bagian batasan.
+
+### Langkah 6. Tambahkan pasien baru bila diperlukan
+
+Tekan **TAMBAH DATA PASIEN BARU**. Sebuah jendela formulir terbuka di atas daftar. Isi kolom berikut:
+
+- **Nama Pasien**, wajib diisi.
+- **No BPJS** dan **No KTP**, opsional.
+- **Tempat Lahir** dan **Tgl Lahir**, wajib diisi.
+- **Jenis Kelamin**, pilih salah satu.
+- **Alamat**, wajib diisi.
+- **Kelurahan**, wajib diisi dan dipilih lewat jendela pencarian. Tekan ikon kaca pembesar di sebelah kolom, pilih kelurahan pada daftar, lalu tekan **Pilih**.
+- **Agama**, pilih salah satu.
+
+![Formulir Tambah Data Pasien Baru terisi contoh data, kolom Nama Pasien, kolom pencarian Kelurahan, dan tombol Tambah ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/06-formulir-pasien-baru.png)
+
+Tekan **Tambah** untuk menyimpan. Nomor rekam medis dibuat otomatis oleh sistem dan tidak perlu diisi manual. Nomor rekam medis dan nama pasien inilah yang nantinya ikut terbawa ke transaksi PRECIA.
+
+### Langkah 7. Buat registrasi rawat jalan
+
+Kembali ke daftar pasien, lalu tekan tautan **RAWAT JLN** pada baris pasien yang bersangkutan. Formulir registrasi terbuka dengan identitas pasien sudah terisi otomatis dan tidak dapat diubah dari layar ini. Nama petugas juga terisi otomatis dari akun yang sedang masuk.
+
+Kolom yang perlu dipilih petugas:
+
+- **Asal Rujukan**, wajib dipilih.
+- **Jenis Pasien**, wajib dipilih.
+- **Poliklinik**, wajib dipilih. Pilihan yang tersedia adalah tujuh poliklinik rawat jalan, yaitu Umum, Penyakit Dalam, Gigi, Mata, Rehab Medik, Kandungan, dan Anak. UGD tidak muncul pada formulir ini.
+- **Biaya Daftar**, wajib dipilih. Total biaya dihitung otomatis setelah pilihan ditentukan.
+
+![Formulir registrasi rawat jalan MEDICCA, kelompok pilihan Poliklinik, kelompok pilihan Biaya Daftar, dan tombol Tambah ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/07-formulir-registrasi-rawat-jalan.png)
+
+Pilihan **Poliklinik** adalah kolom terpenting bagi PRECIA, karena poliklinik inilah yang dirancang menentukan unit PRECIA penerima transaksi. Perlu dicatat bahwa penentuan tersebut belum dapat dibuktikan hari ini, sebab pemetaan poliklinik ke unit pada konfigurasi yang aktif masih mengarah ke unit organisasi lain, sebagaimana diuraikan pada bagian [Batasan yang berlaku hari ini](#batasan-yang-berlaku-hari-ini). Meski begitu, pastikan pilihannya tetap sesuai dengan tujuan kunjungan pasien.
+
+Tekan **Tambah** untuk menyimpan registrasi. Aplikasi kembali ke daftar pasien. Pada saat inilah MEDICCA mencatat registrasi tersebut ke antrean integrasi menuju PRECIA. Tidak ada tombol tambahan yang perlu ditekan.
+
+### Langkah 8. Periksa histori registrasi
+
+Buka menu **HISTORI REGISTRASI** untuk memastikan registrasi tersimpan. Baris terbaru menampilkan tanggal, jam, nama pasien, nomor rekam medis, poliklinik, jenis rawat, jenis pasien, total biaya, dan nama petugas yang memasukkan data.
+
+![Halaman Histori Registrasi MEDICCA, menu Histori Registrasi dan baris registrasi terbaru ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/08-histori-registrasi.png)
+
+Sampai di sini seluruh pekerjaan petugas loket sudah selesai. Tidak ada langkah lanjutan di dalam MEDICCA.
+
+## Bagian 4. Memeriksa transaksi di PRECIA
+
+### Langkah 9. Buka daftar kerja transaksi
+
+Masuk ke PRECIA memakai akun yang berada pada organisasi rumah sakit yang sama, lalu buka menu **Klinis**. Pilih unit yang sesuai dengan poliklinik tujuan, atau pilih **Semua unit** pada penyaring **Unit** untuk melihat gabungan seluruh unit. Perhatikan bahwa **Umum** pada penyaring tersebut bukan pilihan gabungan, melainkan nama salah satu unit poliklinik, yaitu Poliklinik Umum dengan kode UMUM. Daftar **Daftar Kerja Transaksi** akan tampil beserta penghitung jumlah hasil di sudut kanan atas.
+
+![Daftar Kerja Transaksi PRECIA untuk organisasi MEDICCA, penghitung nol hasil dan pesan Transaksi tidak ditemukan ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/09-daftar-kerja-transaksi-precia.png)
+
+Gambar di atas diambil pada organisasi **RS Uji Coba MEDICCA** dengan kode MEDICCA-DEV, yaitu organisasi tenant yang memuat ketiga unit poliklinik pada Langkah 1.
+
+Transaksi yang berasal dari MEDICCA dikenali dari kode transaksinya, yang selalu diawali kata MEDICCA. Kolom **Cari** menerima kode transaksi, nomor rekam medis, atau nama pasien, sehingga registrasi tertentu dapat ditemukan dengan cepat.
+
+Perlu dinyatakan terus terang: pada saat dokumentasi ini disusun, daftar tersebut masih kosong dan penghitung menunjukkan **0 hasil**, seperti terlihat pada gambar. Registrasi MEDICCA belum pernah berhasil sampai ke PRECIA. Gambar di atas menampilkan keadaan sebenarnya pada organisasi RS Uji Coba MEDICCA, bukan contoh keadaan kosong yang dibuat buat.
+
+Namun daftar kosong tersebut tidak dapat dipakai sebagai bukti mengenai tujuan yang sebenarnya ditulis oleh penghubung MEDICCA. Aplikasi MEDICCA hari ini masuk ke PRECIA memakai akun super admin platform, bukan akun layanan RS Uji Coba MEDICCA, dan memetakan poliklinik ke unit milik organisasi lain. Artinya, seandainya masalah panjang kode transaksi sudah diperbaiki sekalipun, transaksinya belum tentu muncul pada daftar kerja organisasi ini. Penyebabnya diuraikan pada bagian berikut.
+
+## Batasan yang berlaku hari ini
+
+Batasan berikut berlaku pada saat dokumentasi ini disusun dan semuanya diperiksa langsung, bukan diperkirakan.
+
+- **Registrasi tidak pernah sampai ke PRECIA.** Kode transaksi yang dibentuk MEDICCA menggabungkan awalan tetap sepanjang delapan karakter dengan pengenal registrasi sepanjang empat puluh delapan karakter, sehingga totalnya lima puluh enam karakter. Kolom kode transaksi PRECIA hanya menerima maksimal lima puluh karakter, dan permintaan ditolak dengan galat validasi pada kolom kode. Selama pembentukan kode belum diperpendek, setiap registrasi nyata pasti ditolak dan tetap tertinggal di antrean. Inilah sebab daftar kerja transaksi pada Langkah 9 masih kosong.
+- **Antrean tidak diproses otomatis.** Tidak ada penjadwal bawaan di dalam paket MEDICCA maupun di server yang menjalankan proses latar pengirim antrean atau penarik hasil. Selama proses tersebut belum dijalankan secara manual, registrasi hanya menumpuk di antrean.
+- **Kegagalan pengiriman tidak terlihat oleh petugas.** MEDICCA tetap menampilkan registrasi berhasil disimpan walaupun pengiriman ke PRECIA gagal, karena kedua hal itu terpisah. Kegagalan hanya tercatat pada log server dan tidak muncul di layar petugas.
+- **Arah balik belum tersambung ke organisasi yang benar.** PRECIA mengirim hasil AI ke SIMRS hanya ketika sebuah validasi klinis dipublikasikan, dan tujuan pengirimannya ditentukan oleh konfigurasi SIMRS pada organisasi pemilik transaksi. Aplikasi MEDICCA masuk ke PRECIA memakai akun super admin platform, bukan akun layanan organisasi rumah sakit, dan konfigurasinya saat ini mengarahkan registrasi ke organisasi lain yang adapter SIMRS-nya bukan MEDICCA, sehingga hasil AI tidak akan kembali ke MEDICCA meskipun masalah panjang kode sudah diperbaiki. Pemetaan poliklinik ke unit pada konfigurasi tersebut juga masih mengarah ke unit organisasi lain itu.
+- **Alamat penerima hasil di MEDICCA sendiri sudah siap.** Titik penerima hasil AI di MEDICCA aktif dan dilindungi rahasia bersama. Permintaan tanpa rahasia yang benar ditolak, dan permintaan dengan rahasia yang benar diteruskan ke pemeriksaan isi data. Jadi kendala arah balik terletak pada penargetan organisasi, bukan pada penerima di MEDICCA.
+- **Hasil AI belum dapat dilihat dari MEDICCA.** Hasil yang diterima memang tersimpan pada basis data MEDICCA, tetapi tidak ada satu pun halaman MEDICCA yang menampilkannya. Hasil hanya dapat dibaca melalui PRECIA.
+- **Registrasi UGD tidak termasuk dalam alur ini.** Pada setiap baris daftar pasien terdapat tautan **UGD**, tetapi level akses Petugas Loket tidak memiliki hak atas tabel UGD, sehingga menekan tautan tersebut menghasilkan pesan penolakan dan mengembalikan petugas ke halaman login. Registrasi UGD juga tidak pernah masuk ke antrean menuju PRECIA. Hanya registrasi rawat jalan yang dikirim.
+- **MEDICCA hanya memuat modul pendaftaran.** Tidak ada modul order klinis, encounter, spesimen, maupun hasil pemeriksaan. Petugas tidak dapat membuat permintaan pemeriksaan atau permintaan pembacaan AI dari dalam MEDICCA. Satu satunya peristiwa MEDICCA yang relevan bagi PRECIA adalah registrasi kunjungan rawat jalan.
+- **Antarmuka MEDICCA hanya tersedia dalam Bahasa Indonesia.** Tidak ada pilihan bahasa lain pada aplikasi MEDICCA.
+
+Selama butir butir di atas belum ditangani, alur MEDICCA berhenti pada registrasi kunjungan. Petugas loket dapat mendaftarkan pasien dan membuat registrasi rawat jalan, dan tidak lebih dari itu.

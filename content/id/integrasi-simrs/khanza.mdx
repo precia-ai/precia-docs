@@ -1,0 +1,128 @@
+---
+title: Alur transaksi dari SIMRS Khanza ke PRECIA
+---
+
+# Alur transaksi dari SIMRS Khanza ke PRECIA
+
+Halaman ini menjelaskan perjalanan satu kasus, mulai dari pendaftaran pasien yang sudah tercatat di SIMRS Khanza sampai transaksi klinisnya terlihat di PRECIA. Penjelasan ditujukan untuk petugas rumah sakit yang akan menjalankan atau memantau integrasi, bukan untuk pengembang.
+
+Adapter Khanza bekerja dengan pola tarik. Layanan pendamping di sisi Khanza yang menghubungi PRECIA secara berkala; PRECIA tidak pernah memanggil Khanza. Artinya seluruh kegiatan pengiriman berjalan dari sisi rumah sakit, dan PRECIA hanya menerima.
+
+Seluruh langkah di bawah diperagakan memakai kasus nyata di lingkungan demo, yaitu nomor rawat 2026/07/28/000001 atas nama pasien ADI KAZAMA dengan nomor rekam medis 000051.
+
+## Ringkasan alur
+
+1. Pendaftaran pasien tercatat di Khanza dan memperoleh nomor rawat.
+2. Kasus tersebut didaftarkan ke antrean pengiriman melalui layanan penghubung Khanza. Tidak ada tombol di dalam aplikasi Khanza untuk langkah ini, penjelasannya ada pada bagian tersendiri di bawah.
+3. Layanan pendamping Khanza memeriksa antrean setiap 30 detik, masuk ke PRECIA memakai akun layanan organisasi, lalu membuat transaksi klinis.
+4. Transaksi muncul pada daftar kerja PRECIA, lengkap dengan catatan yang memuat nomor rawat asal sehingga kasus selalu dapat ditelusuri kembali ke Khanza.
+
+## Sebelum mulai
+
+Persiapan berikut cukup dilakukan sekali oleh admin organisasi bersama tim implementasi.
+
+**Adapter organisasi diatur ke Khanza.** Buka menu **Pengaturan**, pilih **Integrasi SIMRS**, lalu pilih **Khanza** pada kolom **Adapter**. Rincian setiap kolom pada halaman ini dijelaskan di [Integrasi SIMRS](/integrasi-simrs).
+
+![Halaman Integrasi SIMRS dengan kolom Adapter berisi pilihan Khanza ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/01-pengaturan-adapter.png)
+
+**Akun layanan PRECIA sudah tersedia.** Layanan pendamping di sisi Khanza memakai satu akun PRECIA milik organisasi untuk membuat transaksi. Akun ini disiapkan oleh tim implementasi dan tidak dipakai oleh petugas untuk masuk ke aplikasi.
+
+**Unit tujuan sudah disepakati.** Unit tempat transaksi dibuat ditentukan pada konfigurasi layanan di sisi Khanza, bukan dari peta unit yang tersimpan di PRECIA. Satu instalasi Khanza mengirim seluruh kasusnya ke satu unit yang sama. Pada lingkungan demo, unit tersebut adalah Cardiology.
+
+## Langkah 1. Buka klien Khanza
+
+Buka alamat klien Khanza yang diberikan tim implementasi pada peramban. Alamat tersebut langsung mengarahkan Anda ke tampilan aplikasi Khanza.
+
+Sebelum ada operator yang masuk, perhatikan dua hal. Kolom status di kiri bawah masih berbunyi **Log Out**, dan tombol modul seperti **Registrasi**, **IGD/UGD**, serta **Rawat Jalan** masih redup dan tidak dapat dipakai.
+
+![Tampilan awal klien Khanza, menu Program dan kolom status Log Out di kiri bawah ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/02-buka-klien-khanza.png)
+
+Pada lingkungan demo, klien Khanza hanya menanggapi keyboard. Karena itu seluruh langkah di bawah memakai pintasan keyboard. Keterangan lengkapnya ada pada bagian [Batasan yang perlu diketahui](#batasan-yang-perlu-diketahui).
+
+## Langkah 2. Masuk sebagai operator
+
+Buka menu **Program**, lalu pilih **Log In**. Dengan keyboard, urutannya adalah tekan `Alt+P` untuk membuka baris menu, tekan panah kiri untuk berpindah ke menu **Program**, tekan panah bawah untuk menyorot **Log In**, lalu tekan `Enter`.
+
+Kotak **Silahkan Anda Login** muncul di tengah layar. Isi **ID Admin** dengan nomor pegawai operator, tekan `Tab`, isi **Password**, lalu tekan `Enter` untuk menjalankan tombol **Log-in**.
+
+![Kotak Silahkan Anda Login pada klien Khanza, kolom ID Admin, kolom Password, dan tombol Log-in ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/03-dialog-login.png)
+
+## Langkah 3. Pastikan operator sudah masuk
+
+Setelah kredensial diterima, tampilan kembali ke layar utama dengan tiga perubahan yang mudah dikenali. Kolom status di kiri bawah berubah dari **Log Out** menjadi nomor pegawai operator, tombol modul yang tadinya redup kini aktif, dan tombol **Log In** pada baris tombol berubah menjadi **Log Out**.
+
+![Layar utama Khanza setelah operator masuk, kolom status berisi nomor pegawai dan tombol Registrasi yang sudah aktif ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/04-berhasil-masuk.png)
+
+Kalau kolom status masih berbunyi **Log Out**, kredensial belum diterima. Ulangi Langkah 2 dan pastikan nomor pegawai serta kata sandi diketik dengan benar.
+
+## Langkah 4. Buka Registrasi dan catat nomor rawat
+
+Tekan `Alt+R` untuk membuka modul **Registrasi**. Jendela **Registrasi Periksa Hari Ini** menampilkan tabel pendaftaran untuk tanggal berjalan.
+
+Kolom yang paling penting adalah **No.Rawat**. Nilai itulah satu-satunya kunci yang dipakai pada seluruh langkah berikutnya, termasuk saat kasus dikirim ke PRECIA dan saat hasilnya ditelusuri kembali. Penyaring **Periode** di bagian bawah jendela menentukan rentang tanggal yang ditampilkan, dan secara bawaan berisi tanggal berjalan.
+
+Pada tangkapan layar di bawah, tabel tampil kosong dengan penanda **Record : 0**. Penyebabnya, kasus contoh pada halaman ini terdaftar pada 28 Juli 2026, bukan pada tanggal berjalan saat tangkapan layar dibuat, sedangkan penyaring **Periode** tidak dapat diubah dari klien demo sehingga rentang tanggalnya tidak dapat digeser. Nomor rawat kasus lama tetap dapat dipakai untuk pengiriman, hanya barisnya yang tidak dapat ditampilkan di layar. Rincian batasan ini ada pada bagian [Batasan yang perlu diketahui](#batasan-yang-perlu-diketahui).
+
+![Jendela Registrasi Periksa Hari Ini pada Khanza, judul jendela, kolom No.Rawat, dan penyaring Periode ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/05-daftar-registrasi.png)
+
+Untuk contoh pada halaman ini, nomor rawat yang dipakai adalah 2026/07/28/000001.
+
+## Mengirim kasus ke PRECIA
+
+Tidak ada tombol **Kirim ke PRECIA** di dalam aplikasi Khanza. Pengiriman dilakukan oleh layanan penghubung Khanza, yang dipanggil dari sistem rumah sakit oleh tim integrasi. Karena tidak ada layar yang terlibat, langkah ini tidak memiliki tangkapan layar.
+
+Isi permintaan pengiriman terdiri atas tiga nilai:
+
+| Nilai | Keterangan |
+| --- | --- |
+| `no_rawat` | Nomor rawat yang dicatat pada Langkah 4, contoh 2026/07/28/000001. |
+| `ai_module_code` | Kode modul AI yang diminta. Pada lingkungan demo, kode yang dipakai adalah `ai-ecg-digitization`. |
+| `sumber_data` | Asal data pemeriksaan, diisi `radiologi` atau `laboratorium`. |
+
+Jawaban yang menandakan berhasil adalah pesan **Kasus terdaftar untuk dikirim ke PRECIA**. Kalau nomor rawat dan kode modul yang sama dikirim ulang, layanan menjawab dengan pesan **Kasus ini sudah pernah diajukan ke PRECIA** dan tidak membuat kasus ganda, sehingga pengiriman ulang aman dilakukan.
+
+Layanan yang sama juga menyediakan pemeriksaan status kasus. Pada verifikasi ini, jawaban yang teramati berisi status pengiriman per modul AI, sehingga tim integrasi dapat memastikan kasus benar-benar terkirim tanpa membuka PRECIA. Menurut kontrak layanan, jawaban yang sama juga memuat hasil AI bila hasil tersebut sudah tersedia, tetapi bagian itu belum teramati pada lingkungan demo.
+
+Setelah kasus masuk antrean, layanan pendamping Khanza memeriksa antrean setiap 30 detik, masuk ke PRECIA, lalu membuat transaksinya. Pada uji coba terakhir, transaksi terbentuk 8 detik setelah kasus masuk antrean. Semua kegiatan ini berjalan tanpa campur tangan petugas.
+
+## Langkah 5. Temukan transaksi di daftar kerja PRECIA
+
+Masuk ke PRECIA dengan akun yang berada pada organisasi yang sama, buka menu **Klinis**, lalu pilih unit tujuan integrasi.
+
+Transaksi baru muncul pada **Daftar Kerja Transaksi** dengan kode yang dibentuk dari nomor rawat, dengan garis miring diganti tanda hubung, ditambah kode modul AI. Untuk contoh ini kodenya adalah `2026-07-28-000001-ai-ecg-digitization`. Statusnya **Belum Diproses**, karena berkas pemeriksaan belum diunggah.
+
+![Daftar Kerja Transaksi PRECIA untuk unit Cardiology, baris transaksi yang berasal dari Khanza ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/06-daftar-kerja-precia.png)
+
+Kalau transaksi belum muncul, tunggu satu siklus pemeriksaan antrean, lalu tekan **Muat Ulang**. Pastikan juga unit yang dipilih adalah unit tujuan integrasi, karena seluruh kasus dari Khanza masuk ke satu unit yang sama.
+
+## Langkah 6. Periksa detail transaksi
+
+Klik baris transaksi untuk membuka detailnya. Halaman detail menampilkan kode transaksi di bagian atas, identitas pasien yang disalin dari Khanza, unit tujuan, serta kolom **Catatan**.
+
+Kolom **Catatan** berisi nomor rawat, kode modul AI, dan asal data apa adanya, dalam bentuk `no_rawat=2026/07/28/000001;ai_module_code=ai-ecg-digitization;sumber_data=radiologi`. Kolom inilah yang dipakai untuk mencocokkan kembali transaksi PRECIA dengan pendaftaran di Khanza.
+
+![Detail transaksi PRECIA, kode transaksi, kolom Catatan berisi nomor rawat, dan kartu Unit ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/07-detail-transaksi.png)
+
+Pada contoh ini terlihat tiga slot modul AI yang masih menunggu berkas. Pemrosesan AI baru berjalan setelah petugas klinis mengunggah berkas pemeriksaan pada transaksi tersebut.
+
+## Setelah transaksi terbentuk
+
+Transaksi hasil integrasi diperlakukan sama dengan transaksi yang dibuat manual. Petugas klinis mengunggah berkas pemeriksaan, modul AI diproses, kemudian dokter meninjau dan memvalidasi hasilnya. Rincian setiap tahap tersebut dijelaskan pada bagian [Kasus Klinis](/kasus-klinis).
+
+Arah balik, yaitu pengembalian hasil AI ke Khanza, juga memakai pola tarik. Layanan pendamping Khanza yang menarik hasil dari PRECIA setelah hasil tersedia. Batasan yang berlaku hari ini dijelaskan pada bagian berikut.
+
+## Batasan yang perlu diketahui
+
+**Tidak ada tombol pengiriman di dalam Khanza.** Aplikasi Khanza tidak memiliki menu atau tombol untuk mengirim kasus ke PRECIA. Pengiriman selalu dilakukan lewat layanan penghubung yang dipanggil oleh tim integrasi rumah sakit.
+
+**Klien demo hanya menanggapi keyboard.** Pada lingkungan demo, klik mouse di dalam jendela aplikasi Khanza tidak diproses karena kesalahan internal pada komponen tampilan aplikasi. Keyboard tetap berfungsi penuh, sehingga seluruh langkah pada halaman ini ditulis memakai pintasan keyboard. Batasan ini berlaku pada instalasi demo tersebut, bukan pada Khanza secara umum.
+
+**Membuat pendaftaran baru dari klien demo belum dapat dilakukan.** Pengisian dokter dan unit pada form pendaftaran memerlukan kotak pencarian yang hanya dapat dibuka dengan mouse. Karena mouse tidak bekerja pada klien demo, gunakan pendaftaran yang sudah ada untuk mencoba alur ini.
+
+**Penyaring Periode tidak dapat diubah dari klien demo.** Dengan alasan yang sama, jendela Registrasi hanya menampilkan pendaftaran pada tanggal berjalan. Nomor rawat kasus lama tetap dapat dipakai untuk pengiriman, hanya barisnya yang tidak dapat ditampilkan di layar demo.
+
+**Unit tujuan tidak mengikuti peta unit di PRECIA.** Peta unit yang tersimpan pada pengaturan Integrasi SIMRS dipakai untuk pemeriksaan konfigurasi, bukan untuk menentukan tujuan kasus. Unit tujuan diambil dari konfigurasi layanan di sisi Khanza, sehingga kasus dengan asal data radiologi pun tetap masuk ke unit yang dikonfigurasi di sana. Pada lingkungan demo, seluruh kasus masuk ke unit Cardiology.
+
+**Halaman hasil AI di Khanza belum dapat dibuka operator.** Halaman yang menampilkan hasil AI di sisi Khanza memerlukan sesi masuk tersendiri yang berbeda dari klien operator, sehingga saat ini belum dapat dijadikan langkah kerja petugas.
+
+**Arah balik belum diuji pada verifikasi ini.** Bukti yang tersedia mencakup arah Khanza ke PRECIA. Pengembalian hasil AI ke Khanza belum dijalankan sampai selesai pada lingkungan demo.
