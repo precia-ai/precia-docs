@@ -15,16 +15,22 @@
  *   1. Run each step once, inspect the raw (pre-annotation) PNG, and
  *      correct the annotate coordinates the same way probe.js is used
  *      elsewhere in this directory to measure real element positions.
- *   2. Step 10-11 assume the ECG orderable's title contains the
- *      substring "ECG" and is reachable through the "Select Activity
- *      Definition" combobox's search tab (CommandInput, selector
- *      `input[cmdk-input]`, see care_fe
- *      src/components/Common/ResourceDefinitionCategoryPicker.tsx). This
- *      searches by title directly instead of assuming a category, since
- *      whether the ECG orderable was filed under "Imaging" or a separate
- *      category (e.g. "Cardiology") was not verified. If the search tab
- *      does not exist on this CARE version, fall back to browsing
- *      categories the way steps 04-05 do for Chest X-ray.
+ *   2. UPDATE 2026-08-23 (later the same day): steps 10-11 originally
+ *      searched for the ECG orderable by title through the picker's
+ *      CommandInput tab, because its category was unverified. That is now
+ *      CONFIRMED WRONG/UNNECESSARY: prod evidence
+ *      public/screenshots/_evidence/prod/prod-care-21-clinician-picks-ecg-12-lead-precia-ai.png
+ *      shows the orderable is titled exactly "ECG 12 lead (PRECIA AI)"
+ *      (no hyphen, lowercase "lead") and sits in the SAME "Imaging"
+ *      category as "Chest X-ray (PRECIA AI)", both listed together under
+ *      the same Root > Imaging breadcrumb. Steps 10-11 now reuse
+ *      openImagingCategory exactly like steps 04-06 do, instead of the
+ *      untested search-tab approach. This is prod evidence, not dev - the
+ *      UI structure should be identical (same CARE build), the demo
+ *      patient/facility is not (prod evidence shows "Ayushman Chander",
+ *      unrelated to the dev fixtures below). searchOrderable() is kept
+ *      in this file as a documented fallback only, unused by the current
+ *      steps.
  *   3. STEPS 13-15 ARE CONFIRMED BLOCKED AT THE DATA LEVEL, NOT JUST AN
  *      OPEN QUESTION. Read via direct DB query on app-dev by precia-tracker
  *      on 2026-08-23 (~12:40 local): CARE-dev has 8 transactions with
@@ -174,9 +180,11 @@ async function openImagingCategory(page) {
 
 /**
  * Open the activity picker and search it by title instead of browsing
- * categories, used for the ECG orderable whose category was not verified.
- * See the file-header note dated 2026-08-23 for why this searches instead
- * of clicking through "Imaging" the way openImagingCategory does.
+ * categories. UNUSED by the current steps as of 2026-08-23 - confirmed via
+ * prod evidence that the ECG orderable lives in the same "Imaging" category
+ * as Chest X-ray, so steps 10-11 use openImagingCategory instead. Kept only
+ * as a documented fallback in case the category changes on a given CARE
+ * install. See the file-header note dated 2026-08-23 for details.
  */
 async function searchOrderable(page, term) {
   await openActivityPicker(page)
@@ -372,24 +380,28 @@ module.exports = [
     ]
   },
   // -----------------------------------------------------------------
-  // Steps 10-12: ordering ECG 12-lead in CARE, mirroring steps 03-07
-  // for Chest X-ray but via title search (see searchOrderable above).
-  // Coordinates below are estimates, unverified against a live page.
+  // Steps 10-12: ordering ECG 12 lead in CARE, mirroring steps 04-07 for
+  // Chest X-ray - same category picker, same openImagingCategory helper,
+  // confirmed by prod evidence (see file-header note dated 2026-08-23).
+  // Coordinates are estimates sized off that evidence's 1560x1000/1172
+  // screenshots, not a clean ratio to this file's 1440x900 viewport - more
+  // grounded than a blind guess, still needs re-measuring on first run.
   // -----------------------------------------------------------------
   {
-    id: 'integrasi-simrs__care__10-mencari-pemeriksaan-ecg',
+    id: 'integrasi-simrs__care__10-memilih-pemeriksaan-ecg',
     section: 'integrasi-simrs',
     pageSlug: 'care',
-    stepSlug: '10-mencari-pemeriksaan-ecg',
+    stepSlug: '10-memilih-pemeriksaan-ecg',
     route: `${ENCOUNTER_BASE}/questionnaire/service_request`,
     preActions: async (page) => {
-      await searchOrderable(page, 'ECG')
+      await openImagingCategory(page)
     },
     annotate: [
-      // Search input inside the activity picker
-      { type: 'box', x: 336, y: 300, width: 700, height: 44 },
-      // First matching result row (assumed to be the ECG orderable)
-      { type: 'box', x: 331, y: 360, width: 700, height: 42 }
+      // Breadcrumb Root > Imaging, same box as step 05
+      { type: 'box', x: 337, y: 417, width: 180, height: 32 },
+      // "ECG 12 lead (PRECIA AI)" row, listed above Chest X-ray per
+      // prod-care-21 evidence
+      { type: 'box', x: 331, y: 458, width: 418, height: 42 }
     ]
   },
   {
@@ -399,10 +411,10 @@ module.exports = [
     stepSlug: '11-mengirim-permintaan-ecg',
     route: `${ENCOUNTER_BASE}/questionnaire/service_request`,
     preActions: async (page) => {
-      await searchOrderable(page, 'ECG')
-      // Click the first result. Text match is a best guess at the title
-      // ("ECG 12-Lead (PRECIA AI)", mirroring "Chest X-ray (PRECIA AI)")
-      // and needs confirming against the live catalog.
+      await openImagingCategory(page)
+      // Exact title confirmed via prod-care-21 evidence: "ECG 12 lead
+      // (PRECIA AI)", no hyphen, lowercase "lead". Loose match is still
+      // used here so a minor label change does not break the run.
       await page.getByText('ECG', { exact: false }).first().click()
       await page.waitForTimeout(2500)
     },
