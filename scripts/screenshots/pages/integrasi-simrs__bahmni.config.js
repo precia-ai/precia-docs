@@ -115,19 +115,22 @@ function annotationsForBahmni(step, locale, names) {
 async function resolvePatientUuidByMrn(page, mrn) {
   await openBahmniApp(page, '/bahmni/registration/index.html#/search', '#registrationNumber')
   await page.fill('#registrationNumber', mrn)
-  // PERLU VERIFIKASI: assumes Enter submits the search (typical Bahmni
-  // ng-keyup binding on this field). Never confirmed live — if this stalls,
-  // the fix is almost certainly a debounced auto-search that needs a short
-  // wait instead, not a missing submit button; Bahmni's registration search
-  // does not show one in the layout the earlier steps 01-03 already proved.
+  // Confirmed live 2026-08-27 for MRN ABC200005: Enter does submit the
+  // search, but a single exact MRN match auto-navigates straight to
+  // #/patient/<uuid> without ever rendering a results table. The table only
+  // appears for a multi-match (partial) search. Wait for either outcome.
   await page.keyboard.press('Enter')
-  await page.waitForSelector('table tbody tr', { timeout: 30000 })
-  const rowCount = await page.locator('table tbody tr').count()
-  if (rowCount === 0) {
-    throw new Error(`Registration search for MRN ${mrn} returned no rows.`)
+  const patientNav = page.waitForURL(/#\/patient\/[0-9a-f-]{36}/, { timeout: 30000 }).catch(() => null)
+  const tableAppear = page.waitForSelector('table tbody tr', { timeout: 30000 }).catch(() => null)
+  await Promise.race([patientNav, tableAppear])
+  if (!/#\/patient\/[0-9a-f-]{36}/.test(page.url())) {
+    const rowCount = await page.locator('table tbody tr').count()
+    if (rowCount === 0) {
+      throw new Error(`Registration search for MRN ${mrn} returned no rows.`)
+    }
+    await page.locator('table tbody tr').first().click()
+    await page.waitForURL(/#\/patient\/[0-9a-f-]{36}/, { timeout: 30000 })
   }
-  await page.locator('table tbody tr').first().click()
-  await page.waitForURL(/#\/patient\/[0-9a-f-]{36}/, { timeout: 30000 })
   const match = page.url().match(/patient\/([0-9a-f-]{36})/)
   if (!match) {
     throw new Error(`Could not resolve a patient uuid for MRN ${mrn} from URL ${page.url()}`)
@@ -332,13 +335,21 @@ module.exports = [
     stepSlug: '08-daftar-kasus-precia',
     route: `/clinical?unit=${PRECIA_UNIT_ID}`,
     role: 'BAHMNI',
-    preActions: async (page) => {
+    preActions: async (page, { locale }) => {
       await page.waitForSelector('tbody tr', { timeout: 30000 })
       await page.waitForTimeout(1500)
+      // The worklist sorts by creation time descending, so a newer
+      // transaction (the write-back proof case captured for steps 10-11,
+      // created 2026-08-23) pushes this walkthrough's row (Rahmawati
+      // Nurhaliza / MRN ABC200003) out of the first position. Locate it by
+      // MRN text instead of assuming it is always the top row.
+      const row = page.locator('tbody tr', { hasText: 'ABC200003' }).first()
+      await row.waitFor({ state: 'visible', timeout: 30000 })
+      await measure(page, '08', locale, 'row', row, 4)
     },
-    annotate: [
+    annotate: ({ locale }) => [
       { type: 'box', x: 532, y: 318, width: 234, height: 51 },
-      { type: 'box', x: 300, y: 474, width: 1096, height: 95 }
+      ...annotationsForBahmni('08', locale, ['row'])
     ]
   },
   {
@@ -388,10 +399,13 @@ module.exports = [
       // plain <button> with no data-testid, keyed on the transaction code
       // and patient name text — there is no other stable selector, and that
       // text is identical in id/en since names and codes are never
-      // translated.
-      await page.waitForSelector('button', { timeout: 30000 })
+      // translated. A generic page.waitForSelector('button') is unsafe here:
+      // the header's hidden mobile "Close menu" button is first in DOM order
+      // and never becomes visible at this viewport, so waitForSelector locks
+      // onto it and times out even though the worklist row is already
+      // visible. Wait on the specific row locator directly instead.
       const row = page.locator('button', { hasText: WRITEBACK_TX_CODE }).first()
-      await row.waitFor({ timeout: 30000 })
+      await row.waitFor({ state: 'visible', timeout: 30000 })
       await measure(page, '10', locale, 'row', row)
       await row.click()
       // The detail card swaps in-place on the right column; wait for the
