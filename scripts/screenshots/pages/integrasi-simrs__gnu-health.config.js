@@ -47,17 +47,24 @@
  *     otomatis. Nilai harus dipilih dari daftar saran, bukan sekadar
  *     diketik.
  *
- * SELEKTOR YANG BELUM DIVERIFIKASI PADA REVISI INI, karena host precia.site
- * sedang tidak dapat diakses saat spec ini ditulis. Ditandai satu per satu
- * di preActions masing-masing langkah dengan komentar "PERLU VERIFIKASI".
- * Dugaan diturunkan dari pola yang sudah terbukti bekerja pada elemen sejenis
- * di bagian lain file ini (title attribute pada tombol toolbar, class
- * .modal-content pada dialog), bukan dikarang bebas:
- *   - Field Patient pada wizard "Medical Imaging - New order" diasumsikan
- *     bernama `patient`, sama seperti form Imaging Test Request lama. Wizard
- *     ini adalah layar berbeda dan belum pernah dibuka lewat automasi.
- *   - Baris Tests pada wizard tersebut diasumsikan dapat dicentang lewat
- *     checkbox pertama pada barisnya.
+ * Langkah 4-7 dan 13-14 (wizard Request Imaging Test dan record order yang
+ * sudah selesai) sudah diverifikasi hidup 2026-08-27, setelah izin modul
+ * Medical Imaging dan tautan tenaga kesehatan akun docs dibereskan:
+ *   - Field Patient pada wizard "Medical Imaging - New order" memang
+ *     bernama `patient`, sama seperti form Imaging Test Request lama.
+ *   - Baris Tests pada wizard tersebut BUKAN daftar centang statis seperti
+ *     dugaan sebelumnya, melainkan widget many2many: field bernama `tests`
+ *     berupa kolom pelengkapan otomatis, baris baru ditambahkan dengan
+ *     mengetik lalu memilih saran, dan baris yang ditambahkan otomatis
+ *     tercentang.
+ *   - Membuka wizard ini dengan `.dblclick()` pada baris menunya membuka 3
+ *     dialog modal bertumpuk, bukan 1. Dialog yang benar-benar interaktif
+ *     selalu yang PALING BARU di DOM (`.last()`), bukan `.first()`.
+ *   - Akun login harus tertaut ke rekaman tenaga kesehatan (field
+ *     `internal_user` pada `party.party`) atau wizard menolak dibuka
+ *     dengan galat SM-CORE-0007. Akun docs ditautkan ke party "Wilson"
+ *     yang sebelumnya belum dipakai siapa pun (`internal_user` masih
+ *     kosong), bukan membuat party baru maupun menimpa tautan pihak lain.
  *   - Tombol aksi "Generate Results" pada toolbar Imaging Test Request
  *     diasumsikan punya `title="Generate Results"`, mengikuti pola tombol
  *     New dan Save yang sudah terbukti. Ini BELUM pernah diklik oleh
@@ -175,8 +182,21 @@ function requestRow(page) {
     .locator('xpath=ancestor::tr')
 }
 
-async function openImagingTestRequestList(page) {
+/**
+ * "Medical Imaging" is nested under "Health" in the tree menu, and Tryton's
+ * sao client only renders a branch's children after that branch has been
+ * expanded at least once. A fresh login always starts with every branch
+ * collapsed, so "Medical Imaging" does not exist in the DOM yet until
+ * "Health" itself is expanded first. Confirmed live 2026-08-27: expanding
+ * "Medical Imaging" directly after login times out with no such row found.
+ */
+async function openMedicalImagingBranch(page) {
+  await expandMenu(page, 'Health')
   await expandMenu(page, 'Medical Imaging')
+}
+
+async function openImagingTestRequestList(page) {
+  await openMedicalImagingBranch(page)
   await menuCell(page, 'Imaging Test Request').dblclick()
   await page.waitForSelector('#tabcontent button[title="New"]', { timeout: 30000 })
   await page.waitForTimeout(3000)
@@ -204,7 +224,7 @@ async function openExistingOrder(page) {
 }
 
 async function openImagingTestResultList(page) {
-  await expandMenu(page, 'Medical Imaging')
+  await openMedicalImagingBranch(page)
   await menuCell(page, 'Imaging Test Result').dblclick()
   await page.waitForSelector('#tabcontent tbody tr', { timeout: 30000 })
   await page.waitForTimeout(3000)
@@ -213,27 +233,38 @@ async function openImagingTestResultList(page) {
 /**
  * Buka wizard "Request Imaging Test" dan isi Patient serta baris Tests,
  * TANPA menekan REQUEST. Tidak pernah membuat record baru di instansi dev.
- * PERLU VERIFIKASI: field Patient pada wizard ini belum pernah dibuka oleh
- * generator, lihat catatan di kepala berkas.
+ *
+ * dblclick() pada baris menu ini membuka wizard LEBIH dari sekali (3 dialog
+ * bertumpuk terkonfirmasi langsung 2026-08-27), berbeda dari baris menu
+ * daftar (Imaging Test Request/Result) yang aman menerima dblclick berulang.
+ * .modal-content terlama (.first()) berada di belakang backdrop dialog yang
+ * lebih baru, sehingga elemen di dalamnya tidak menerima klik ("subtree
+ * intercepts pointer events"). Dialog yang benar-benar interaktif selalu
+ * yang PALING BARU (.last()).
  */
 async function fillNewOrderWizardWithoutSubmitting(page) {
-  await expandMenu(page, 'Medical Imaging')
+  await openMedicalImagingBranch(page)
   await menuCell(page, 'Request Imaging Test').dblclick()
   await page.waitForSelector('.modal-content', { timeout: 30000 })
   await page.waitForTimeout(2000)
-  const modal = page.locator('.modal-content').first()
+  const modal = page.locator('.modal-content').last()
   const patientInput = modal.locator('input[name="patient"]').first()
   await patientInput.click()
   await patientInput.fill(PATIENT_FRAGMENT)
   await page.waitForTimeout(2500)
   await modal.locator('ul.dropdown-menu li.completion a').first().click()
   await page.waitForTimeout(1500)
-  const testRow = modal.locator('table tr', { hasText: STUDY_FRAGMENT }).first()
-  const testCheckbox = testRow.locator('input[type="checkbox"]').first()
-  if (!(await testCheckbox.isChecked().catch(() => false))) {
-    await testCheckbox.click()
-    await page.waitForTimeout(800)
-  }
+  // "Tests" is a many2many widget (add/remove buttons plus one autocomplete
+  // input, name="tests"), not a pre-populated table with checkboxes to tick
+  // as the old comment assumed. Confirmed live 2026-08-27: the grid starts
+  // empty; typing into the autocomplete and picking the matching suggestion
+  // is what adds (and auto-checks) the row.
+  const testsInput = modal.locator('input[name="tests"]').first()
+  await testsInput.click()
+  await testsInput.fill(STUDY_FRAGMENT)
+  await page.waitForTimeout(2500)
+  await modal.locator('.form-many2many-toolbar ul.dropdown-menu li.completion a').first().click()
+  await page.waitForTimeout(1500)
   return modal
 }
 
@@ -312,7 +343,7 @@ module.exports = [
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
       await loginGnuhealth(page)
-      await expandMenu(page, 'Medical Imaging')
+      await openMedicalImagingBranch(page)
       await measure(page, '04', locale, 'medical-imaging', menuCell(page, 'Medical Imaging'))
       await measure(page, '04', locale, 'request-wizard', menuCell(page, 'Request Imaging Test'))
       await measure(page, '04', locale, 'request-list', menuCell(page, 'Imaging Test Request'))
@@ -327,6 +358,7 @@ module.exports = [
     stepSlug: '05-formulir-permintaan-baru',
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
+      await loginGnuhealth(page)
       const modal = await fillNewOrderWizardWithoutSubmitting(page)
       await measure(page, '05', locale, 'patient', modal.locator('input[name="patient"]').first())
       await measure(
@@ -347,6 +379,7 @@ module.exports = [
     stepSlug: '06-permintaan-tersimpan',
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
+      await loginGnuhealth(page)
       await openImagingTestRequestList(page)
       await switchToAllTab(page)
       await measure(page, '06', locale, 'row', requestRow(page), 4)
@@ -360,6 +393,7 @@ module.exports = [
     stepSlug: '07-hasil-pemeriksaan',
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
+      await loginGnuhealth(page)
       await openImagingTestResultList(page)
       const row = page.locator('#tabcontent tbody tr', { hasText: RESULT_NUMBER }).first()
       await measure(page, '07', locale, 'row', row, 4)
@@ -544,6 +578,7 @@ module.exports = [
     stepSlug: '13-order-selesai-di-gnu-health',
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
+      await loginGnuhealth(page)
       await openExistingOrder(page)
       await measure(page, '13', locale, 'state', page.locator('select[name="state"]'))
       await measure(
@@ -563,6 +598,7 @@ module.exports = [
     stepSlug: '14-catatan-hasil-ai',
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
+      await loginGnuhealth(page)
       await openExistingOrder(page)
       await page.click('#tabcontent button[title^="Note"]')
       await page.waitForSelector('.modal-content', { timeout: 30000 })
