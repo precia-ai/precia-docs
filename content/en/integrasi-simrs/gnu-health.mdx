@@ -30,9 +30,9 @@ Each organization's SIMRS connection settings are stored on the **Settings > SIM
 
 ![SIMRS Integration page in PRECIA, the Adapter field and the Endpoint URL field marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/01-pengaturan-koneksi.png)
 
-Please note: in the PRECIA version currently running, the options in the **Adapter** field are still limited to Khanza, MEDICCA and Open Hospital. **GNU Health is not yet available as an option in that field.** Registering a GNU Health connection is done by the PRECIA implementation team through the platform-level SIMRS onboarding process, not through this page.
+Selecting **GNU Health** in the **Adapter** field updates the description text and the credential label below it to match GNU Health's own connector requirements, as shown above.
 
-This means that as hospital staff you do not need to fill in anything on this page for GNU Health. Simply confirm with the implementation team that your organization's connection has been registered and has passed its self test before staff start creating imaging test requests.
+As hospital staff you do not need to fill in anything on this page yourself. Registering and saving the connection is handled by the PRECIA implementation team during onboarding. Simply confirm with that team that your organization's connection has been registered and has passed its self test before staff start creating imaging test requests.
 
 ## 2. Signing in to GNU Health
 
@@ -46,7 +46,7 @@ The **Database** field above it is already filled in with the hospital database 
 
 GNU Health then shows a second box asking for your password.
 
-![GNU Health Password for admin box, the password entry field marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/03-kata-sandi.png)
+![GNU Health password entry box, the password field marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/03-kata-sandi.png)
 
 Type your password, then click **OK** or press Enter. Once accepted, the GNU Health main screen opens with the tree menu on the left.
 
@@ -56,7 +56,7 @@ Type your password, then click **OK** or press Enter. Once accepted, the GNU Hea
 
 In the tree menu on the left, open **Health**, then **Medical Imaging**. The branch offers two relevant entries: **Request Imaging Test**, a wizard for raising a new request, and **Imaging Test Request**, the list of requests already on file.
 
-![GNU Health tree menu, the Medical Imaging row, the Request Imaging Test row and the Imaging Test Request row marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/04-menu-pencitraan.png)
+**Screenshot not yet available.** The account used to capture this section does not yet have the Medical Imaging module enabled; see [Current limitations](#current-limitations). An earlier screenshot of this step existed but was taken with a full administrator account rather than the account used for the rest of this page, so it is not shown here rather than mixing two different identities across one walkthrough.
 
 To open a menu row, double click on its label. The small arrow to the left of a row expands or collapses that branch of the menu.
 
@@ -64,9 +64,7 @@ To open a menu row, double click on its label. The small arrow to the left of a 
 
 Double click **Request Imaging Test** to open the wizard.
 
-![Request Imaging Test wizard in GNU Health, the Patient field and the test row for PRECIA AI ECG marked with a blue box, the REQUEST button marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/05-formulir-permintaan-baru.png)
-
-Fill in the following:
+**Screenshot not yet available.** The account used to capture this section does not yet have the Medical Imaging module enabled; see [Current limitations](#current-limitations). Fill in the following:
 
 1. **Patient**: the patient name. This field is an autocomplete. Type part of the name, wait for the suggestion list to appear, then click the patient name in that list. A value that is only typed and never picked from the list will not be saved.
 2. **Tests**: tick the row for the examination type that matches the AI module to be used, for example **PRECIA AI ECG** for ejection fraction analysis.
@@ -75,9 +73,9 @@ Click **REQUEST** to submit. Unlike an old draft-only form, this wizard creates 
 
 ### Step 6: Confirm the request on file
 
-Open **Imaging Test Request** from the tree menu, then switch to the **All** tab, since a request that has moved past Draft no longer shows under the default tab. The screenshot below shows order `010`, a request that has already completed its full cycle.
+Open **Imaging Test Request** from the tree menu, then switch to the **All** tab, since a request that has moved past Draft no longer shows under the default tab. Order `010` is the request that has already completed its full cycle in the walkthrough this page follows.
 
-![Imaging Test Request list in GNU Health, the All tab and the row for order 010 marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/06-permintaan-tersimpan.png)
+**Screenshot not yet available**, same reason as Step 5.
 
 ## 4. Confirming the completed examination
 
@@ -85,7 +83,7 @@ Open **Imaging Test Request** from the tree menu, then switch to the **All** tab
 
 Once the imaging unit performs the study and records a result, that result appears under **Imaging Test Result**, a separate list from the request itself.
 
-![Imaging Test Result list in GNU Health, the row for study TEST008 marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/07-hasil-pemeriksaan.png)
+**Screenshot not yet available**, same reason as Step 5.
 
 This is the file the PRECIA connector picks up for AI analysis; the request and its result are two different records linked by the same order number.
 
@@ -111,11 +109,11 @@ The **Notes** section carries the raw GNU Health context, including the imaging 
 
 ### Step 10: Open the AI module tab
 
-On the same case detail page, click the AI module tab, **ECG EF Screening** in this example. It shows the source file uploaded for analysis and the button used to run the AI module.
+On the same case detail page, click the AI module tab, **ECG EF Screening** in this example. It shows the source file uploaded for analysis and the module's processing status.
 
-![PRECIA case detail, ECG EF Screening tab, the uploaded source file and the Trigger AI button marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/10-slot-ai-terisi.png)
+![PRECIA case detail, ECG EF Screening tab, the uploaded source file and the Completed status marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/10-slot-ai-terisi.png)
 
-A case appearing in PRECIA does not run AI analysis on its own; an operator still needs to press the AI processing button, the same limitation documented for every SIMRS on this site.
+The case example this page follows has already been processed, so its status reads **Completed**. A case appearing in PRECIA does not run AI analysis on its own, though: an operator still needs to press the AI processing button once a file is uploaded, the same limitation documented for every SIMRS on this site.
 
 ### Step 11: Read the AI result
 
@@ -141,21 +139,19 @@ Publishing a validation is the trigger for the write-back leg: PRECIA sends the 
 
 Back in GNU Health, open **Imaging Test Request**, switch to the **All** tab, and open order `010` again. The **State** field now reads **Done**, and the note button on the toolbar shows a note is attached.
 
-![GNU Health Imaging Test Request for order 010, the State field and the Notes button marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/13-order-selesai-di-gnu-health.png)
+**Screenshot not yet available.** The account used to capture this section does not yet have the Medical Imaging module enabled; see [Current limitations](#current-limitations).
 
 ### Step 14: Open the AI result note
 
-Click the Notes button, then double click the note row to open its contents.
+Click the Notes button, then double click the note row to open its contents. The note is authored by the PRECIA integration account rather than a member of staff, and holds the AI module name, the confidence level, the validation status, and a summary of the result. Click **OK** to close the note box; it stays attached to the imaging test request and can be reopened at any time.
 
-![Notes box on a GNU Health imaging test request, the Last User field and the AI result note body marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/14-catatan-hasil-ai.png)
-
-The note is authored by the PRECIA integration account rather than a member of staff, and holds the AI module name, the confidence level, the validation status, and a summary of the result. Click **OK** to close the note box; it stays attached to the imaging test request and can be reopened at any time.
+**Screenshot not yet available**, same reason as Step 13.
 
 ## Current limitations
 
 The GNU Health integration is still at trial stage. The following limitations apply and should be understood before it is used in day-to-day work.
 
-1. **GNU Health is not yet available in the Adapter field.** The Settings > SIMRS Integration page currently offers only Khanza, MEDICCA and Open Hospital. Registering a GNU Health connection is handled by the PRECIA implementation team through platform-level SIMRS onboarding.
+1. **Steps 4 through 7 and 13 through 14 have no screenshot yet.** The demo account used to capture that half of this page can log in, but its role does not yet include the Medical Imaging module (confirmed live: the full expanded Health menu for this account has no Medical Imaging entry). Access has been requested; no fixed date yet. The written description of those steps reflects GNU Health's documented Request Imaging Test / Imaging Test Request flow, but has not been re-verified against the live screen in this pass.
 2. **The AI module still has to be triggered by hand.** See Step 10; a case appearing in PRECIA does not analyse itself. Both the request delivery from GNU Health and the result delivery back to it, by contrast, are confirmed automatic from the platform's own audit trail.
 3. **A GNU Health imaging test request carries no attachment.** The Imaging Test Request wizard offers neither a file attachment nor a DICOM image reference. The source file for AI analysis is uploaded on the transaction detail page in PRECIA, as shown in Step 10.
 4. **AI modules must be configured on the destination unit first.** Until the unit AI policy is set, the AI Modules panel on the detail page reports that no slots are configured, and the transaction stops at the Unprocessed status.
