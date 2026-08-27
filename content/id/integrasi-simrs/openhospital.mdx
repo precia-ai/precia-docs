@@ -100,15 +100,15 @@ Pada kasus contoh, modul melaporkan keyakinan **71,7%** dengan klasifikasi **Abn
 
 ## 9. Mengirim hasil ke validasi klinis
 
-Dokter membuka menu **Validation** dan menemukan kasus tersebut pada daftar kerja. Setelah meninjau hasil AI, dokter mencatat keputusan (**Accepted** pada kasus contoh) beserta catatan klinis, dan kasus siap diterbitkan.
+Dokter membuka menu **Validasi** dan menemukan kasus tersebut pada daftar kerja. Setelah meninjau hasil AI, dokter mencatat keputusan beserta catatan klinis. Pada kasus contoh, keputusannya **Diterima**.
 
-![Halaman Validation Detail di PRECIA, kolom Decision dan Status, serta tombol Publish validation ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/09-validasi-dokter.png)
+![Halaman Detail Validasi di PRECIA, kolom Keputusan berisi Diterima, kolom Status, dan Catatan klinis ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/09-validasi-dokter.png)
 
 ## 10. Menerbitkan validasi
 
-Mengeklik **Publish validation** menandai kasus sebagai sudah ditinjau. Kolom **Status** berubah menjadi **Published** dan waktu **Published at** tercatat.
+Menekan tombol **Publikasikan validasi** menandai kasus sebagai sudah ditinjau. Kolom **Status** berubah menjadi **Dipublikasikan** dan waktu **Dipublikasikan pada** tercatat.
 
-![Halaman Validation Detail di PRECIA setelah diterbitkan, spanduk konfirmasi dan status Published ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/10-validasi-dipublikasikan.png)
+![Halaman Detail Validasi di PRECIA, kolom Status berisi Dipublikasikan dan waktu Dipublikasikan pada ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/10-validasi-dipublikasikan.png)
 
 ## 11. Memastikan hasil sampai ke Open Hospital
 
@@ -120,11 +120,11 @@ Penerbitan validasi memicu PRECIA mengirim hasil kembali ke Open Hospital lewat 
 
 ## Bagaimana data dipetakan
 
-Tabel berikut menjelaskan asal setiap data pada kasus PRECIA, berdasarkan kasus contoh `laboratory-1`.
+Tabel berikut menjelaskan asal setiap data pada kasus PRECIA, berdasarkan kasus contoh `laboratory-500001`.
 
 | Data di PRECIA | Asal di Open Hospital |
 |---|---|
-| Kode kasus | `<source_type>-<source_code>`, misalnya `laboratory-1` untuk pemeriksaan laboratorium pertama |
+| Kode kasus | `<source_type>-<source_code>`, misalnya `laboratory-500001` |
 | Nama pasien, tanggal lahir, jenis kelamin | Data demografi pasien |
 | Nomor rekam medis | **PAT.ID** pada data pasien |
 | Unit tujuan | Jenis pemeriksaan yang diminta, misalnya **ECG 12 Lead** dipetakan ke unit **Kardiologi** |
@@ -135,7 +135,7 @@ Tabel berikut menjelaskan asal setiap data pada kasus PRECIA, berdasarkan kasus 
 
 Bagian ini mencatat hal yang belum tersedia, agar tidak menimbulkan salah harapan saat integrasi dipakai.
 
-1. **Perpindahan otomatis ke PRECIA sudah dibuktikan, belum terkonfirmasi sebagai layanan tetap.** Pada 22 Agustus 2026, kasus yang dipakai di seluruh halaman ini (`laboratory-1`) menunjukkan waktu registrasi pada data permintaan Open Hospital sendiri (`registration_date: 2026-08-22T15:35:36`) yang sama, hingga ke menit, dengan waktu **Created** kasus tersebut di PRECIA (22 Agu 2026, 22:35, waktu yang sama pada UTC+7). Kasus dibuat oleh akun layanan **Open Hospital dev connector**, bukan oleh petugas. Ini adalah bukti pengambilan data nyaris seketika dan tanpa campur tangan manusia untuk percobaan ini. Kasus kedua pada hari yang sama menunjukkan arah yang sama: log konektor sendiri mencatat pembukaan kasus PRECIA `laboratory-500000` dua puluh detik setelah permintaan yang sesuai dibuat di Open Hospital, di dalam satu siklus pemindaian rutin, bukan menjalankan skrip satu kali (`05:24:21 INFO [app.runner] opened PRECIA case laboratory-500000 unit=CD transaction=c90f1dc3-0cbc-43b3-aaac-903ca5ee52e5`, diikuti `cycle done scanned=2 new=1 acknowledged=0 known=1 rejected=0 failed=0`). Panduan ini tidak membaca log tersebut secara langsung, sehingga dicantumkan sebagai penguat yang dilaporkan oleh insinyur yang menjalankan pembuktian, bukan sebagai bukti utama seperti kecocokan waktu di atas. Kedua kasus ini belum setara dengan layanan yang dipantau dan berjalan terus-menerus dari waktu ke waktu: panduan ini tidak dapat memastikan konektor tidak dijalankan secara manual untuk kedua pembuktian ini, dan waktu aktifnya belum diamati dalam jangka panjang.
+1. **Perpindahan otomatis ke PRECIA sudah dibuktikan, belum terkonfirmasi sebagai layanan tetap.** Pada 27 Agustus 2026, kasus yang dipakai di seluruh halaman ini (`laboratory-500001`) menunjukkan waktu registrasi pada data permintaan Open Hospital sendiri (`registration_date: 2026-08-27T13:58:06`) yang sama, hingga ke menit, dengan waktu **Dibuat** kasus tersebut di PRECIA (27 Agu 2026, 20:58, waktu yang sama pada UTC+7). Kasus dibuat oleh akun layanan **Open Hospital dev connector**, bukan oleh petugas. Ini adalah bukti pengambilan data nyaris seketika dan tanpa campur tangan manusia untuk percobaan ini. Kasus lain pada hari yang berdekatan menunjukkan arah yang sama: log konektor sendiri mencatat pembukaan kasus PRECIA `laboratory-500000` dua puluh detik setelah permintaan yang sesuai dibuat di Open Hospital, di dalam satu siklus pemindaian rutin, bukan menjalankan skrip satu kali (`05:24:21 INFO [app.runner] opened PRECIA case laboratory-500000 unit=CD transaction=c90f1dc3-0cbc-43b3-aaac-903ca5ee52e5`, diikuti `cycle done scanned=2 new=1 acknowledged=0 known=1 rejected=0 failed=0`). Panduan ini tidak membaca log tersebut secara langsung, sehingga dicantumkan sebagai penguat yang dilaporkan oleh insinyur yang menjalankan pembuktian, bukan sebagai bukti utama seperti kecocokan waktu di atas. Kedua kasus ini belum setara dengan layanan yang dipantau dan berjalan terus-menerus dari waktu ke waktu: panduan ini tidak dapat memastikan konektor tidak dijalankan secara manual untuk kedua pembuktian ini, dan waktu aktifnya belum diamati dalam jangka panjang.
 2. **Pengiriman hasil AI kembali ke Open Hospital sudah terkonfirmasi lewat API, belum lewat tampilan web.** Langkah 11 di atas menunjukkan endpoint Open Hospital sendiri (`precia-integration/ai-results/{sourceType}/{sourceCode}`) mengembalikan hasil tervalidasi dengan `validation_status: "published"` dan waktu `synced_at`, memastikan pengiriman baliknya sampai ke database Open Hospital. Namun panduan ini belum menemukan tempat pada antarmuka web Open Hospital yang menampilkan hasil tersebut kepada petugas.
 3. **Kasus tercatat tanpa penanda asal SIMRS pada riwayat audit.** Kasus yang dibuat konektor masuk melalui jalur pencatatan kasus biasa, sehingga pada riwayat audit tidak tampak keterangan bahwa kasus berasal dari Open Hospital secara eksplisit. Kolom Catatan pada halaman detail adalah satu-satunya penanda yang tersedia saat ini.
 4. **Modul AI harus dikonfigurasi lebih dahulu pada unit tujuan.** Selama kebijakan AI unit belum diatur, panel Modul AI pada halaman detail menampilkan keterangan bahwa belum ada slot yang dikonfigurasi, dan kasus berhenti pada status Belum Diproses.
