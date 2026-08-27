@@ -19,6 +19,8 @@ The flow in short:
 
 All screenshots on this page were taken in the PRECIA OpenEMR test environment. The view in your hospital's installation may differ slightly, depending on the OpenEMR version and the display settings in use.
 
+The inbound direction described below, from a saved order in OpenEMR to a matching case in PRECIA, runs automatically today, and once a doctor validates an AI result in PRECIA it is written back into the same patient's OpenEMR record. Both directions were most recently re-verified on 27 August 2026. What is not yet covered on this page is set out in [Current limitations](#current-limitations).
+
 ## Before you start
 
 Prepare the following:
@@ -129,7 +131,7 @@ The work in OpenEMR ends here.
 
 ## Viewing the matching case in PRECIA
 
-Once the order is saved, the PRECIA connector reads it and creates a new clinical case. In the test environment the connector is run by the technical team, so the case does not always appear immediately. See [Current limitations](#current-limitations).
+Once the order is saved, a connector signed in as PRECIA reads it and creates a new clinical case automatically. The connector polls for new orders on a fixed interval rather than being notified the instant one is saved, so there can be a short delay before the case appears.
 
 ### 1. Open the unit list
 
@@ -172,17 +174,15 @@ The table below explains where each field on the PRECIA case comes from.
 
 This section records what is not available yet, so the integration is not relied on for more than it does.
 
-1. **Orders do not reach PRECIA automatically.** A continuously running connector service is not deployed. In the test environment, reading orders out of OpenEMR is performed by the technical team, so a new case appears in PRECIA only after that process is run.
+1. **There can be a short delay before a case appears.** The connector polls OpenEMR for new orders on a fixed interval rather than being notified the instant one is saved, so a new case does not always appear in PRECIA the same second the order is saved in OpenEMR.
 
-2. **OpenEMR sends no automatic notification.** OpenEMR has no mechanism to notify another system when a new order is raised. The connector has to check for new orders periodically, so there is always a delay between saving the order in OpenEMR and the case appearing in PRECIA.
+2. **OpenEMR settings are not yet on the SIMRS Integration page.** The adapter list on the [SIMRS Integration](/integrasi-simrs) page does not include OpenEMR. The unit mapping, for example **Radiology** to the **Radiologi** unit, currently lives in the connector rather than in the organization settings in PRECIA. Mapping changes have to be requested from the technical team.
 
-3. **OpenEMR settings are not yet on the SIMRS Integration page.** The adapter list on the [SIMRS Integration](/integrasi-simrs) page does not include OpenEMR. The unit mapping, for example **Radiology** to the **Radiologi** unit, currently lives in the connector rather than in the organization settings in PRECIA. Mapping changes have to be requested from the technical team.
+3. **The Transmit Order button is not used.** That button belongs to the laboratory messaging path built into OpenEMR. The PRECIA integration does not use that path, and pressing it does not speed up processing.
 
-4. **Cases are recorded without a SIMRS origin marker.** Cases created by the connector come in through the ordinary case recording path, so the audit history does not show that the case originated in OpenEMR. Duplicate protection is not active either, so running the connector twice can produce more than one case for a single order.
+4. **Viewing the AI result inside OpenEMR is not covered by this guide.** The connector writes a validated AI result back into the patient's OpenEMR record as a document, but this page does not yet walk through opening that document from the OpenEMR side. Reviewing the result in PRECIA remains the documented path.
 
-5. **The Transmit Order button is not used.** That button belongs to the laboratory messaging path built into OpenEMR. The PRECIA integration does not use that path, and pressing it does not speed up processing.
-
-6. **Sending AI results back into OpenEMR is not covered by this guide.** This guide covers the inbound direction only, from OpenEMR into PRECIA. AI module output is reviewed in PRECIA.
+An earlier version of this page reported that a continuously running connector service was not deployed, that a case created through the connector carried no marker showing it came from OpenEMR, that duplicate protection was not active, and that sending an AI result back into OpenEMR did not happen. None of that is current: the connector now runs as a standing service, a case created through it carries a SIMRS origin marker, restarting the connector does not reprocess an order it already handled, and a validated AI result is written back into the patient's OpenEMR record automatically. What remains open is the unit mapping and the OpenEMR-side viewing walkthrough described above.
 
 ## Troubleshooting
 
@@ -190,6 +190,6 @@ This section records what is not available yet, so the integration is not relied
 |---|---|---|
 | The **Sending To** field does not list PRECIA | The provider is not registered in OpenEMR | Check the **Procedure Providers** page, then contact the PRECIA implementation team |
 | The **Find Procedure Order** search returns nothing | The procedure is not in the order dictionary | Check the **Configure Orders and Results** page under the **PRECIA Radiology** group |
-| The order is saved but no case appears in PRECIA | The connector has not been run, or **Performer Type** was not set to **Radiology** | Reopen the order in OpenEMR and check the entries, then contact the technical team |
+| The order is saved but no case appears in PRECIA | The connector has not polled yet, wait one cycle, or **Performer Type** was not set to **Radiology** | Wait briefly and refresh, or reopen the order in OpenEMR and check the entries, then contact the technical team |
 | The case appears in the wrong unit | The **Performer Type** value does not match the unit mapping | Correct the entry on the order, then ask the technical team to check the unit mapping |
-| The case appears more than once | The connector was run repeatedly for the same order | Cancel the extra cases in PRECIA and report it to the technical team |
+| The case appears more than once | An unexpected duplicate slipped through | Cancel the extra cases in PRECIA and report it to the technical team |
