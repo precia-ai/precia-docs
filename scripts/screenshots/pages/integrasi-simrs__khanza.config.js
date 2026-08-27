@@ -9,6 +9,11 @@
  *      PRECIA di sisi Khanza.
  *   3. Halaman daftar kerja dan detail transaksi PRECIA yang terbentuk dari
  *      kasus Khanza 2026/07/28/000001.
+ *   4. Langkah 08 dan 09 (arah balik, hasil AI ditarik ke Khanza) BELUM
+ *      TERBUKTI. Lihat komentar pada masing-masing spec untuk daftar
+ *      asumsi yang wajib diverifikasi lebih dulu: URL portal webapps/,
+ *      apakah kredensial klien Swing juga berlaku di sana, dan apakah
+ *      kasus contoh sudah punya baris hasil di precia_result_in.
  *
  * KLIEN KHANZA HANYA MERESPONS KEYBOARD, DAN INI SUDAH DIVERIFIKASI.
  * Setiap peristiwa mouse yang masuk ke jendela Java memicu
@@ -28,6 +33,18 @@
  */
 
 const KHANZA_URL = process.env.KHANZA_UI_URL || 'https://khanza-ui-dev.precia.site'
+
+/**
+ * Base URL portal web terpisah (webapps/) tempat preciahasil.php berada.
+ * BELUM DIKONFIRMASI: nilai bawaan di bawah adalah tebakan berpola sama
+ * dengan KHANZA_UI_URL, bukan alamat yang sudah diverifikasi berjalan.
+ * Set KHANZA_WEBAPPS_URL di .env.local begitu tim infrastruktur
+ * mengonfirmasi alamat sesungguhnya.
+ */
+function khanzaWebappsUrl(pathSuffix) {
+  const base = (process.env.KHANZA_WEBAPPS_URL || 'https://khanza-webapps-dev.precia.site').replace(/\/$/, '')
+  return `${base}${pathSuffix}`
+}
 
 const TX_ID = '5a55439c-7ad5-4a19-9f28-0a928db4b9e7'
 const TX_CODE = '2026-07-28-000001-ai-ecg-digitization'
@@ -410,5 +427,120 @@ module.exports = [
       )
     },
     annotate: ({ locale }) => annotationsFor('07', locale, ['kode', 'catatan', 'unit'])
+  },
+
+  /* ------------------------------------------------------------------ */
+  /* Arah balik: hasil AI ditarik kembali ke Khanza                       */
+  /*                                                                      */
+  /* BELUM TERBUKTI. Langkah 08 dan 09 di bawah belum pernah dijalankan   */
+  /* sampai selesai terhadap host hidup, dan wajib diverifikasi lebih     */
+  /* dulu sebelum dianggap siap eksekusi tanpa pengawasan:                */
+  /*                                                                      */
+  /*   1. URL portal webapps/preciahasil.php belum diketahui. Env         */
+  /*      KHANZA_WEBAPPS_URL di bawah adalah tebakan (subdomain sejenis   */
+  /*      KHANZA_UI_URL, path webapps/), belum dikonfirmasi ke tim        */
+  /*      infrastruktur.                                                  */
+  /*   2. Portal ini punya login sendiri (session ses_admin_login),       */
+  /*      terpisah dari klien operator Swing yang dipakai langkah 02-05.  */
+  /*      Selektor #TxtIsi1 / #TxtIsi2 / tombol submit "Log-In" diambil   */
+  /*      dari pembacaan simrs/SIMRS-Khanza/webapps/index.php, bukan dari */
+  /*      DOM sungguhan, jadi tetap perlu dicocokkan saat host hidup.     */
+  /*      Query login memeriksa tabel `admin` maupun `user` dengan skema  */
+  /*      aes_encrypt yang sama dengan klien Swing, sehingga              */
+  /*      KHANZA_UI_USER/KHANZA_UI_PASSWORD KEMUNGKINAN BESAR berlaku di  */
+  /*      sini juga, tetapi ini asumsi, bukan fakta terverifikasi.        */
+  /*   3. Kasus 2026/07/29/000001 dipakai sebagai contoh karena sisi      */
+  /*      PRECIA-nya sudah terbukti selesai (lihat                       */
+  /*      integrasi-simrs__khanza-bukti-round-trip.config.js). Belum ada  */
+  /*      kepastian baris hasilnya sudah muncul di precia_result_in pada  */
+  /*      staging Khanza; kalau tabel kosong saat host hidup, ganti       */
+  /*      KHANZA_RESULT_NO_RAWAT dengan kasus lain yang statusnya sudah   */
+  /*      Selesai di PRECIA.                                              */
+  /*                                                                      */
+  /* Karena field selector di sini diturunkan dari kode PHP, bukan dari   */
+  /* observasi, kedua langkah memakai waitForSelector dengan pesan galat  */
+  /* eksplisit alih-alih delay tetap, supaya kegagalan selector terlihat  */
+  /* jelas alih-alih menghasilkan tangkapan layar halaman galat.          */
+  /* ------------------------------------------------------------------ */
+
+  {
+    id: 'integrasi-simrs__khanza__08-login-portal-hasil',
+    section: 'integrasi-simrs',
+    pageSlug: 'khanza',
+    stepSlug: '08-login-portal-hasil',
+    // PENDING: subdomain/path belum dikonfirmasi tim infrastruktur.
+    route: khanzaWebappsUrl('/index.php'),
+    viewport: { width: 1440, height: 900 },
+    preActions: async (page, { locale }) => {
+      const { user, pass } = khanzaCredentials()
+      await page.waitForSelector('#TxtIsi1', { timeout: 20000 })
+      await page.fill('#TxtIsi1', user)
+      await page.fill('#TxtIsi2', pass)
+      // Tangkapan layar diambil SEBELUM submit, supaya kolom password yang
+      // terisi masih terlihat pada anotasi tanpa menerbitkan nilainya
+      // (redact menutup kotak sebelum garis kotak digambar).
+      await measure(page, '08', locale, 'user', page.locator('#TxtIsi1'))
+      await measure(page, '08', locale, 'password', page.locator('#TxtIsi2'))
+      await measure(page, '08', locale, 'tombol', page.locator('input[name="BtnLogin"]'))
+      // Salin kotak password sebagai redaksi, memakai geometri yang sama.
+      measured[keyOf('08', locale, 'password-redact')] = {
+        ...measured[keyOf('08', locale, 'password')],
+        type: 'redact'
+      }
+    },
+    annotate: ({ locale }) => [
+      ...annotationsFor('08', locale, ['password-redact']),
+      ...annotationsFor('08', locale, ['user', 'password', 'tombol'])
+    ]
+  },
+  {
+    id: 'integrasi-simrs__khanza__09-halaman-hasil-ai',
+    section: 'integrasi-simrs',
+    pageSlug: 'khanza',
+    stepSlug: '09-halaman-hasil-ai',
+    // Berangkat dari halaman login yang sama seperti langkah 08: setiap
+    // spec berjalan pada browser context baru (lihat run.js), jadi sesi
+    // ses_admin_login TIDAK terbawa dari langkah 08 dan login harus
+    // diulang di sini.
+    route: khanzaWebappsUrl('/index.php'),
+    viewport: { width: 1440, height: 900 },
+    preActions: async (page, { locale }) => {
+      const { user, pass } = khanzaCredentials()
+      const noRawat = process.env.KHANZA_RESULT_NO_RAWAT || '2026/07/29/000001'
+
+      await page.waitForSelector('#TxtIsi1', { timeout: 20000 })
+      await page.fill('#TxtIsi1', user)
+      await page.fill('#TxtIsi2', pass)
+      await Promise.all([
+        page.waitForNavigation({ timeout: 15000 }).catch(() => {}),
+        page.click('input[name="BtnLogin"]')
+      ])
+
+      await page.goto(khanzaWebappsUrl(`/preciahasil.php?no_rawat=${encodeURIComponent(noRawat)}`), {
+        waitUntil: 'networkidle'
+      })
+
+      const row = page.locator('table tbody tr')
+      try {
+        await row.first().waitFor({ timeout: 20000 })
+      } catch {
+        throw new Error(
+          `Tidak ada baris hasil untuk no_rawat ${noRawat}. Kemungkinan penyebab: login ke portal ` +
+          'gagal (cek KHANZA_UI_USER/KHANZA_UI_PASSWORD berlaku di tabel admin/user portal ini), ' +
+          'atau precia_result_in di staging Khanza belum berisi hasil untuk kasus ini. Ganti ' +
+          'KHANZA_RESULT_NO_RAWAT dengan kasus lain yang statusnya sudah Selesai di PRECIA.'
+        )
+      }
+      await page.waitForTimeout(500)
+
+      await measure(page, '09', locale, 'form', page.locator('#no_rawat'))
+      await measure(page, '09', locale, 'baris', row.first())
+      const tandaiLink = row.first().locator('a', { hasText: /dibaca/i })
+      if (await tandaiLink.count()) {
+        await measure(page, '09', locale, 'tandai', tandaiLink)
+      }
+    },
+    annotate: ({ locale }) =>
+      annotationsFor('09', locale, ['form', 'baris', 'tandai'].filter((name) => measured[keyOf('09', locale, name)]))
   }
 ]
