@@ -20,7 +20,7 @@ Alamat yang dipakai pada lingkungan uji coba:
 Butir berikut disiapkan oleh tim implementasi PRECIA satu kali saat penyiapan, bukan oleh pengguna rumah sakit. Pastikan semuanya sudah tersedia sebelum Anda mencoba alur di bawah.
 
 1. **Akun staf CARE.** Anda membutuhkan nama pengguna dan kata sandi staf pada fasilitas yang dipakai untuk uji coba. Akun pasien tidak dapat memesan pemeriksaan.
-2. **Katalog pemeriksaan pencitraan di CARE.** CARE bawaan hanya menyediakan katalog laboratorium. Tim implementasi menambahkan kategori **Imaging** beserta pemeriksaan **Chest X-ray (PRECIA AI)**. Tanpa penambahan itu, kotak pilihan pemesanan tidak menawarkan satu pun pemeriksaan radiologi dan alur ini tidak dapat dijalankan.
+2. **Katalog pemeriksaan pencitraan di CARE.** CARE bawaan hanya menyediakan katalog laboratorium. Tim implementasi menambahkan kategori **Imaging** beserta dua pemeriksaan, yaitu **Chest X-ray (PRECIA AI)** dan **ECG 12 lead (PRECIA AI)**. Tanpa penambahan itu, kotak pilihan pemesanan tidak menawarkan satu pun pemeriksaan radiologi dan alur ini tidak dapat dijalankan.
 3. **Organisasi dan unit di PRECIA.** Organisasi rumah sakit harus sudah terdaftar di PRECIA dan memiliki unit radiologi, pada contoh ini bernama **RAD - Radiologi**.
 4. **Akun PRECIA dengan akses unit tersebut.** Akun Anda di PRECIA harus berada pada organisasi yang sama dan berhak membaca daftar kerja unit radiologi.
 
@@ -96,6 +96,58 @@ Klik salah satu baris untuk membuka detail kasus. Halaman detail menampilkan kod
 
 Dari titik ini kasus diperlakukan sama seperti kasus yang dibuat langsung di PRECIA. Anda dapat mengunggah berkas pendukung dan meneruskan kasus ke validator melalui tombol **Kirim ke Validator**.
 
+## Langkah 10. Memesan pemeriksaan EKG
+
+Katalog CARE pada kategori **Imaging** tidak hanya berisi Chest X-ray. Tepat di atas **Chest X-ray (PRECIA AI)** terdapat pemeriksaan **ECG 12 lead (PRECIA AI)**. Buka kembali formulir **Service Request** pada encounter yang sama seperti Langkah 3, tekan kotak pilihan **Select Activity Definition**, lalu tekan kategori **Imaging**, persis seperti Langkah 4.
+
+![Katalog pemeriksaan CARE pada kategori Imaging, jejak navigasi Root ke Imaging dan pemeriksaan ECG 12 lead (PRECIA AI) ditandai kotak biru](/screenshots/id/integrasi-simrs/care/10-memilih-pemeriksaan-ecg.png)
+
+Tekan nama pemeriksaan **ECG 12 lead (PRECIA AI)** untuk memilihnya.
+
+## Langkah 11. Mengirim permintaan EKG
+
+Pemeriksaan yang dipilih tampil sebagai satu baris pada formulir, lengkap dengan lencana kategori **Imaging** dan nama dokter pemesan, sama seperti pola pada Langkah 6. Tekan **Submit** untuk mengirim permintaan.
+
+![Formulir Service Request CARE berisi ECG 12 lead (PRECIA AI) dengan lencana Imaging, baris pemeriksaan dan tombol Submit ditandai kotak biru](/screenshots/id/integrasi-simrs/care/11-mengirim-permintaan-ecg.png)
+
+## Langkah 12. Memastikan permintaan EKG tercatat di CARE
+
+Kembali ke tab **Service Requests** pada encounter. Daftar ini diurutkan dari permintaan terbaru, sehingga baris **ECG 12 lead (PRECIA AI)** muncul paling atas, di atas seluruh baris Chest X-ray yang sudah ada sebelumnya, berstatus **Active** dan berprioritas **Routine**.
+
+![Tab Service Requests CARE, baris ECG 12 lead (PRECIA AI) terbaru di posisi teratas dengan status Active ditandai kotak biru](/screenshots/id/integrasi-simrs/care/12-daftar-permintaan-ecg.png)
+
+Permintaan ini mengikuti jalur yang sama dengan Chest X-ray pada Langkah 7 sampai 9. Begitu berstatus **Active**, permintaan ini memenuhi syarat untuk dibaca ke PRECIA lewat mekanisme yang identik, terlepas dari jenis pemeriksaannya.
+
+## Melihat hasil AI dari kasus CARE, dan hasilnya tertulis kembali ke CARE
+
+Bagian ini menunjukkan rupa kasus asal CARE setelah AI benar-benar selesai memproses dan hasilnya tertulis kembali sebagai laporan diagnostik baru di CARE. Contoh pada Langkah 13 sampai 15 memakai kasus yang **berbeda** dari permintaan EKG pada Langkah 10 sampai 12: sebuah kasus **Chest X-ray** yang sudah lebih dulu ada di lingkungan uji coba dan bernomor kasus `CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f`.
+
+**Konfigurasi demonstrasi untuk menguji jalur pipeline CARE dev secara menyeluruh.** Modul AI yang berjalan pada kasus ini, **ECG Low Ejection Fraction Screening**, diaktifkan tim implementasi pada unit **RAD - Radiologi** sebagai bukti konektivitas, bukan rekomendasi klinis untuk departemen ini. Skrining fraksi ejeksi lewat EKG tidak sesuai dengan pemeriksaan Chest X-ray yang sesungguhnya dipesan pada kasus ini; nilai hasil yang ditampilkan pada Langkah 13 semata membuktikan bahwa jalur pemrosesan AI dan penulisan hasil kembali ke CARE benar-benar berfungsi ujung ke ujung, bukan temuan klinis yang berlaku pada pemeriksaan radiologi.
+
+## Langkah 13. Melihat hasil AI di PRECIA
+
+Masuk ke PRECIA, buka menu **Klinis**, pilih unit **RAD - Radiologi** seperti pada Langkah 8, lalu tekan tab **Berdasarkan Modul AI**. Atur penyaring **Status Slot** ke **Selesai**. Klik baris berkode `CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f` untuk membuka rincian hasilnya.
+
+![Daftar Kerja Transaksi PRECIA pada tab Berdasarkan Modul AI, baris kasus CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f dan panel hasil AI ECG Low Ejection Fraction Screening ditandai kotak biru](/screenshots/id/integrasi-simrs/care/13-hasil-ai-modul-precia.png)
+
+Panel yang terbuka menampilkan skor keyakinan **65.8%**, klasifikasi **EF-Low**, serta catatan bahwa hasil ini adalah bantuan skrining, bukan diagnosis akhir. Keputusan klinis tetap berada pada dokter yang menangani pasien.
+
+## Langkah 14. Melihat laporan diagnostik hasil AI di CARE
+
+Setelah hasil AI tervalidasi, PRECIA menuliskannya kembali ke CARE sebagai laporan diagnostik baru. Buka encounter CARE yang sama, lalu pilih tab **Diagnostic Reports**.
+
+![Tab Diagnostic Reports pada encounter CARE, tab aktif dan kartu laporan Chest X-ray (PRECIA AI) terbaru ditandai kotak biru](/screenshots/id/integrasi-simrs/care/14-laporan-diagnostik-care.png)
+
+Laporan terbaru muncul di posisi teratas daftar, berjudul sama dengan pemeriksaan asal, **Chest X-ray (PRECIA AI)**, dan berstatus **Final**.
+
+## Langkah 15. Membuka detail laporan diagnostik
+
+Klik laporan tersebut untuk membuka detailnya. Kolom **Notes** memuat ringkasan hasil AI: kode modul, skor keyakinan, versi model, status validasi, serta nomor transaksi dan nomor job PRECIA yang dapat dipakai untuk menelusuri kembali ke kasus asalnya.
+
+![Detail laporan diagnostik CARE, lencana status Final dan kolom Notes berisi ringkasan hasil AI PRECIA ditandai kotak biru](/screenshots/id/integrasi-simrs/care/15-detail-laporan-diagnostik-care.png)
+
+Di bawah ringkasan tersebut, kolom **Notes** yang sama juga memuat data mentah bentuk gelombang EKG dalam format JSON, sebagai bagian dari keluaran teknis modul AI. Data itu tidak ditujukan untuk dibaca petugas dan sedang dilaporkan sebagai catatan perbaikan tampilan kepada tim teknis.
+
 ## Cara mencocokkan kasus PRECIA dengan permintaan CARE
 
 Ada dua penanda yang menghubungkan keduanya, dan keduanya dapat dibaca langsung di layar.
@@ -110,8 +162,8 @@ Bila Anda perlu memastikan satu kasus tertentu, salin potongan nomor tersebut la
 Bagian ini menjelaskan apa yang belum berjalan pada lingkungan uji coba. Semua butir di bawah teramati langsung, bukan perkiraan.
 
 1. **Perpindahan kasus dari CARE ke PRECIA belum berjalan otomatis.** Konektor yang membaca permintaan dari CARE belum terpasang sebagai layanan yang berjalan terjadwal. Pada peragaan, langkah tersebut dijalankan oleh tim implementasi setelah permintaan dikirim. Karena itu jangan menunggu kasus muncul dengan sendirinya di PRECIA, dan jangan menyimpulkan ada kegagalan bila kasus belum tampak.
-2. **Hasil AI belum dikirim kembali ke CARE.** PRECIA belum menulis hasil pemeriksaan ke tab **Diagnostic Reports** milik CARE pada lingkungan ini. Arah pengiriman balik sudah diuji secara terpisah oleh tim teknis, tetapi belum tersambung ke alur PRECIA, sehingga pengguna belum dapat mengandalkannya.
-3. **Belum ada modul AI yang terpasang pada unit radiologi.** Pada detail kasus, bagian **Modul AI** menampilkan keterangan bahwa belum ada slot yang dikonfigurasi. Artinya kasus dari CARE tersimpan dengan benar, tetapi belum ada analisis AI yang berjalan atasnya.
+2. **Hasil AI sudah terbukti dapat dikirim kembali ke CARE, tetapi baru untuk satu kasus demonstrasi.** Langkah 13 sampai 15 di atas menunjukkan bukti nyata bahwa PRECIA dapat menulis hasil pemeriksaan ke tab **Diagnostic Reports** milik CARE. Ini bukan kemampuan yang berjalan otomatis untuk setiap kasus baru, karena modul AI yang menghasilkannya hanya diaktifkan khusus untuk kasus tersebut sebagai bukti konektivitas, bukan sebagai konfigurasi permanen pada unit radiologi.
+3. **Modul AI pada unit radiologi hanya aktif untuk satu kasus demonstrasi.** Kasus baru dari CARE, termasuk permintaan EKG pada Langkah 10 sampai 12, tetap berhenti pada status **Belum Diproses** karena bagian **Modul AI** pada detail kasus menampilkan keterangan bahwa belum ada slot yang dikonfigurasi untuk unit ini secara umum. Jangan menganggap hasil pada Langkah 13, yang memakai modul **ECG Low Ejection Fraction Screening**, sebagai kesesuaian klinis antara modul tersebut dan pemeriksaan radiologi biasa; modul itu diaktifkan semata untuk membuktikan jalur AI-ke-CARE berfungsi ujung ke ujung.
 4. **Nomor rekam medis diisi dengan nomor pasien milik CARE.** Nilai pada kolom MRN adalah pengenal pasien di CARE, bukan nomor rekam medis rumah sakit. Nilai itu konsisten dan dapat dipakai untuk pencarian, tetapi jangan dianggap sama dengan nomor rekam medis pada sistem pendaftaran.
 5. **Prioritas tidak diambil dari CARE.** Seluruh permintaan pada contoh di atas berprioritas **Routine** di CARE, sedangkan salah satu kasus di PRECIA tercatat berprioritas **Mendesak**. Prioritas kasus ditentukan saat kasus dibawa masuk ke PRECIA, jadi periksa kembali nilainya di PRECIA bila prioritas penting bagi alur kerja Anda.
 6. **Jenis kelamin yang tidak dikenal PRECIA dipetakan menjadi Lainnya.** Data uji coba CARE memuat nilai jenis kelamin yang tidak memiliki padanan di PRECIA. Nilai semacam itu ditampilkan sebagai **Lainnya** pada detail kasus.

@@ -20,7 +20,7 @@ Addresses used in the trial environment:
 The items below are prepared once by the PRECIA implementation team during setup, not by hospital users. Make sure all of them are in place before you try the workflow.
 
 1. **A CARE staff account.** You need a staff username and password on the facility used for the trial. Patient accounts cannot place orders.
-2. **The imaging catalogue in CARE.** Stock CARE only provides a laboratory catalogue. The implementation team adds the **Imaging** category together with the **Chest X-ray (PRECIA AI)** examination. Without that addition, the ordering combobox offers no radiology examination at all and this workflow cannot be run.
+2. **The imaging catalogue in CARE.** Stock CARE only provides a laboratory catalogue. The implementation team adds the **Imaging** category together with two examinations, **Chest X-ray (PRECIA AI)** and **ECG 12 lead (PRECIA AI)**. Without that addition, the ordering combobox offers no radiology examination at all and this workflow cannot be run.
 3. **The organization and unit in PRECIA.** The hospital organization must already be registered in PRECIA and must have a radiology unit, named **RAD - Radiologi** in this example.
 4. **A PRECIA account with access to that unit.** Your PRECIA account must belong to the same organization and be allowed to read the radiology unit worklist.
 
@@ -96,6 +96,58 @@ Click one of the rows to open the case detail. The detail page shows the case co
 
 From this point the case behaves exactly like a case created directly in PRECIA. You can upload supporting files and pass the case on to a validator with the **Send to Validator** button.
 
+## Step 10. Ordering an ECG examination
+
+The CARE catalogue in the **Imaging** category is not limited to Chest X-ray. Right above **Chest X-ray (PRECIA AI)** sits an **ECG 12 lead (PRECIA AI)** examination. Open the **Service Request** form again on the same encounter as in Step 3, press the **Select Activity Definition** combobox, then press the **Imaging** category, exactly as in Step 4.
+
+![CARE examination catalogue in the Imaging category, the Root to Imaging breadcrumb and the ECG 12 lead (PRECIA AI) examination marked with blue boxes](/screenshots/en/integrasi-simrs/care/10-memilih-pemeriksaan-ecg.png)
+
+Press the examination name, **ECG 12 lead (PRECIA AI)**, to select it.
+
+## Step 11. Sending the ECG request
+
+The selected examination appears as a row on the form, complete with the **Imaging** category badge and the name of the ordering doctor, the same pattern as Step 6. Press **Submit** to send the request.
+
+![CARE Service Request form holding ECG 12 lead (PRECIA AI) with the Imaging badge, the examination row and the Submit button marked with blue boxes](/screenshots/en/integrasi-simrs/care/11-mengirim-permintaan-ecg.png)
+
+## Step 12. Confirming the ECG request was recorded in CARE
+
+Return to the **Service Requests** tab on the encounter. The list sorts newest first, so the **ECG 12 lead (PRECIA AI)** row appears at the top, above every Chest X-ray row already there, with status **Active** and priority **Routine**.
+
+![Service Requests tab in CARE, the newest ECG 12 lead (PRECIA AI) row at the top with status Active marked with a blue box](/screenshots/en/integrasi-simrs/care/12-daftar-permintaan-ecg.png)
+
+This request follows the same path as the Chest X-ray request in Steps 7 through 9. Once it is **Active**, it is eligible to be read into PRECIA through the identical mechanism, regardless of examination type.
+
+## Seeing an AI result from a CARE case, and its result written back to CARE
+
+This section shows what a CARE-origin case looks like once AI has actually finished processing it and the result has been written back as a new diagnostic report in CARE. The example in Steps 13 through 15 uses a **different** case from the ECG request in Steps 10 through 12: a **Chest X-ray** case that already existed in the trial environment, coded `CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f`.
+
+**Demonstration configuration to exercise the CARE dev pipeline end to end.** The AI module that ran on this case, **ECG Low Ejection Fraction Screening**, was enabled by the implementation team on the **RAD - Radiologi** unit as a connectivity proof, not a clinical recommendation for this department. Ejection-fraction screening from an ECG does not match the Chest X-ray examination actually ordered on this case; the result value shown in Step 13 exists solely to prove that AI processing and writing the result back to CARE genuinely works end to end, not as a clinical finding that applies to a radiology examination.
+
+## Step 13. Viewing the AI result in PRECIA
+
+Sign in to PRECIA, open the **Clinical** menu, select the **RAD - Radiologi** unit as in Step 8, then press the **By AI Module** tab. Set the **Slot Status** filter to **Completed**. Click the row coded `CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f` to open its result detail.
+
+![PRECIA Transaction Worklist on the By AI Module tab, the CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f case row and the ECG Low Ejection Fraction Screening AI result panel marked with blue boxes](/screenshots/en/integrasi-simrs/care/13-hasil-ai-modul-precia.png)
+
+The panel that opens shows a confidence score of **65.8%**, classification **EF-Low**, and a note that this result is a screening aid, not a final diagnosis. The clinical decision remains with the treating doctor.
+
+## Step 14. Viewing the AI result's diagnostic report in CARE
+
+Once the AI result is validated, PRECIA writes it back into CARE as a new diagnostic report. Open the same CARE encounter, then select the **Diagnostic Reports** tab.
+
+![Diagnostic Reports tab on the CARE encounter, the active tab and the newest Chest X-ray (PRECIA AI) report card marked with blue boxes](/screenshots/en/integrasi-simrs/care/14-laporan-diagnostik-care.png)
+
+The newest report appears at the top of the list, titled the same as the original examination, **Chest X-ray (PRECIA AI)**, with status **Final**.
+
+## Step 15. Opening the diagnostic report detail
+
+Click the report to open its detail. The **Notes** field carries a summary of the AI result: the module code, confidence score, model version, validation status, and the PRECIA transaction and job numbers that can be used to trace back to the original case.
+
+![CARE diagnostic report detail, the Final status badge and the Notes field holding the PRECIA AI result summary marked with blue boxes](/screenshots/en/integrasi-simrs/care/15-detail-laporan-diagnostik-care.png)
+
+Below that summary, the same **Notes** field also carries the raw ECG waveform data in JSON, as part of the AI module's technical output. That data is not meant for staff to read and is being reported as a display cleanup item to the technical team.
+
 ## Matching a PRECIA case to a CARE request
 
 Two markers connect the two, and both can be read straight off the screen.
@@ -110,8 +162,8 @@ If you need to confirm one specific case, copy part of that number and paste it 
 This section describes what does not yet work in the trial environment. Every item below was observed directly, not assumed.
 
 1. **Moving a case from CARE to PRECIA is not yet automatic.** The connector that reads requests from CARE is not installed as a scheduled running service. During the demonstration that step is performed by the implementation team after the request has been sent. Do not wait for the case to appear in PRECIA on its own, and do not conclude that something has failed when the case is not yet visible.
-2. **AI results are not sent back to CARE.** PRECIA does not write examination results into the CARE **Diagnostic Reports** tab in this environment. The return direction has been tested separately by the technical team, but it is not connected to the PRECIA workflow, so users cannot rely on it yet.
-3. **No AI module is attached to the radiology unit.** On the case detail, the **AI Modules** section states that no slot is configured. This means the case from CARE is stored correctly, but no AI analysis runs on it.
+2. **AI results have been proven to be sent back to CARE, but only for one demonstration case.** Steps 13 through 15 above show real evidence that PRECIA can write examination results into the CARE **Diagnostic Reports** tab. This is not a capability that runs automatically for every new case, because the AI module that produced it was enabled specifically for that case as a connectivity proof, not as a permanent configuration on the radiology unit.
+3. **The AI module on the radiology unit is only active for one demonstration case.** New cases from CARE, including the ECG request in Steps 10 through 12, still stop at the **Unprocessed** status, because the **AI Modules** section on the case detail states that no slot is configured for this unit in general. Do not treat the result in Step 13, which uses the **ECG Low Ejection Fraction Screening** module, as clinical fitness between that module and an ordinary radiology examination; the module was enabled solely to prove the AI-to-CARE path works end to end.
 4. **The medical record number is filled with the CARE patient number.** The value in the MRN column is the patient identifier in CARE, not the hospital medical record number. It is consistent and can be used for searching, but do not treat it as the same as the medical record number in the registration system.
 5. **Priority is not taken from CARE.** Every request in the example above is **Routine** in CARE, while one of the cases in PRECIA is recorded as **Urgent**. Case priority is set at the moment the case is brought into PRECIA, so check the value again in PRECIA if priority matters to your workflow.
 6. **Genders PRECIA does not recognise are mapped to Other.** The CARE trial data contains gender values that have no equivalent in PRECIA. Such values are displayed as **Other** on the case detail.

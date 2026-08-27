@@ -6,7 +6,7 @@ title: OpenMRS 3 Integration
 
 This page explains how the integration between **OpenMRS 3** (the OpenMRS 3 Reference Application) and PRECIA works, from a hospital staff point of view. The flow is straightforward: staff raise a test order in OpenMRS 3 as usual, then the PRECIA connector reads that order list and creates a matching clinical case in PRECIA.
 
-What is documented here is **one direction only, from OpenMRS 3 into PRECIA**. Writing the AI result back into the OpenMRS medical record is not part of the flow shown in the screenshots below, and must not be assumed to be running.
+Most of this page shows **one direction, from OpenMRS 3 into PRECIA**: raising an order through to seeing the case in PRECIA. The last section of this page, [Viewing the AI result and validation synced back to OpenMRS](#viewing-the-ai-result-and-validation-synced-back-to-openmrs), shows the return direction using one case that has genuinely finished processing: the AI result, the doctor's validation decision, and the result synced back into the OpenMRS medical record. Do not assume other cases automatically follow the same path; see the notes in that section for its scope.
 
 ## Before you start
 
@@ -129,9 +129,35 @@ On the **Transaction Details** card, the **AI Modules** section states that no s
 
 ![PRECIA case detail from the OpenMRS 3 integration, the transaction code and the notes holding the OpenMRS order number marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/15-detail-kasus.png)
 
+## Viewing the AI result and validation synced back to OpenMRS
+
+This section shows what one case looks like once it is genuinely finished: AI has processed it, a doctor has validated it, and the result has synced back into OpenMRS. The example uses a different case from Steps 13 through 15 above, the transaction belonging to patient **Mary Smith** (OpenMRS ID **10000F1**) on the **Kardiologi** unit, with the **ECG Mitral Valve Screening** AI module. The case in Steps 13 through 15 is deliberately left waiting (no AI slot configured) so the reader sees the most common condition first; the case in this section shows the condition once an AI module is genuinely active and runs to completion. Do not conclude that the Kardiologi unit always processes new cases automatically; whether an AI module is active on a given unit can change over time, and the implementation team can explain the current state in full.
+
+### 16. Viewing the AI result on the transaction detail
+
+Open the transaction detail as in Step 15, this time for Mary Smith's transaction. The **Transaction Details** card now shows the **ECG Mitral Valve Screening** module in the **AI Modules** section, replacing the "no slot configured" message shown in Step 15. The tab on the right shows the same module name with status **Completed**.
+
+![PRECIA transaction detail for patient Mary Smith, the AI Modules section and the ECG Mitral Valve Screening result tab with status Completed marked with blue boxes](/screenshots/en/integrasi-simrs/openmrs/16-hasil-ai.png)
+
+### 17. Viewing the AI result and the doctor's validation decision
+
+The validation status and decision are not shown on the transaction detail page, they live on a separate **Validation** menu. Open that menu, then find the transaction coded `eb0d127b-0917-4dc8-8289-61418f3fa2e1` in the **Recorded Decisions** list. Click that row to open the **Validation Detail** card.
+
+![PRECIA Validation Detail card for transaction eb0d127b, the Decision/Status row and the AI result box holding the confidence score marked with blue boxes](/screenshots/en/integrasi-simrs/openmrs/17-hasil-ai-dan-validasi.png)
+
+This card shows both the AI result (confidence score **86.0%**, together with a note that this result is a screening aid, not a final diagnosis) and the doctor's decision, **Accepted** with status **Published**. Because this case has already been validated, this section only captures the outcome, not the decision-making step itself; that flow is covered in [Clinical Cases](/kasus-klinis).
+
+### 18. Confirming the result synced back to OpenMRS
+
+Sign in to OpenMRS 3, open patient **Mary Smith**'s record, then select the **Results** tab in the left navigation. The top card in this panel shows the result from PRECIA.
+
+![OpenMRS 3 Results panel on Mary Smith's patient record, the PRECIA AI ECG Mitral Regurgitation Assessment card with value Control marked with a blue box](/screenshots/en/integrasi-simrs/openmrs/18-hasil-tersinkron-openmrs.png)
+
+The card is titled **PRECIA AI ECG Mitral Regurgitation Assessment** with value **Control**, a result category rather than a confidence figure. The confidence score is only shown on the PRECIA side (Step 17), not in this OpenMRS view.
+
 ## Known limitations
 
-- **This integration runs in one direction.** Test orders flow from OpenMRS 3 into PRECIA. Writing the AI result back into the OpenMRS medical record is not shown in this flow and must not be promised to clinical users on the basis of this page.
+- **The return direction has been proven to work, but only for one case that genuinely finished.** The [Viewing the AI result and validation synced back to OpenMRS](#viewing-the-ai-result-and-validation-synced-back-to-openmrs) section shows real evidence that an AI result and a validation decision can sync back into the OpenMRS medical record. This is not a guarantee that every new case will automatically follow the same path; whether an AI module is active on a given unit can change over time.
 - **Cases stop at the Unprocessed status** while the target unit has no active AI module. The case stays visible and can be opened, but no AI result is produced.
 - **Add to basket alone is not enough.** An order must go through **Order form** and **Save order**, otherwise **Sign and close** stays disabled.
 - **The order basket is not stored permanently.** An unsigned order is lost when the page is reloaded.

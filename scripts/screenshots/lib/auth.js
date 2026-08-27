@@ -21,7 +21,7 @@ function credsForRole(role) {
 
 async function login(page, role) {
   const { email, password } = credsForRole(role)
-  await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' })
+  await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' })
   await page.fill('#email', email)
   await page.fill('#password', password)
   await page.click('button[type="submit"]')
