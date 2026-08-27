@@ -70,6 +70,7 @@ const GNUHEALTH_URL = process.env.GNUHEALTH_UI_URL || 'https://gnuhealth-dev.pre
 /** Kasus pembuktian pada organisasi demo "RS Uji Coba GNU Health". */
 const PRECIA_TX_ID = '223cb1c1-0aa4-41bc-8f2c-37599464cceb'
 const PRECIA_UNIT_LABEL = 'Poliklinik Kardiologi'
+const PRECIA_UNIT_ID = 'a876b556-f672-475b-9e4a-44837f06af28'
 
 /** Order dan hasil pemeriksaan pencitraan pada instansi GNU Health dev. */
 const ORDER_NUMBER = '010'
@@ -254,6 +255,19 @@ module.exports = [
     preActions: async (page, { locale }) => {
       await page.waitForSelector('#simrs-adapter', { timeout: 20000 })
       await page.waitForTimeout(1500)
+      // The shared platform SUP account's own organization ("System Health
+      // Organization") has a single mutable simrs.adapter record that every
+      // SIMRS needing this settings screen was racing to overwrite via
+      // "Save connection settings" — confirmed live 2026-08-27 by diffing
+      // this page's earlier saved screenshot against Open Hospital's:
+      // byte-identical, same admin@precia.ai identity, same org, whichever
+      // SIMRS saved last silently won. Fixed the same way
+      // integrasi-simrs__khanza.config.js already does: overwrite the form
+      // to GNU Health's own values WITHOUT clicking Save, so the screenshot
+      // is correct regardless of whatever another SIMRS last persisted.
+      await page.selectOption('#simrs-adapter', 'gnuhealth')
+      await page.fill('#simrs-endpoint-url', 'https://simrs.contoh-rs.example/gnuhealth')
+      await page.waitForTimeout(800)
       await measure(page, '01', locale, 'adapter', page.locator('#simrs-adapter'))
       await measure(page, '01', locale, 'endpoint', page.locator('#simrs-endpoint-url'))
     },
@@ -357,15 +371,22 @@ module.exports = [
     section: SECTION,
     pageSlug: PAGE,
     stepSlug: '08-daftar-kerja-precia',
-    route: '/clinical',
+    // Verified live 2026-08-27: plain /clinical now shows a "Choose a Unit"
+    // card picker with no table at all, not a worklist with a select
+    // filter. Passing ?unit=<id> lands directly on that unit's worklist,
+    // same convention as Bahmni's own step 08.
+    route: `/clinical?unit=${PRECIA_UNIT_ID}`,
     role: 'GNUHEALTH',
     preActions: async (page, { locale }) => {
       await page.waitForSelector('table tbody tr', { timeout: 25000 })
       await page.waitForTimeout(1500)
-      // PERLU VERIFIKASI: indeks select ini diwarisi dari versi sebelumnya
-      // (nth(1) = penyaring Unit), belum diukur ulang pada tampilan terkini.
+      // With ?unit= already in the route, select index 1 (0 is Status) is
+      // the Unit filter and is already set to Poliklinik Kardiologi.
+      // selectOption({label: PRECIA_UNIT_LABEL}) failed here: the actual
+      // option label is "KARDIO - Poliklinik Kardiologi" (code prefix
+      // included), not the bare unit name, and reselecting is redundant
+      // anyway since the URL already picked it. Just measure it as-is.
       const unitFilter = page.locator('select').nth(1)
-      await unitFilter.selectOption({ label: PRECIA_UNIT_LABEL })
       await page.waitForTimeout(2000)
       await measure(page, '08', locale, 'unit-filter', unitFilter)
       await measure(
@@ -401,16 +422,38 @@ module.exports = [
     annotate: ({ locale }) => annotationsFor('09', locale, ['code', 'unit'])
   },
   {
+    // Two elements both render the text "ECG EF Screening": the AI Modules
+    // chip under Transaction Details (index 0) and the actual tab button
+    // (index 1). .first() was clicking the chip, which does nothing, so the
+    // page stayed on the Patient Info tab and neither locator below was
+    // ever found. Confirmed live 2026-08-27.
+    //
+    // Also: GNUHEALTH-10's AI module already reached status "Completed" by
+    // the time this generator runs (same permanence problem already noted
+    // on step 12's own comment below) — there is no "Trigger AI" button to
+    // capture anymore, and reproducing the pre-trigger moment would mean
+    // reverting a real completed result. This step therefore shows the
+    // uploaded source file together with the module's current status.
+    //
+    // That status text is itself translated (precia-fe lib/i18n/
+    // translations.ts, key "status.completed": "Completed" in English,
+    // "Selesai" in Indonesian) — a literal 'text=Completed' locator only
+    // ever matches the English pass. Confirmed live: on the 'id' pass the
+    // tab click was working correctly the whole time, the page really did
+    // show "Selesai", not "Completed"; hours were lost to this looking
+    // like a click/network bug when it was a hardcoded-English-string bug.
     id: 'integrasi-simrs__gnu-health__10-slot-ai-terisi',
     section: SECTION,
     pageSlug: PAGE,
     stepSlug: '10-slot-ai-terisi',
     route: `/clinical/transactions/${PRECIA_TX_ID}`,
     role: 'GNUHEALTH',
+    fullPage: true,
     preActions: async (page, { locale }) => {
+      const statusText = locale === 'id' ? 'Selesai' : 'Completed'
       await page.waitForSelector('h1', { timeout: 25000 })
-      await page.getByText('ECG EF Screening', { exact: true }).first().click()
-      await page.waitForTimeout(2000)
+      await page.getByText('ECG EF Screening', { exact: true }).nth(1).click()
+      await page.waitForSelector(`text=${statusText}`, { timeout: 20000 })
       await measure(
         page,
         '10',
@@ -422,29 +465,44 @@ module.exports = [
         page,
         '10',
         locale,
-        'trigger',
-        page.locator('button:has-text("Trigger AI")').first()
+        'status',
+        page.locator(`text=${statusText}`).first()
       )
     },
-    annotate: ({ locale }) => annotationsFor('10', locale, ['file', 'trigger'])
+    annotate: ({ locale }) => annotationsFor('10', locale, ['file', 'status'])
   },
   {
+    // Confidence/classification render below the fold at the default
+    // viewport height; a non-fullPage screenshot cropped them out entirely
+    // while the step still reported success (boundingBox() doesn't require
+    // the element to be within the visible viewport). Confirmed live
+    // 2026-08-27: the saved PNG was exactly 1440x900 with no annotated
+    // content visible anywhere in it.
     id: 'integrasi-simrs__gnu-health__11-hasil-ai-tampil',
     section: SECTION,
     pageSlug: PAGE,
     stepSlug: '11-hasil-ai-tampil',
     route: `/clinical/transactions/${PRECIA_TX_ID}`,
     role: 'GNUHEALTH',
+    fullPage: true,
     preActions: async (page, { locale }) => {
+      // "Confidence" is a translated label (precia-fe lib/i18n/
+      // translations.ts, "clinical.colConfidence": "Confidence" / EN,
+      // "Keyakinan" / ID) — a literal 'text=Confidence' locator only
+      // matches the English pass. "Abnormal" is a raw AI classification
+      // value, not translated, confirmed absent from the translations file
+      // as its own key, so it is safe as a literal in both locales.
+      const confidenceLabel = locale === 'id' ? 'Keyakinan' : 'Confidence'
       await page.waitForSelector('h1', { timeout: 25000 })
-      await page.getByText('ECG EF Screening', { exact: true }).first().click()
+      // Same click-index fix as step 10: index 1 is the actual tab.
+      await page.getByText('ECG EF Screening', { exact: true }).nth(1).click()
       await page.waitForTimeout(2500)
       await measure(
         page,
         '11',
         locale,
         'confidence',
-        page.locator('text=Confidence').first().locator('xpath=ancestor::div[1]')
+        page.locator(`text=${confidenceLabel}`).first().locator('xpath=ancestor::div[1]')
       )
       await measure(page, '11', locale, 'classification', page.locator('text=Abnormal').first())
     },
@@ -464,10 +522,18 @@ module.exports = [
     route: '/validation',
     role: 'GNUHEALTH',
     preActions: async (page, { locale }) => {
-      await page.waitForSelector('text=Validation Detail', { timeout: 25000 })
+      // Both "Validation Detail" and "Published" are translated labels
+      // (precia-fe lib/i18n/translations.ts: "validation.detailTitle" ->
+      // "Detail Validasi" in Indonesian, "validation.statusPublished" ->
+      // "Dipublikasikan"). Literal English locators only ever matched the
+      // English pass; this is the actual reason this step kept timing out
+      // on the 'id' pass, not the network flakiness it looked like.
+      const detailTitle = locale === 'id' ? 'Detail Validasi' : 'Validation Detail'
+      const publishedLabel = locale === 'id' ? 'Dipublikasikan' : 'Published'
+      await page.waitForSelector(`text=${detailTitle}`, { timeout: 25000 })
       await page.waitForTimeout(2000)
       await measure(page, '12', locale, 'transaction', page.locator('text=GNUHEALTH-10').first())
-      await measure(page, '12', locale, 'status', page.locator('text=Published').first())
+      await measure(page, '12', locale, 'status', page.locator(`text=${publishedLabel}`).first())
     },
     annotate: ({ locale }) => annotationsFor('12', locale, ['transaction', 'status'])
   },

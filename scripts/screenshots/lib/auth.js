@@ -21,7 +21,12 @@ function credsForRole(role) {
 
 async function login(page, role) {
   const { email, password } = credsForRole(role)
-  await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' })
+  // This is a Next.js dev server: HMR keeps a connection open, so
+  // 'networkidle' never resolves and every login intermittently times out
+  // navigating to /login. Wait for the DOM instead, then let page.fill's
+  // own actionability wait handle hydration.
+  await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('#email', { timeout: 30000 })
   await page.fill('#email', email)
   await page.fill('#password', password)
   await page.click('button[type="submit"]')
