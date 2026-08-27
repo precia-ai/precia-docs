@@ -45,8 +45,12 @@ async function runSpec(browser, spec) {
       await login(page, spec.role)
     }
     if (spec.route) {
+      // domcontentloaded, not networkidle: every spec already has its own
+      // explicit waitForSelector right after this goto, and networkidle was
+      // timing out on routes with long-polling/background requests that
+      // never go idle (same fix already applied to lib/auth.js's login()).
       await page.goto(spec.route.startsWith('http') ? spec.route : `${process.env.PRECIA_BASE_URL || 'https://app-dev.precia.site'}${spec.route}`, {
-        waitUntil: 'networkidle'
+        waitUntil: 'domcontentloaded'
       })
     }
     if (typeof spec.preActions === 'function') {

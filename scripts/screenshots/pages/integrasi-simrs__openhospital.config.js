@@ -27,14 +27,24 @@
  *      Berkas hasilnya harus disalin manual ke folder locale satunya
  *      setelah dijalankan, supaya kedua bahasa dokumentasi menunjuk ke
  *      gambar yang sama, mengikuti pola yang sudah dipakai pada berkas
- *      integrasi-simrs__khanza-alur-kasus.config.js. Kredensial dibaca dari
- *      env OH_USERNAME/OH_PASSWORD, sama dengan akun yang sudah disediakan
- *      di .env.local.example untuk scripts/screenshots/oh-roundtrip-api-evidence.js;
- *      dipakai ulang di sini untuk login UI karena akun itu sudah punya izin
- *      precia_integration.callback dan sudah terverifikasi ada. PERLU
- *      VERIFIKASI: akun itu juga punya izin membaca/menulis modul Patients
- *      dan Laboratory yang dipakai langkah 02-05 dan 07 di bawah.
- *   2. Halaman worklist dan detail transaksi PRECIA, peran demo
+ *      integrasi-simrs__khanza-alur-kasus.config.js.
+ *
+ *      Kredensial login UI dibaca dari env OH_CLINICIAN_USERNAME/
+ *      OH_CLINICIAN_PASSWORD, BUKAN OH_USERNAME/OH_PASSWORD. Rencana semula
+ *      memakai ulang akun connector (OH_USERNAME/OH_PASSWORD, dipakai juga
+ *      oleh scripts/screenshots/oh-roundtrip-api-evidence.js) untuk login UI,
+ *      dengan asumsi akun itu juga bisa baca/tulis modul Patients dan
+ *      Laboratory. DIVERIFIKASI SALAH lewat JWT sungguhan: akun itu
+ *      (precia_cb) hanya punya laboratories.read, opds.read, dan
+ *      precia_integration.callback - tidak ada patients.read sama sekali,
+ *      dan /laboratory butuh permission `laboratories.access` yang berbeda
+ *      dari `laboratories.read` yang dimilikinya. Akun itu murni untuk
+ *      panggilan API balik connector, bukan untuk menjelajah UI sebagai
+ *      manusia. OH_CLINICIAN_USERNAME/PASSWORD adalah akun docs terpisah,
+ *      grup "doctor", dengan patients.access/read/create/update,
+ *      laboratories.access/read/create, opds.access/read/create - baru bisa
+ *      membuka langkah 03-05 dan 07 di bawah.
+ *   2. Halaman worklist dan detail transaksi PRECIA (langkah 06), peran demo
  *      `OPENHOSPITAL` (akun di dalam organisasi "RS Uji Coba Open
  *      Hospital"), dibaca dari env PRECIA_DEMO_OPENHOSPITAL_EMAIL/
  *      PRECIA_DEMO_OPENHOSPITAL_PASSWORD. Baris ini sudah ada di
@@ -46,6 +56,16 @@
  *      menggantikan rencana itu dengan satu berkas tunggal yang mencakup
  *      kedua arah, jadi baris .env.local.example itu cukup dianggap
  *      merujuk ke berkas ini.
+ *
+ *      Langkah 01 (pengaturan koneksi organisasi) sebaliknya memakai peran
+ *      `SUP` (admin@precia.ai, akun super admin dev, sama seperti dipakai
+ *      integrasi-simrs__gnu-health.config.js dan
+ *      integrasi-simrs__khanza.config.js untuk step ini), BUKAN akun
+ *      `OPENHOSPITAL`. Diverifikasi langsung: akun `OPENHOSPITAL` (peran
+ *      NRS+CAD, dibuat untuk langkah klinis) mendapat "Unable to load
+ *      settings, You do not have permission to perform this action" saat
+ *      membuka /settings/simrs-integration, akun itu tidak berwenang
+ *      membaca pengaturan SIMRS organisasi.
  *
  * Langkah 07 (hasil-ai-di-openhospital) MENUNGGU PEMBUKTIAN. Panel
  * "PRECIA AI Result" pada LaboratoryDetails.tsx sungguh ada di kode UI
@@ -119,11 +139,19 @@ function annotationsFor(step, locale, names, extra = []) {
 /* ------------------------------------------------------------------ */
 
 function ohCredentials() {
-  const user = process.env.OH_USERNAME
-  const password = process.env.OH_PASSWORD
+  // OH_USERNAME/OH_PASSWORD sengaja TIDAK dipakai di sini: itu akun connector
+  // precia_cb (laboratories.read, opds.read, precia_integration.callback saja,
+  // dipakai scripts/screenshots/oh-roundtrip-api-evidence.js), diverifikasi
+  // lewat JWT-nya TIDAK punya patients.read/patients.create/laboratories.access
+  // sama sekali, jadi tidak bisa membuka satu pun layar klinisi di bawah ini.
+  // OH_CLINICIAN_USERNAME/PASSWORD adalah akun docs terpisah (grup "doctor",
+  // patients.access/read/create/update + laboratories.access/read/create +
+  // opds.access/read/create) yang dibuat khusus untuk langkah 03/04/05/07.
+  const user = process.env.OH_CLINICIAN_USERNAME
+  const password = process.env.OH_CLINICIAN_PASSWORD
   if (!user || !password) {
     throw new Error(
-      'Env OH_USERNAME dan OH_PASSWORD wajib diisi saat menjalankan spec Open Hospital.'
+      'Env OH_CLINICIAN_USERNAME dan OH_CLINICIAN_PASSWORD wajib diisi saat menjalankan spec Open Hospital.'
     )
   }
   return { user, password }
@@ -140,8 +168,13 @@ async function ohLogin(page) {
   await page.fill('#username', user)
   await page.fill('#password', password)
   await page.click('[data-cy="login-panel"] button[type="submit"]')
-  // PERLU VERIFIKASI: seberapa lama transisi ke /patients setelah login.
-  await page.waitForSelector('.appHeader__nav__item', { timeout: 30000 })
+  // DIVERIFIKASI: login sukses berpindah ke /patients, tapi header pasca-login
+  // tidak memakai class .appHeader__nav__item di mana pun (dicek lewat
+  // screenshot sungguhan) - itu tebakan lama yang salah dan membuat setiap
+  // langkah yang login (03, 04, 05, 07) macet 30 detik lalu gagal. Menunggu
+  // navigasi keluar dari /login, sama seperti pola scripts/screenshots/lib/auth.js
+  // di sisi PRECIA, jauh lebih tahan banting daripada menebak nama class.
+  await page.waitForURL((url) => !url.pathname.startsWith('/login'), { timeout: 30000 })
   await page.waitForTimeout(1500)
 }
 
@@ -164,14 +197,23 @@ async function openExistingPatient(page) {
 }
 
 /** Dari halaman detail pasien, buka bagian Laboratory di menu kiri.
- * Ikon Colorize dipakai sebagai penanda karena teks menu tidak dilokalkan
- * lewat locale PRECIA (Open Hospital punya bahasa sendiri), tapi tetap
- * lebih aman dipakai lewat data-testid ikon MUI daripada teks. */
+ * DIVERIFIKASI: [data-testid="ColorizeIcon"] tidak pernah ada di build ini
+ * sama sekali - dicek langsung, seluruh halaman nol elemen data-testid,
+ * bukan cuma pada kasus ini. OutPatientDashboardMenu.tsx (sumber ikon ini)
+ * memang memakai <Colorize> dari @mui/icons-material tanpa data-testid
+ * eksplisit, dan versi MUI di build ini tidak menyuntikkan data-testid
+ * otomatis. Teks menu "Laboratory" (tidak dilokalkan lewat locale PRECIA,
+ * Open Hospital punya bahasa sendiri) jauh lebih tahan banting di sini. */
 async function openLaboratorySection(page) {
   await page.click(
-    '[data-cy="patient-details-main-menu"] .patientDetails__main_menu__item:has([data-testid="ColorizeIcon"])'
+    '[data-cy="patient-details-main-menu"] .patientDetails__main_menu__item:has-text("Laboratory")'
   )
-  await page.waitForSelector('.patientExamForm', { timeout: 20000 })
+  // DIVERIFIKASI ULANG 2026-08-27: class pembungkus form permintaan exam pada
+  // build yang sedang berjalan adalah .patientExamRequestForm, bukan
+  // .patientExamForm seperti ditulis sebelumnya di berkas ini (dicek langsung
+  // lewat HTML halaman sungguhan). .patientExamForm tidak pernah ada di DOM,
+  // membuat langkah 04/05 macet 20 detik lalu gagal.
+  await page.waitForSelector('.patientExamRequestForm', { timeout: 20000 })
   await page.waitForTimeout(1500)
 }
 
@@ -185,7 +227,7 @@ module.exports = [
     pageSlug: PAGE,
     stepSlug: '01-pengaturan-koneksi',
     route: '/settings/simrs-integration',
-    role: 'OPENHOSPITAL',
+    role: 'SUP',
     preActions: async (page, { locale }) => {
       await page.waitForSelector('#simrs-adapter', { timeout: 20000 })
       await page.waitForTimeout(1500)
@@ -274,7 +316,7 @@ module.exports = [
         '04',
         locale,
         'submit',
-        page.locator('.patientExamForm .submit_button button[type="submit"]')
+        page.locator('.patientExamRequestForm .submit_button button[type="submit"]')
       )
     },
     annotate: ({ locale }) => annotationsFor('04', locale, ['exam', 'submit'])
