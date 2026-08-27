@@ -70,11 +70,11 @@ Work in Open Hospital is done at this step.
 
 The PRECIA connector reads that request and creates a new clinical case in the matching unit. Sign in to PRECIA, open the **Clinical** menu, then pick the destination unit, for example **Kardiologi** (Cardiology), to see that unit's worklist. Click the newly appeared case to open its detail page.
 
-![Case detail page in PRECIA, the code laboratory-1, the Kardiologi unit, the Notes section holding raw data from Open Hospital, and the Medical Staff section holding Created by Open Hospital dev connector marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
+![Case detail page in PRECIA, the code laboratory-500001, the Kardiologi unit, the Notes section holding raw data from Open Hospital, and the Medical Staff section holding Created by Open Hospital dev connector marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
 
 A case from Open Hospital can be recognized by three things:
 
-- The transaction **code** has the shape `<source type>-<sequence number>`, for example `laboratory-1`.
+- The transaction **code** has the shape `<source type>-<sequence number>`, for example `laboratory-500001`.
 - The **Notes** section holds the raw request data from Open Hospital, including `source_system: "openhospital"`, the examination code and description, and the request date.
 - The **Medical Staff** section lists **Created by** as the connector service account (`Open Hospital dev connector`, address `simrs-svc+openhospital-dev@precia.ai`), not a member of staff.
 
