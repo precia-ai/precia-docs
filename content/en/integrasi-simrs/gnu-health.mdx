@@ -23,6 +23,7 @@ Prepare the following:
 - The address of your hospital's GNU Health web client. This address is provided by the hospital technical team or the PRECIA implementation team.
 - A PRECIA account in the same organization, so you can check the incoming transaction.
 - Patient records already registered in GNU Health, because the Patient field only accepts existing patients.
+- The GNU Health account must be linked to a health professional record (the **Internal User** field on that person's Party record). GNU Health blocks the Request Imaging Test wizard for a login with no such link, regardless of its menu access.
 
 ## 1. Checking the connection settings in PRECIA
 
@@ -56,7 +57,7 @@ Type your password, then click **OK** or press Enter. Once accepted, the GNU Hea
 
 In the tree menu on the left, open **Health**, then **Medical Imaging**. The branch offers two relevant entries: **Request Imaging Test**, a wizard for raising a new request, and **Imaging Test Request**, the list of requests already on file.
 
-**Screenshot not yet available.** The account used to capture this section does not yet have the Medical Imaging module enabled; see [Current limitations](#current-limitations). An earlier screenshot of this step existed but was taken with a full administrator account rather than the account used for the rest of this page, so it is not shown here rather than mixing two different identities across one walkthrough.
+![Health tree menu in GNU Health, the Medical Imaging branch, Request Imaging Test and Imaging Test Request marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/04-menu-pencitraan.png)
 
 To open a menu row, double click on its label. The small arrow to the left of a row expands or collapses that branch of the menu.
 
@@ -64,10 +65,12 @@ To open a menu row, double click on its label. The small arrow to the left of a 
 
 Double click **Request Imaging Test** to open the wizard.
 
-**Screenshot not yet available.** The account used to capture this section does not yet have the Medical Imaging module enabled; see [Current limitations](#current-limitations). Fill in the following:
+![Request Imaging Test wizard in GNU Health, the Patient field, the added test row, and the REQUEST button marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/05-formulir-permintaan-baru.png)
+
+Fill in the following:
 
 1. **Patient**: the patient name. This field is an autocomplete. Type part of the name, wait for the suggestion list to appear, then click the patient name in that list. A value that is only typed and never picked from the list will not be saved.
-2. **Tests**: tick the row for the examination type that matches the AI module to be used, for example **PRECIA AI ECG** for ejection fraction analysis.
+2. **Tests**: this field is also an autocomplete, not a static checklist. Type part of the examination name, for example **PRECIA AI ECG**, then click the matching suggestion; the wizard adds it as a row below, already ticked.
 
 Click **REQUEST** to submit. Unlike an old draft-only form, this wizard creates the request directly in the **Requested** state, ready for the imaging unit to act on. Note the **Order** number GNU Health assigns; it is what later shows up on the PRECIA case.
 
@@ -75,7 +78,7 @@ Click **REQUEST** to submit. Unlike an old draft-only form, this wizard creates 
 
 Open **Imaging Test Request** from the tree menu, then switch to the **All** tab, since a request that has moved past Draft no longer shows under the default tab. Order `010` is the request that has already completed its full cycle in the walkthrough this page follows.
 
-**Screenshot not yet available**, same reason as Step 5.
+![Imaging Test Request list in GNU Health, the All tab and the row for order 010 marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/06-permintaan-tersimpan.png)
 
 ## 4. Confirming the completed examination
 
@@ -83,7 +86,7 @@ Open **Imaging Test Request** from the tree menu, then switch to the **All** tab
 
 Once the imaging unit performs the study and records a result, that result appears under **Imaging Test Result**, a separate list from the request itself.
 
-**Screenshot not yet available**, same reason as Step 5.
+![Imaging Test Result list in GNU Health, the row for order 010 / TEST008 marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/07-hasil-pemeriksaan.png)
 
 This is the file the PRECIA connector picks up for AI analysis; the request and its result are two different records linked by the same order number.
 
@@ -139,20 +142,19 @@ Publishing a validation is the trigger for the write-back leg: PRECIA sends the 
 
 Back in GNU Health, open **Imaging Test Request**, switch to the **All** tab, and open order `010` again. The **State** field now reads **Done**, and the note button on the toolbar shows a note is attached.
 
-**Screenshot not yet available.** The account used to capture this section does not yet have the Medical Imaging module enabled; see [Current limitations](#current-limitations).
+![Imaging Test Request detail in GNU Health, the State field and the note button marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/13-order-selesai-di-gnu-health.png)
 
 ### Step 14: Open the AI result note
 
 Click the Notes button, then double click the note row to open its contents. The note is authored by the PRECIA integration account rather than a member of staff, and holds the AI module name, the confidence level, the validation status, and a summary of the result. Click **OK** to close the note box; it stays attached to the imaging test request and can be reopened at any time.
 
-**Screenshot not yet available**, same reason as Step 13.
+![Note attached to order 010 in GNU Health, the author field and the AI result message marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/14-catatan-hasil-ai.png)
 
 ## Current limitations
 
 The GNU Health integration is still at trial stage. The following limitations apply and should be understood before it is used in day-to-day work.
 
-1. **Steps 4 through 7 and 13 through 14 have no screenshot yet.** The demo account used to capture that half of this page can log in, but its role does not yet include the Medical Imaging module (confirmed live: the full expanded Health menu for this account has no Medical Imaging entry). Access has been requested; no fixed date yet. The written description of those steps reflects GNU Health's documented Request Imaging Test / Imaging Test Request flow, but has not been re-verified against the live screen in this pass.
-2. **The AI module still has to be triggered by hand.** See Step 10; a case appearing in PRECIA does not analyse itself. Both the request delivery from GNU Health and the result delivery back to it, by contrast, are confirmed automatic from the platform's own audit trail.
-3. **A GNU Health imaging test request carries no attachment.** The Imaging Test Request wizard offers neither a file attachment nor a DICOM image reference. The source file for AI analysis is uploaded on the transaction detail page in PRECIA, as shown in Step 10.
-4. **AI modules must be configured on the destination unit first.** Until the unit AI policy is set, the AI Modules panel on the detail page reports that no slots are configured, and the transaction stops at the Unprocessed status.
-5. **The AI result is written back as a note, not as a structured examination result.** The result summary appears in the Notes box of the imaging test request, not under the Imaging Test Result menu.
+1. **The AI module still has to be triggered by hand.** See Step 10; a case appearing in PRECIA does not analyse itself. Both the request delivery from GNU Health and the result delivery back to it, by contrast, are confirmed automatic from the platform's own audit trail.
+2. **A GNU Health imaging test request carries no attachment.** The Imaging Test Request wizard offers neither a file attachment nor a DICOM image reference. The source file for AI analysis is uploaded on the transaction detail page in PRECIA, as shown in Step 10.
+3. **AI modules must be configured on the destination unit first.** Until the unit AI policy is set, the AI Modules panel on the detail page reports that no slots are configured, and the transaction stops at the Unprocessed status.
+4. **The AI result is written back as a note, not as a structured examination result.** The result summary appears in the Notes box of the imaging test request, not under the Imaging Test Result menu.
