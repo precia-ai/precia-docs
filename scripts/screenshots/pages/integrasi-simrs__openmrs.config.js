@@ -56,9 +56,23 @@
  *     16:14:56 UTC) - hanya dikonfirmasi lewat DB, belum ada bukti visual,
  *     jadi cadangan saja. Bila dipakai, ROUND_TRIP_PATIENT_NAME/MRN di
  *     bawah perlu diverifikasi ulang, kemungkinan besar pasien BEDA.
- * Kolom `code` transaksi OpenMRS 3 berisi UUID itu sendiri (bukan format
- * "OPENMRS3-xxx" seperti CARE), jadi id di atas langsung dipakai sebagai id
- * transaksi PRECIA, bukan hasil pencarian dinamis.
+ * KOREKSI 2026-08-27: kedua UUID di atas TERNYATA kolom `code` transaksi
+ * (referensi order OpenMRS 3 sendiri), BUKAN `id` transaksi PRECIA -
+ * keduanya sama-sama berformat UUID polos tanpa prefiks (beda dari CARE
+ * yang codenya berprefiks "CARE-"), jadi asumsi awal "code sudah pasti id"
+ * di atas keliru. Dibuktikan lewat GET /api/clinical/transactions/{code}/
+ * yang membalas 404 untuk kedua UUID itu ketika route diminta langsung.
+ * `id` PRECIA yang benar, dikonfirmasi lewat
+ * GET /api/clinical/transactions/?source=simrs&page_size=50 dengan akun
+ * PRECIA_DEMO_OPENMRS3_EMAIL:
+ *   - code eb0d127b-0917-4dc8-8289-61418f3fa2e1 -> id
+ *     0a564fef-05ce-4809-94dc-977f6a679cdb (dipakai di bawah)
+ *   - code 53f56457-c07c-4fcb-9d9d-21ea52a61f6a -> id
+ *     95e35460-47d7-4f1a-8755-6f8344cfd459 (cadangan)
+ * Kedua transaksi ternyata pasien dan modul yang SAMA (Mary Smith, MRN
+ * 10000F1, Kardiologi, ECG Mitral Valve Screening), bukan pasien berbeda
+ * seperti dugaan semula - jadi ROUND_TRIP_PATIENT_NAME/MRN di bawah valid
+ * untuk keduanya, cadangan tidak perlu diverifikasi ulang lagi.
  *
  * KARENA kasusnya sudah selesai (bukan sedang menunggu divalidasi), spec
  * 17 TIDAK melakukan aksi validasi apa pun (beda dari pola
@@ -76,21 +90,20 @@
  * satu tampilan, jadi spec 17 memotret keduanya sekaligus dengan dua kotak
  * anotasi terpisah, bukan dua spec terpisah.
  *
- * TEMUAN PENTING UNTUK team lead / docs-demo-creds, BELUM DIKONFIRMASI:
- * akun yang tampil pada bukti /validation (openmrs3-11 dan openmrs3-14)
- * berprofil "Dokter Validator OpenMRS3" / email berawalan
- * "openmrs3-validator@...", BUKAN akun generik yang dipakai spec 13-15 di
- * atas (yang mana pun akun sebenarnya di balik PRECIA_DEMO_OPENMRS3_EMAIL,
- * profil pada bukti openmrs3-09 untuk transaksi INI justru "Perawat
- * OpenMRS 3" / "openmrs3-perawat@..."). Kemungkinan besar validasi
- * memerlukan kredensial PERAN BERBEDA (validator/dokter, mirip kode peran
- * CVL pada seed_demo_accounts.py) dari kredensial klinisi/perawat yang
- * sudah diminta lewat PRECIA_DEMO_OPENMRS3_EMAIL/PASSWORD. Bila
- * PRECIA_DEMO_OPENMRS3_EMAIL yang disediakan docs-demo-creds ternyata
- * tidak punya akses ke menu Validation, spec 17 akan gagal login/redirect,
- * BUKAN karena selector salah - perlu kredensial ketiga, bukan perbaikan
- * kode. Sudah dilaporkan ke team lead, jangan dihabiskan waktu
- * mendebug selector dulu bila spec 17 gagal dengan gejala itu.
+ * TEMUAN 2026-08-23 (kredensial), DIKONFIRMASI SELESAI 2026-08-27: akun
+ * yang tampil pada bukti /validation (openmrs3-11 dan openmrs3-14)
+ * berprofil "Dokter Validator OpenMRS3", beda dari profil "Perawat OpenMRS
+ * 3" pada bukti openmrs3-09, sehingga sempat diduga spec 17 perlu
+ * kredensial peran ketiga (mirip kode peran CVL) selain
+ * PRECIA_DEMO_OPENMRS3_EMAIL/PASSWORD yang dipakai spec 13-16. Probe
+ * langsung 2026-08-27 dengan akun PRECIA_DEMO_OPENMRS3_EMAIL yang ADA
+ * (peran CAD) menunjukkan akun ini BISA membuka /validation dan melihat
+ * daftar "RECORDED DECISIONS" termasuk transaksi round trip ini berstatus
+ * Published - berbeda profil rupanya tidak menghalangi akses BACA ke
+ * keputusan yang sudah dipublikasikan, hanya aksi create_decision/
+ * publish_result (tidak dipakai spec 17, lihat catatan di bawah) yang
+ * kemungkinan masih terbatas pada peran validator. Kredensial CVL
+ * terpisah TIDAK diperlukan untuk spec 17 sebagaimana ditulis sekarang.
  *
  * Spec 18 (sisi OpenMRS) memakai ROUND_TRIP_PATIENT_NAME yang SUDAH
  * dikonfirmasi dari bukti visual di atas ("Mary Smith"), bukan hasil baca
@@ -113,8 +126,14 @@ const TRANSACTION_UUID = '2eee5073-7854-4254-8823-c3555b36f7c1'
 // succeeded) DAN dikonfirmasi lewat bukti visual 2026-08-22. Lihat catatan
 // SPEC 16-18 di atas untuk kenapa ini yang dipilih sebagai utama, bukan yang
 // lebih dulu ditemukan di DB.
-const ROUND_TRIP_TRANSACTION_ID = 'eb0d127b-0917-4dc8-8289-61418f3fa2e1'
-const ROUND_TRIP_TRANSACTION_ID_FALLBACK = '53f56457-c07c-4fcb-9d9d-21ea52a61f6a'
+const ROUND_TRIP_TRANSACTION_ID = '0a564fef-05ce-4809-94dc-977f6a679cdb'
+const ROUND_TRIP_TRANSACTION_ID_FALLBACK = '95e35460-47d7-4f1a-8755-6f8344cfd459'
+// Worklist Validasi PRECIA menampilkan kolom `code` transaksi (referensi
+// order OpenMRS 3), BUKAN `id` di atas - dikonfirmasi lewat probe langsung
+// 2026-08-27 terhadap /validation, baris "RECORDED DECISIONS" menampilkan
+// teks eb0d127b-... apa adanya, bukan 0a564fef-.... Dipakai khusus untuk
+// pencarian teks pada langkah 17, terpisah dari id rute di atas.
+const ROUND_TRIP_TRANSACTION_CODE = 'eb0d127b-0917-4dc8-8289-61418f3fa2e1'
 // Dikonfirmasi dari public/screenshots/_evidence/dev/openmrs3-09-precia-ai-result.png
 // untuk ROUND_TRIP_TRANSACTION_ID di atas. Bila dipaksa memakai id cadangan,
 // dua nilai ini BELUM diverifikasi dan kemungkinan besar salah.
@@ -216,7 +235,13 @@ async function openValidationDetailFor(page, transactionId) {
     timeout: 20000
   }).catch(() => {})
   await page.waitForTimeout(1500)
-  await page.locator('a, div, button').filter({ hasText: transactionId }).first().click()
+  // Dikoreksi 2026-08-27: `a, div, button` cocok SEMBILAN elemen bersarang
+  // untuk baris yang sama (dikonfirmasi lewat probe langsung), dan
+  // `.first()` mengambil DIV pembungkus paling luar (seluruh halaman),
+  // bukan baris itu sendiri - klik itu tidak melakukan apa pun, hasilnya
+  // "Belum ada kasus yang dipilih" tanpa error. Baris worklist yang
+  // sungguh bisa diklik adalah elemen <button>.
+  await page.getByRole('button').filter({ hasText: transactionId }).first().click()
   await page.waitForTimeout(1500)
 }
 
@@ -490,15 +515,23 @@ module.exports = [
     role: 'OPENMRS3',
     preActions: async (page) => {
       await page.waitForTimeout(6000)
+      // Tab "Info Pasien"/"Patient Info" aktif secara default. getByText
+      // dengan nama modul cocok DUA elemen (badge di kartu kiri, dan tombol
+      // tab di kanan) - getByRole('button', ...) memaksa cocok hanya
+      // tombol tab, dikonfirmasi unik lewat probe langsung 2026-08-27.
+      await page.getByRole('button', { name: /ECG Mitral Valve Screening/ }).click()
+      await page.waitForTimeout(1500)
     },
     annotate: [
-      // Diukur dari openmrs3-09-precia-ai-result.png (1600x1000, ×0.9):
-      // baris "AI Modules" pada kartu Transaction Details, menggantikan
-      // keterangan "belum ada slot" pada spec 15.
-      { type: 'box', x: 299, y: 556, width: 260, height: 90 },
-      // Tab kanan berisi nama modul dan status "Completed", pada baris yang
-      // sama dengan berkas terlampir.
-      { type: 'box', x: 745, y: 296, width: 660, height: 90 }
+      // Baris "Modul AI"/"AI Modules" pada kartu Detail Transaksi (kolom
+      // kiri), di bawah baris Unit/Prioritas - dikoreksi 2026-08-27,
+      // koordinat evidence lama ternyata menunjuk baris Unit/Prioritas,
+      // bukan baris Modul AI.
+      { type: 'box', x: 299, y: 626, width: 260, height: 70 },
+      // Kartu modul pada tab kanan setelah tab diklik: nama modul, domain,
+      // dan badge status "Completed" - diukur ulang 2026-08-27 dari probe
+      // langsung (1440x900, setelah page.getByRole('button', ...).click()).
+      { type: 'box', x: 763, y: 330, width: 627, height: 80 }
     ]
   },
   {
@@ -507,12 +540,18 @@ module.exports = [
     pageSlug: 'openmrs',
     stepSlug: '17-hasil-ai-dan-validasi',
     // Status dan hasil validasi TIDAK ada di halaman detail transaksi, ada
-    // di menu Validation terpisah. Lihat catatan SPEC 16-18 di atas soal
-    // kemungkinan kredensial ini butuh peran berbeda dari spec 13-16.
+    // di menu Validation terpisah. Akun CAD yang sama dengan spec 13-16
+    // sebenarnya sudah cukup untuk melihat keputusan yang sudah
+    // dipublikasikan (dikonfirmasi lewat probe), tapi dipakai akun CVL
+    // asli (docs-demo-creds, 2026-08-27) karena itu persona yang secara
+    // semantik benar untuk tangkapan layar validasi - lihat catatan SPEC
+    // 16-18 di atas.
     route: '/validation',
-    role: 'OPENMRS3',
+    role: 'OPENMRS3_VALIDATOR',
     preActions: async (page) => {
-      await openValidationDetailFor(page, ROUND_TRIP_TRANSACTION_ID)
+      // Worklist menampilkan `code`, bukan `id` - lihat catatan
+      // ROUND_TRIP_TRANSACTION_CODE di atas.
+      await openValidationDetailFor(page, ROUND_TRIP_TRANSACTION_CODE)
     },
     annotate: [
       // Diukur dari openmrs3-14-precia-validation-published.png

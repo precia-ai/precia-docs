@@ -55,6 +55,31 @@
  *      step 13 comes back empty for an ECG-derived case, either the ECG
  *      AI module's target unit needs to be added to this account's
  *      access, or a second role needs resolving for that unit.
+ *   5. UPDATE 2026-08-27: steps 10-11 captured for real, both locales, no
+ *      coordinate corrections needed. Step 12's ECG order was ALSO
+ *      submitted for real this session (one-off script, not through
+ *      run.js - run.js's steps 10-11 still never click Submit, same as
+ *      steps 05-06). The list sorts newest first, so the ECG row landed at
+ *      the TOP of Service Requests, not below the Chest X-ray rows as
+ *      originally guessed - annotate box corrected accordingly.
+ *   6. UPDATE 2026-08-27: point 3 above is now STALE for one specific
+ *      transaction. `care-stuck-pipeline` activated AI-ECG-DIGITIZATION-EF
+ *      on the Radiologi unit and pushed transaction
+ *      `18a4052b-2da2-45b3-8c64-d49b1368d1e2` all the way through
+ *      doctor_reviewed with a published, accepted ClinicalValidation and a
+ *      successful SimrsDelivery. Steps 13-15 can now target this fixed id
+ *      instead of the dynamic `careOriginRow()`/`openCompletedAiModuleSlots()`
+ *      search, which is no longer safely unambiguous now that a second
+ *      CARE-origin transaction exists (the ECG order from point 5, which
+ *      will eventually also process through the same now-active module).
+ *      HARD REQUIREMENT from care-stuck-pipeline: any prose or caption
+ *      about this result must carry, verbatim in meaning: "Demonstration
+ *      configuration to exercise the CARE dev pipeline end to end.
+ *      AI-ECG-DIGITIZATION-EF was enabled on the Radiologi unit as a
+ *      connectivity proof, not a clinical recommendation for this
+ *      department." Never imply PRECIA recommends ECG screening for a
+ *      general radiology department. Steps 13-15 NOT YET updated to the
+ *      fixed id as of this note - still uses the dynamic search below.
  *
  * Everything above step 10 (steps 01-09) was already captured and is
  * unaffected by this addition.
@@ -112,6 +137,21 @@ const ENCOUNTER_ID = 'fe6ad2c7-7f19-4bb0-9220-6197d329b0ad'
 const PRECIA_UNIT_ID = '80e9ac80-5774-42d2-9a23-6c71f78b4cb6'
 const PRECIA_TRANSACTION_ID = '12334b18-1f5a-46fc-94d5-7107a27ae16b'
 
+// Transaksi yang benar-benar sudah ai_completed + doctor_reviewed +
+// delivery succeeded, dipakai steps 13-15 (lihat catatan header poin 6).
+// Sama pasien/encounter dengan konstanta di atas (Gayathri Sabharwal,
+// encounter fe6ad2c7...), dikonfirmasi lewat GET /api/clinical/transactions/
+// 2026-08-27: id 18a4052b-2da2-45b3-8c64-d49b1368d1e2, code
+// CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f (code adalah yang tampil di
+// worklist PRECIA, dipakai untuk filter baris, bukan id).
+const AI_RESULT_TRANSACTION_CODE = 'CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f'
+// HARUS disertakan pada prosa/keterangan mana pun yang menyebut hasil ini
+// (syarat mutlak dari care-stuck-pipeline): AI-ECG-DIGITIZATION-EF
+// diaktifkan di unit Radiologi sebagai bukti konektivitas, bukan rekomendasi
+// klinis untuk departemen ini.
+const AI_RESULT_DISCLAIMER_ID =
+  'Konfigurasi demonstrasi untuk menguji jalur pipeline CARE dev secara menyeluruh. AI-ECG-DIGITIZATION-EF diaktifkan pada unit Radiologi sebagai bukti konektivitas, bukan rekomendasi klinis untuk departemen ini.'
+
 const ENCOUNTER_BASE = `${CARE_ORIGIN}/facility/${FACILITY_ID}/patient/${PATIENT_ID}/encounter/${ENCOUNTER_ID}`
 
 // CARE stores its JWT under this key, see src/common/constants.tsx in care_fe.
@@ -160,7 +200,11 @@ async function openCare(page, url) {
     },
     [CARE_TOKEN_KEY, token]
   )
-  await page.goto(url, { waitUntil: 'networkidle' })
+  // Dikoreksi 2026-08-27 mengikuti perbaikan run.js/lib/auth.js
+  // (shots-bahmni-gnuhealth): 'networkidle' pada CARE tidak pernah settle
+  // dengan stabil di bawah jaringan dev yang flapping, sedangkan
+  // waitForTimeout tetap di bawah sudah cukup untuk render selesai.
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
   await page.waitForTimeout(2500)
 }
 
@@ -219,9 +263,14 @@ async function openCompletedAiModuleSlots(page) {
   await page.waitForTimeout(800)
 }
 
-/** First worklist row whose visible text carries the CARE- transaction prefix. */
+/**
+ * Worklist row for the pinned AI_RESULT_TRANSACTION_CODE. Was a generic
+ * "first row starting with CARE-" filter - no longer safe now that a
+ * second CARE-origin transaction exists (see header note point 6), so this
+ * pins the exact code instead.
+ */
 function careOriginRow(page) {
-  return page.locator('table tbody tr').filter({ hasText: 'CARE-' }).first()
+  return page.locator('table tbody tr').filter({ hasText: AI_RESULT_TRANSACTION_CODE }).first()
 }
 
 module.exports = [
@@ -435,10 +484,11 @@ module.exports = [
       await openCare(page, `${ENCOUNTER_BASE}/service_requests`)
     },
     annotate: [
-      // Row for the ECG request, expected Active/Routine like step 07.
-      // This box assumes the ECG row lands directly under the Chest
-      // X-ray row from step 07; re-measure once both requests exist.
-      { type: 'box', x: 425, y: 300, width: 988, height: 64 }
+      // Row for the ECG request. Corrected 2026-08-27 after the order was
+      // actually submitted for real: the list sorts newest first, so the
+      // ECG row lands at the TOP, above the pre-existing Chest X-ray rows,
+      // not below them as originally assumed.
+      { type: 'box', x: 425, y: 364, width: 988, height: 68 }
     ]
   },
   // -----------------------------------------------------------------
@@ -454,7 +504,11 @@ module.exports = [
     section: 'integrasi-simrs',
     pageSlug: 'care',
     stepSlug: '13-hasil-ai-modul-precia',
-    route: '/clinical',
+    // Dikoreksi 2026-08-27: plain '/clinical' sekarang mendarat di layar
+    // "Choose a Unit" (akun ini bisa melihat lebih dari satu unit), bukan
+    // langsung ke worklist, sehingga tab group "By AI Module" tidak pernah
+    // muncul. Sertakan unit lewat query param persis seperti step 08.
+    route: `/clinical?unit=${PRECIA_UNIT_ID}`,
     role: 'CARE',
     fullPage: true,
     preActions: async (page) => {
@@ -489,10 +543,15 @@ module.exports = [
       await page.waitForTimeout(700)
     },
     annotate: [
-      // "Diagnostic Reports" tab in the encounter tab bar
-      { type: 'box', x: 780, y: 158, width: 190, height: 32 },
-      // First report card in the left panel list
-      { type: 'box', x: 20, y: 96, width: 340, height: 96 }
+      // "Diagnostic Reports" tab in the encounter tab bar. Re-measured
+      // 2026-08-27 against the real page (write-back finally landed) - the
+      // original guess (x:780) was off, this page's tab bar sits further
+      // right than assumed.
+      { type: 'box', x: 985, y: 156, width: 152, height: 36 },
+      // First (newest) report card in the left panel list, already
+      // highlighted by CARE itself - re-measured 2026-08-27, the original
+      // guess (x:20,y:96) was landing on the encounter sidebar instead.
+      { type: 'box', x: 421, y: 268, width: 240, height: 80 }
     ]
   },
   {
@@ -508,12 +567,19 @@ module.exports = [
       await page.waitForTimeout(1200)
     },
     annotate: [
-      // Status badge on the detail card (Preliminary/Final)
-      { type: 'box', x: 1180, y: 96, width: 140, height: 30 },
+      // Status badge on the detail card (Preliminary/Final). Re-measured
+      // 2026-08-27, original guess (y:96) landed in empty header space -
+      // the badge sits next to the report title, not the page header.
+      { type: 'box', x: 1288, y: 232, width: 65, height: 30 },
       // Notes field: PRECIA writes "PRECIA <module code>" as its first
       // line, followed by confidence, model version, validation status,
-      // the PRECIA transaction id and job id (see care.py _note()).
-      { type: 'box', x: 380, y: 420, width: 700, height: 160 }
+      // the PRECIA transaction id and job id (see care.py _note()). Box
+      // covers only these readable summary lines, not the raw
+      // ecg_waveform JSON dump that follows them (see header note point 6
+      // re: filing that as a separate UX bug, not something to hide here).
+      // Re-measured 2026-08-27, original guess (x:380) landed on the left
+      // report-list panel instead of the right-hand detail panel.
+      { type: 'box', x: 686, y: 443, width: 440, height: 140 }
     ]
   }
 ]

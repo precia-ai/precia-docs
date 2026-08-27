@@ -46,7 +46,7 @@ async function runSpec(browser, spec) {
     }
     if (spec.route) {
       await page.goto(spec.route.startsWith('http') ? spec.route : `${process.env.PRECIA_BASE_URL || 'https://app-dev.precia.site'}${spec.route}`, {
-        waitUntil: 'networkidle'
+        waitUntil: 'domcontentloaded'
       })
     }
     if (typeof spec.preActions === 'function') {
