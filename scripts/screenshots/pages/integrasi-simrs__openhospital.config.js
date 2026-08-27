@@ -101,6 +101,46 @@ const EXAM_NAME = 'ECG 12 Lead' // kode katalog CD.01
 const SECTION = 'integrasi-simrs'
 const PAGE = 'openhospital'
 
+// Kasus laboratory-500001 yang sudah dijalankan sungguhan sampai AI,
+// validasi, publish, dan sinkron balik ke Open Hospital (2026-08-27), dipakai
+// oleh langkah 08-10 di bawah. Beda dari langkah 01-07 di atas: langkah-langkah
+// itu boleh diulang dari awal setiap kali spec ini dijalankan (data tidak
+// disubmit), tapi trigger AI/validasi/publish untuk kasus ini TIDAK diulang
+// di sini karena sudah terjadi sungguhan dan tidak reversibel. Langkah 08-10
+// murni memotret ulang hasil akhirnya yang sudah ada.
+const PROVEN_TRANSACTION_ID = '31b008d0-13be-47ed-9fe2-ac40f5242818'
+const PROVEN_CASE_CODE = 'laboratory-500001'
+
+// Label PRECIA yang tampil di halaman berubah menurut locale (lib/i18n/
+// translations.ts), BEDA dari langkah 01-07 yang selectornya berbasis DOM
+// Open Hospital sendiri (tidak dilokalkan oleh locale PRECIA). Dibaca
+// langsung dari translations.ts baris 975-983 (en) / 3300-3309 (id) untuk
+// aiModule.*, dan baris 1784-1830 (en) / 4114-4161 (id) untuk validation.*.
+// "Abnormal" TIDAK dilokalkan (bukan translation key, nilai mentah dari
+// modul AI), jadi teksnya sama di kedua locale.
+const LABELS = {
+  id: {
+    confidenceScore: 'Skor Keyakinan',
+    classification: 'Klasifikasi',
+    decision: 'Keputusan',
+    decisionAccepted: 'Diterima',
+    clinicalNotes: 'Catatan klinis',
+    status: 'Status',
+    statusPublished: 'Dipublikasikan',
+    publishedAt: 'Dipublikasikan pada'
+  },
+  en: {
+    confidenceScore: 'Confidence Score',
+    classification: 'Classification',
+    decision: 'Decision',
+    decisionAccepted: 'Accepted',
+    clinicalNotes: 'Clinical notes',
+    status: 'Status',
+    statusPublished: 'Published',
+    publishedAt: 'Published at'
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Anotasi diukur dari elemen sungguhan (bukan koordinat piksel tetap), */
 /* karena tata letak tidak bisa dipastikan tanpa membuka host.          */
@@ -132,6 +172,31 @@ function annotationsFor(step, locale, names, extra = []) {
     throw new Error(`Tidak ada anotasi yang terukur untuk langkah ${step} (${locale}).`)
   }
   return [...boxes, ...extra]
+}
+
+/** Mengukur gabungan (union) beberapa locator jadi satu kotak anotasi,
+ * dipakai saat beberapa elemen berdekatan harus ditandai sebagai satu blok
+ * (misalnya baris Confidence Score dan baris Classification yang bersebelahan). */
+async function measureUnion(page, step, locale, name, locators, padding = 8) {
+  const boxes = []
+  for (const locator of locators) {
+    const box = await locator.first().boundingBox()
+    if (!box) {
+      throw new Error(`Tidak dapat mengukur elemen union "${name}" pada langkah ${step} (${locale}).`)
+    }
+    boxes.push(box)
+  }
+  const left = Math.min(...boxes.map((b) => b.x))
+  const top = Math.min(...boxes.map((b) => b.y))
+  const right = Math.max(...boxes.map((b) => b.x + b.width))
+  const bottom = Math.max(...boxes.map((b) => b.y + b.height))
+  measured[keyOf(step, locale, name)] = {
+    type: 'box',
+    x: Math.round(left - padding),
+    y: Math.round(top - padding),
+    width: Math.round(right - left + padding * 2),
+    height: Math.round(bottom - top + padding * 2)
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -428,5 +493,95 @@ module.exports = [
       await measure(page, '07', locale, 'result-data', page.locator('.labDetails__content__precia_result_data'))
     },
     annotate: ({ locale }) => annotationsFor('07', locale, ['panel', 'result-data'])
+  },
+
+  /* ---------------------------------------------------------------- */
+  /* Sisi PRECIA: hasil AI, validasi, dan publikasi untuk kasus         */
+  /* laboratory-500001 (sudah dijalankan sungguhan sampai tuntas,       */
+  /* lihat komentar di PROVEN_TRANSACTION_ID di atas).                  */
+  /* ---------------------------------------------------------------- */
+  {
+    id: 'integrasi-simrs__openhospital__08-hasil-ai',
+    section: SECTION,
+    pageSlug: PAGE,
+    stepSlug: '08-hasil-ai',
+    route: `/clinical/transactions/${PROVEN_TRANSACTION_ID}`,
+    role: 'OPENHOSPITAL',
+    fullPage: true,
+    preActions: async (page, { locale }) => {
+      await page.waitForSelector('h1', { timeout: 20000 })
+      await page.waitForTimeout(1500)
+      // Tab "ECG EF Screening" adalah <button>, bukan elemen [role="tab"];
+      // badge hijau kecil dengan teks yang sama di kartu "AI Modules" kiri
+      // adalah elemen text=ECG EF Screening YANG PERTAMA, jadi harus dipilih
+      // lewat locator('button') supaya tidak salah klik badge itu.
+      await page.locator('button', { hasText: 'ECG EF Screening' }).first().click()
+      const t = LABELS[locale]
+      await page.waitForSelector(`text=${t.confidenceScore}`, { timeout: 20000 })
+      await page.waitForTimeout(1000)
+      await measureUnion(page, '08', locale, 'result', [
+        page.locator(`text=${t.confidenceScore}`).first(),
+        page.locator(`text=${t.classification}`).first(),
+        page.locator('text=Abnormal').first()
+      ])
+    },
+    annotate: ({ locale }) => annotationsFor('08', locale, ['result'])
+  },
+  {
+    id: 'integrasi-simrs__openhospital__09-validasi-dokter',
+    section: SECTION,
+    pageSlug: PAGE,
+    stepSlug: '09-validasi-dokter',
+    route: '/validation',
+    role: 'OPENHOSPITAL_VALIDATOR',
+    preActions: async (page, { locale }) => {
+      const t = LABELS[locale]
+      await page.waitForTimeout(2500)
+      await page.locator(`text=${PROVEN_CASE_CODE}`).first().click()
+      await page.waitForSelector(`text=${t.clinicalNotes}`, { timeout: 20000 })
+      await page.waitForTimeout(1000)
+      // Kasus ini sudah dipublikasikan (lihat catatan di PROVEN_TRANSACTION_ID),
+      // sehingga halaman ini menampilkan Decision dan Status yang sudah
+      // tercatat, bukan formulir kosong menunggu diisi. Langkah 9 menyorot
+      // Decision dan catatan klinis; langkah 10 menyorot Status dan waktu
+      // publikasi pada halaman yang sama.
+      //
+      // getByText(exact:true), BUKAN locator('text=...'): worklist di kiri
+      // punya header "Keputusan tercatat (3)" / "Recorded decisions (3)"
+      // yang mengandung substring label yang sama, dan text= locator akan
+      // menangkap elemen pertama itu (di kiri, salah), bukan label "Keputusan"
+      // sungguhan pada panel Detail Validasi di kanan.
+      await measureUnion(page, '09', locale, 'decision', [
+        page.getByText(t.decision, { exact: true }).first(),
+        page.getByText(t.decisionAccepted, { exact: true }).first(),
+        page.getByText(t.clinicalNotes, { exact: true }).first()
+      ])
+    },
+    annotate: ({ locale }) => annotationsFor('09', locale, ['decision'])
+  },
+  {
+    id: 'integrasi-simrs__openhospital__10-validasi-dipublikasikan',
+    section: SECTION,
+    pageSlug: PAGE,
+    stepSlug: '10-validasi-dipublikasikan',
+    route: '/validation',
+    role: 'OPENHOSPITAL_VALIDATOR',
+    preActions: async (page, { locale }) => {
+      const t = LABELS[locale]
+      await page.waitForTimeout(2500)
+      await page.locator(`text=${PROVEN_CASE_CODE}`).first().click()
+      await page.waitForSelector(`text=${t.publishedAt}`, { timeout: 20000 })
+      await page.waitForTimeout(1000)
+      // .last() untuk lencana status: worklist di kiri juga menampilkan
+      // lencana "Dipublikasikan"/"Published" pada tiap baris (DOM-nya
+      // muncul lebih dulu), panel Detail Validasi di kanan dirender
+      // setelahnya, jadi elemen yang benar adalah kemunculan TERAKHIR.
+      await measureUnion(page, '10', locale, 'published', [
+        page.getByText(t.status, { exact: true }).first(),
+        page.locator('span', { hasText: t.statusPublished }).last(),
+        page.getByText(t.publishedAt, { exact: true }).first()
+      ])
+    },
+    annotate: ({ locale }) => annotationsFor('10', locale, ['published'])
   }
 ]

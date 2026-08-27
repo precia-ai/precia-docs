@@ -23,29 +23,34 @@
 // precia_integration.push or precia_integration.callback, e.g. the callback
 // account already issued for this org) and SHOT_DIR in the environment.
 
-const { chromium } = require('/home/syahrul/projects/airis-precia/precia/precia-user-docs/node_modules/playwright')
+const { chromium } = require('playwright')
 
 const OH_BASE_URL = process.env.OH_BASE_URL
 const OH_USERNAME = process.env.OH_USERNAME
 const OH_PASSWORD = process.env.OH_PASSWORD
 const SOURCE_TYPE = process.env.SOURCE_TYPE || 'laboratory'
-const SOURCE_CODE = process.env.SOURCE_CODE || '1'
+const SOURCE_CODE = process.env.SOURCE_CODE || '500001'
 const SHOT_DIR = process.env.SHOT_DIR
 
-function renderHtml(json) {
+function renderHtml(json, status) {
 	const pretty = JSON.stringify(json, null, 2)
 		.replace(/&/g, '&amp;')
 		.replace(/</g, '&lt;')
+	const url = `${OH_BASE_URL}/precia-integration/ai-results/${SOURCE_TYPE}/${SOURCE_CODE}`
 	return `<!doctype html><html><head><meta charset="utf-8"><style>
 		body { margin: 0; padding: 32px; background: #0f172a; font-family: ui-monospace, monospace; }
-		.card { background: #1e293b; border-radius: 12px; padding: 24px; color: #e2e8f0; }
-		.label { color: #94a3b8; font-size: 13px; margin-bottom: 8px; }
-		pre { margin: 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+		.label { color: #94a3b8; font-size: 13px; margin-bottom: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+		.request { background: #1e293b; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
+		.request .url { color: #e2e8f0; font-size: 15px; word-break: break-all; }
+		.request .status { color: #4ade80; font-size: 14px; margin-top: 6px; }
+		pre { margin: 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; color: #e2e8f0; }
 	</style></head><body>
-		<div class="card">
-			<div class="label">GET /precia-integration/ai-results/${SOURCE_TYPE}/${SOURCE_CODE} &middot; ${OH_BASE_URL}</div>
-			<pre>${pretty}</pre>
+		<div class="label">Open Hospital, hasil AI tersimpan</div>
+		<div class="request" id="request-block">
+			<div class="url">GET ${url}</div>
+			<div class="status">HTTP ${status}</div>
 		</div>
+		<pre id="json-block">${pretty}</pre>
 	</body></html>`
 }
 
@@ -82,10 +87,47 @@ function renderHtml(json) {
 		{ headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
 	)
 	const resultBody = await resultResp.json().catch(() => ({ error: 'non-JSON response', status: resultResp.status() }))
-	console.log('result status', resultResp.status())
+	const status = resultResp.status()
+	console.log('result status', status)
 
-	await page.setContent(renderHtml(resultBody))
-	await page.screenshot({ path: `${SHOT_DIR}/openhospital-roundtrip-03-hasil-tersimpan-oh.png` })
+	await page.setContent(renderHtml(resultBody, status))
+
+	const rawPath = `${SHOT_DIR}/openhospital-roundtrip-03-hasil-tersimpan-oh.raw.png`
+	const finalPath = `${SHOT_DIR}/openhospital-roundtrip-03-hasil-tersimpan-oh.png`
+	await page.screenshot({ path: rawPath })
+
+	// Annotate with the same sharp-based overlay used by run.js, so this
+	// evidence screenshot follows the same "every screenshot gets an
+	// annotation" rule as every other step on this page.
+	const { annotate } = require('./lib/annotate')
+	const requestBox = await page.locator('#request-block').boundingBox()
+	const jsonBox = await page.locator('#json-block').boundingBox()
+	const annotations = []
+	if (requestBox) {
+		annotations.push({
+			type: 'box',
+			x: Math.round(requestBox.x - 8),
+			y: Math.round(requestBox.y - 8),
+			width: Math.round(requestBox.width + 16),
+			height: Math.round(requestBox.height + 16)
+		})
+	}
+	if (jsonBox) {
+		// Only the validation_status/synced_at tail matters for the reader;
+		// approximate its position as the bottom slice of the JSON block
+		// rather than boxing the whole payload.
+		const lineHeight = 22.4 // matches pre { font-size:14px; line-height:1.6 }
+		const tailHeight = lineHeight * 2 + 12
+		annotations.push({
+			type: 'box',
+			x: Math.round(jsonBox.x - 8),
+			y: Math.round(jsonBox.y + jsonBox.height - tailHeight - lineHeight),
+			width: Math.round(jsonBox.width + 16),
+			height: Math.round(tailHeight + lineHeight)
+		})
+	}
+	await annotate(rawPath, finalPath, annotations)
+	require('node:fs').unlinkSync(rawPath)
 
 	await browser.close()
 })().catch((e) => {
