@@ -70,11 +70,11 @@ Pekerjaan di Open Hospital selesai pada langkah ini.
 
 Konektor PRECIA membaca permintaan tersebut dan membuat kasus klinis baru pada unit yang sesuai. Masuk ke PRECIA, buka menu **Klinis**, lalu pilih unit tujuan, misalnya **Kardiologi**, untuk melihat daftar kerja unit tersebut. Klik kasus yang baru muncul untuk membuka detailnya.
 
-![Halaman detail kasus di PRECIA, kode kasus laboratory-1, unit Kardiologi, bagian Catatan berisi data mentah dari Open Hospital, dan bagian Tenaga Medis berisi Dibuat oleh Open Hospital dev connector ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
+![Halaman detail kasus di PRECIA, kode kasus laboratory-500001, unit Kardiologi, bagian Catatan berisi data mentah dari Open Hospital, dan bagian Tenaga Medis berisi Dibuat oleh Open Hospital dev connector ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
 
 Kasus dari Open Hospital dapat dikenali dari tiga hal:
 
-- **Kode** transaksi berbentuk `<jenis sumber>-<nomor urut>`, misalnya `laboratory-1`.
+- **Kode** transaksi berbentuk `<jenis sumber>-<nomor urut>`, misalnya `laboratory-500001`.
 - Bagian **Catatan** memuat data mentah permintaan dari Open Hospital, termasuk `source_system: "openhospital"`, kode dan deskripsi pemeriksaan, serta tanggal permintaan.
 - Bagian **Tenaga Medis** mencantumkan **Dibuat oleh** berisi akun layanan konektor (`Open Hospital dev connector`, alamat `simrs-svc+openhospital-dev@precia.ai`), bukan nama petugas.
 
