@@ -176,7 +176,7 @@ This section records what is not available yet, so the integration is not relied
 
 1. **There can be a short delay before a case appears.** The connector polls OpenEMR for new orders on a fixed interval rather than being notified the instant one is saved, so a new case does not always appear in PRECIA the same second the order is saved in OpenEMR.
 
-2. **OpenEMR settings are not yet on the SIMRS Integration page.** The adapter list on the [SIMRS Integration](/integrasi-simrs) page does not include OpenEMR. The unit mapping, for example **Radiology** to the **Radiologi** unit, currently lives in the connector rather than in the organization settings in PRECIA. Mapping changes have to be requested from the technical team.
+2. **The unit mapping is not on the SIMRS Integration page.** OpenEMR now appears in the Adapter field on the [SIMRS Integration](/integrasi-simrs) page like every other SIMRS, but the mapping from an OpenEMR value, for example **Radiology**, to a PRECIA unit, for example **Radiologi**, still lives in the connector rather than in the organization settings in PRECIA. Mapping changes have to be requested from the technical team.
 
 3. **The Transmit Order button is not used.** That button belongs to the laboratory messaging path built into OpenEMR. The PRECIA integration does not use that path, and pressing it does not speed up processing.
 
