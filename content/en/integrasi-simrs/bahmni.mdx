@@ -120,16 +120,35 @@ Three areas to check:
 
 From this point the case is treated exactly like any other PRECIA case. You can upload supporting documents, send the case to a validator, or cancel it.
 
+## Seeing the AI result written back to Bahmni
+
+The steps above follow one continuous case, but that case's unit has no AI module configured, so it never reaches a published result. The two steps below switch to a different, already-completed case (transaction `BAHMNI-3d2845c5-...`, patient Ratna Proofdev, MRN `ABC200005`) to show what happens once a case like yours reaches that point: PRECIA writes the AI result back into the Bahmni chart on its own.
+
+### Step 10: Check the published validation in PRECIA
+
+Sign in to PRECIA and open **Validation** in the sidebar. The worklist on the left lists every case with a recorded decision. Click the row for the case.
+
+![PRECIA Validation page, the worklist row for transaction BAHMNI-3d2845c5-... marked with a blue box, the published decision detail on the right marked with a blue box](/screenshots/en/integrasi-simrs/bahmni/10-validasi-dipublikasikan.png)
+
+The detail panel on the right shows the decision (**Accepted**), the status (**Published**), when it was validated and when it was published, the clinical notes, and the AI result the validator reviewed, including its confidence score. Once a decision is published, PRECIA sends it to Bahmni on its own: reading the platform's own audit trail shows the delivery started 29 milliseconds after publishing, too fast for anyone to have triggered it by hand.
+
+### Step 11: Read the AI result in the Bahmni chart
+
+Open the same patient in Bahmni (search by MRN `ABC200005` in Registration, the same search used in Step 3), then switch to the **Clinical** application to open the patient dashboard. A section titled **PRECIA AI Results** sits near the top of the chart.
+
+![Bahmni patient dashboard for Ratna Proofdev, the PRECIA AI Results panel marked with a blue box](/screenshots/en/integrasi-simrs/bahmni/11-hasil-ai-di-rekam-medis.png)
+
+This panel holds three values written by the connector: the AI impression (the validator's finding, in free text), the confidence score, and the AI module name. The patient identity on this chart matches the case shown in Step 10, which is what proves the result reached the correct record rather than merely being marked delivered on the PRECIA side.
+
 ## Current limitations
 
 The Bahmni integration is still at trial stage. The limitations below apply as stated and are not usage errors.
 
-- **Bahmni is not yet an option on the PRECIA SIMRS Integration page.** The adapter list on that page does not include Bahmni, so the connection cannot be configured by an organization admin. All setup is handled by the implementation team.
 - **The data transfer does not run continuously.** The bridging service is run by the implementation team during trials rather than as a permanent service. Outside those periods, new visits in Bahmni will not appear in PRECIA until the service is started again.
 - **Cases do not appear instantly.** There is a delay between saving in Bahmni and the case appearing in PRECIA. Use the **Refresh** button on the Transaction Worklist rather than saving again in Bahmni, because saving again can produce duplicate cases.
 - **Examination findings arrive as text in the Notes field.** Height, weight, blood pressure, and pulse values do not become separate fields in PRECIA and cannot yet be used for searching or sorting.
 - **Cases from Bahmni have no AI module slots.** On the case detail, the **AI Modules** section states that no slots are configured. AI analysis has to be set up separately on the destination unit.
-- **PRECIA results are not sent back to Bahmni automatically.** The reverse direction, showing PRECIA analysis results in the Bahmni patient chart, is still being tested and is not yet part of the daily workflow.
+- **The AI module still has to be triggered by hand.** A case appearing in PRECIA does not run AI analysis on its own. Staff or a PRECIA operator still need to press the AI processing button on the case detail page, the same limitation documented for every SIMRS on this site. Once a validator publishes a decision, however, the write-back into Bahmni itself is automatic, not something a person has to run. See [Seeing the AI result written back to Bahmni](#seeing-the-ai-result-written-back-to-bahmni).
 - **Only visits whose examination form was saved are transferred.** A patient who has been registered and whose visit has been opened, but whose examination form has not been saved, will not appear in PRECIA.
 
 ## If the case does not appear in PRECIA
