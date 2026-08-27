@@ -23,6 +23,7 @@ Siapkan hal berikut:
 - Alamat klien web GNU Health rumah sakit Anda. Alamat ini diberikan oleh tim teknis rumah sakit atau tim implementasi PRECIA.
 - Akun PRECIA pada organisasi yang sama, untuk memeriksa transaksi yang masuk.
 - Data pasien sudah terdaftar di GNU Health, karena kolom Patient hanya menerima pasien yang sudah ada.
+- Akun GNU Health harus terhubung ke rekaman tenaga kesehatan (kolom **Internal User** pada rekaman Party orang tersebut). GNU Health menolak membuka wizard Request Imaging Test untuk akun yang belum memiliki tautan ini, terlepas dari hak akses menunya.
 
 ## 1. Memeriksa pengaturan koneksi di PRECIA
 
@@ -56,7 +57,7 @@ Ketik kata sandi Anda, lalu klik **OK** atau tekan Enter. Setelah berhasil, laya
 
 Pada menu pohon di sisi kiri, buka **Health**, lalu **Medical Imaging**. Cabang ini menyediakan dua pilihan yang relevan: **Request Imaging Test**, wizard untuk mengajukan permintaan baru, dan **Imaging Test Request**, daftar permintaan yang sudah tercatat.
 
-**Tangkapan layar belum tersedia.** Akun yang dipakai untuk mengambil bagian ini belum memiliki akses ke modul Medical Imaging, lihat [Batasan saat ini](#batasan-saat-ini). Tangkapan layar lama untuk langkah ini pernah ada, tetapi diambil dengan akun administrator penuh, bukan akun yang dipakai untuk sisa halaman ini, sehingga tidak ditampilkan di sini daripada mencampur dua identitas berbeda dalam satu alur.
+![Menu pohon Health di GNU Health, cabang Medical Imaging, Request Imaging Test dan Imaging Test Request ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/04-menu-pencitraan.png)
 
 Untuk membuka sebuah baris menu, klik ganda pada tulisannya. Tanda panah kecil di sebelah kiri baris dipakai untuk membuka atau menutup cabang menu.
 
@@ -64,10 +65,12 @@ Untuk membuka sebuah baris menu, klik ganda pada tulisannya. Tanda panah kecil d
 
 Klik ganda **Request Imaging Test** untuk membuka wizard.
 
-**Tangkapan layar belum tersedia.** Akun yang dipakai untuk mengambil bagian ini belum memiliki akses ke modul Medical Imaging, lihat [Batasan saat ini](#batasan-saat-ini). Isi hal berikut:
+![Wizard Request Imaging Test di GNU Health, kolom Patient, baris pemeriksaan yang sudah ditambahkan, dan tombol REQUEST ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/05-formulir-permintaan-baru.png)
+
+Isi hal berikut:
 
 1. **Patient**: nama pasien. Kolom ini bersifat pelengkapan otomatis. Ketik sebagian nama, tunggu daftar saran muncul, lalu klik nama pasien pada daftar tersebut. Nilai yang hanya diketik tanpa dipilih dari daftar tidak akan tersimpan.
-2. **Tests**: centang baris jenis pemeriksaan yang sesuai dengan modul AI yang akan dipakai, misalnya **PRECIA AI ECG** untuk analisis fraksi ejeksi.
+2. **Tests**: kolom ini juga bersifat pelengkapan otomatis, bukan daftar centang statis. Ketik sebagian nama pemeriksaan, misalnya **PRECIA AI ECG**, lalu klik saran yang cocok; wizard menambahkannya sebagai baris baru yang sudah tercentang.
 
 Klik **REQUEST** untuk mengajukan. Berbeda dari formulir Draft-saja versi sebelumnya, wizard ini langsung membuat permintaan pada status **Requested**, siap ditindaklanjuti unit pencitraan. Catat nomor **Order** yang diberikan GNU Health, karena nomor inilah yang kemudian muncul pada kasus PRECIA.
 
@@ -75,7 +78,7 @@ Klik **REQUEST** untuk mengajukan. Berbeda dari formulir Draft-saja versi sebelu
 
 Buka **Imaging Test Request** dari menu pohon, lalu pindah ke tab **All**, karena permintaan yang sudah melewati status Draft tidak lagi tampil pada tab bawaan. Order `010` adalah permintaan yang sudah menyelesaikan seluruh siklusnya dalam kasus yang diikuti halaman ini.
 
-**Tangkapan layar belum tersedia**, alasan sama seperti Langkah 5.
+![Daftar Imaging Test Request di GNU Health, tab All dan baris order 010 ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/06-permintaan-tersimpan.png)
 
 ## 4. Memastikan pemeriksaan selesai
 
@@ -83,7 +86,7 @@ Buka **Imaging Test Request** dari menu pohon, lalu pindah ke tab **All**, karen
 
 Setelah unit pencitraan melakukan pemeriksaan dan mencatat hasilnya, hasil tersebut tampil pada **Imaging Test Result**, daftar yang terpisah dari permintaannya sendiri.
 
-**Tangkapan layar belum tersedia**, alasan sama seperti Langkah 5.
+![Daftar Imaging Test Result di GNU Health, baris order 010 / TEST008 ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/07-hasil-pemeriksaan.png)
 
 Berkas inilah yang diambil konektor PRECIA untuk dianalisis AI. Permintaan dan hasilnya adalah dua rekaman berbeda yang terhubung lewat nomor order yang sama.
 
@@ -139,20 +142,19 @@ Publikasi validasi adalah pemicu bagi arah tulis balik: PRECIA mengirim hasil ke
 
 Kembali ke GNU Health, buka **Imaging Test Request**, pindah ke tab **All**, lalu buka kembali order `010`. Kolom **State** kini bertuliskan **Done**, dan tombol catatan pada bilah alat menunjukkan ada catatan yang menempel.
 
-**Tangkapan layar belum tersedia.** Akun yang dipakai untuk mengambil bagian ini belum memiliki akses ke modul Medical Imaging, lihat [Batasan saat ini](#batasan-saat-ini).
+![Detail Imaging Test Request di GNU Health, kolom State dan tombol catatan ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/13-order-selesai-di-gnu-health.png)
 
 ### Langkah 14: Membuka catatan hasil AI
 
 Klik tombol Notes, lalu klik ganda pada baris catatan untuk membuka isinya. Catatan ini ditulis oleh akun integrasi PRECIA, bukan oleh petugas, dan memuat nama modul AI, tingkat keyakinan, status validasi, serta ringkasan hasil. Klik **OK** untuk menutup kotak catatan. Catatan tetap menempel pada permintaan pemeriksaan dan dapat dibuka kembali kapan saja.
 
-**Tangkapan layar belum tersedia**, alasan sama seperti Langkah 13.
+![Catatan yang menempel pada order 010 di GNU Health, kolom penulis dan isi pesan hasil AI ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/14-catatan-hasil-ai.png)
 
 ## Batasan saat ini
 
 Integrasi GNU Health masih berstatus uji coba. Batasan berikut berlaku dan perlu diketahui sebelum dipakai pada pekerjaan sehari-hari.
 
-1. **Langkah 4 sampai 7 dan 13 sampai 14 belum punya tangkapan layar.** Akun demo yang dipakai untuk mengambil separuh halaman ini bisa masuk, tetapi perannya belum mencakup modul Medical Imaging (dikonfirmasi langsung: menu Health yang sudah dibuka penuh untuk akun ini tidak memiliki baris Medical Imaging). Akses sudah diminta, belum ada tanggal pasti. Uraian tertulis pada langkah-langkah tersebut mengikuti alur Request Imaging Test / Imaging Test Request yang sudah terdokumentasi di GNU Health, tetapi belum diverifikasi ulang terhadap layar sungguhan pada sesi ini.
-2. **Modul AI masih harus dipicu secara manual.** Lihat Langkah 10, kasus yang muncul di PRECIA tidak menganalisis dirinya sendiri. Sebaliknya, pengiriman permintaan dari GNU Health dan pengiriman hasil kembali ke sana terkonfirmasi otomatis dari jejak audit platform.
-3. **Permintaan pemeriksaan GNU Health tidak membawa lampiran.** Wizard Request Imaging Test tidak menyediakan lampiran berkas maupun rujukan citra DICOM. Berkas sumber untuk analisis AI diunggah pada halaman detail transaksi di PRECIA, seperti tampak pada Langkah 10.
-4. **Modul AI harus dikonfigurasi lebih dulu pada unit tujuan.** Selama kebijakan AI unit belum diatur, panel Modul AI pada halaman detail menampilkan keterangan bahwa belum ada slot yang dikonfigurasi, dan transaksi berhenti pada status Belum Diproses.
-5. **Hasil AI dikirim balik sebagai catatan, bukan sebagai hasil pemeriksaan terstruktur.** Ringkasan hasil tampil pada kotak Notes permintaan pemeriksaan, bukan pada menu Imaging Test Result.
+1. **Modul AI masih harus dipicu secara manual.** Lihat Langkah 10, kasus yang muncul di PRECIA tidak menganalisis dirinya sendiri. Sebaliknya, pengiriman permintaan dari GNU Health dan pengiriman hasil kembali ke sana terkonfirmasi otomatis dari jejak audit platform.
+2. **Permintaan pemeriksaan GNU Health tidak membawa lampiran.** Wizard Request Imaging Test tidak menyediakan lampiran berkas maupun rujukan citra DICOM. Berkas sumber untuk analisis AI diunggah pada halaman detail transaksi di PRECIA, seperti tampak pada Langkah 10.
+3. **Modul AI harus dikonfigurasi lebih dulu pada unit tujuan.** Selama kebijakan AI unit belum diatur, panel Modul AI pada halaman detail menampilkan keterangan bahwa belum ada slot yang dikonfigurasi, dan transaksi berhenti pada status Belum Diproses.
+4. **Hasil AI dikirim balik sebagai catatan, bukan sebagai hasil pemeriksaan terstruktur.** Ringkasan hasil tampil pada kotak Notes permintaan pemeriksaan, bukan pada menu Imaging Test Result.
