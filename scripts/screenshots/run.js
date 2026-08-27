@@ -45,6 +45,13 @@ async function runSpec(browser, spec) {
       await login(page, spec.role)
     }
     if (spec.route) {
+      // PRECIA's own app is a Next.js dev server (same root cause already
+      // fixed in lib/auth.js's login()): HMR keeps a connection open, so
+      // 'networkidle' can hang or take far longer than the content actually
+      // needs, eating into the time budget before preActions' own explicit
+      // waitForSelector calls even start. Every spec in this codebase
+      // already adds its own such wait immediately after navigation, so
+      // this is a safe, generally-applicable swap, not just a one-off.
       await page.goto(spec.route.startsWith('http') ? spec.route : `${process.env.PRECIA_BASE_URL || 'https://app-dev.precia.site'}${spec.route}`, {
         waitUntil: 'domcontentloaded'
       })
@@ -80,7 +87,13 @@ async function main() {
     process.exit(1)
   }
 
-  const browser = await chromium.launch()
+  // Optional: route through a proxy (e.g. an SSH SOCKS tunnel) when the
+  // sandbox's own direct route to the target host is flaky. Inert unless
+  // SCREENSHOTS_PROXY is explicitly set, so default behavior is unchanged.
+  const launchOptions = process.env.SCREENSHOTS_PROXY
+    ? { proxy: { server: process.env.SCREENSHOTS_PROXY } }
+    : {}
+  const browser = await chromium.launch(launchOptions)
   try {
     for (const spec of specs) {
       try {

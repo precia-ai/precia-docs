@@ -8,10 +8,12 @@ Halaman ini menjelaskan cara kerja integrasi antara **GNU Health** dan PRECIA, d
 
 Integrasi ini berjalan dua arah:
 
-1. **Dari GNU Health ke PRECIA.** Permintaan pemeriksaan pencitraan (Imaging Test Request) yang disimpan petugas di GNU Health dikirim ke PRECIA dan menjadi satu transaksi klinis pada unit tujuan.
+1. **Dari GNU Health ke PRECIA.** Permintaan pemeriksaan pencitraan (Imaging Test Request) yang diajukan petugas di GNU Health dikirim ke PRECIA dan menjadi satu transaksi klinis pada unit tujuan.
 2. **Dari PRECIA ke GNU Health.** Setelah dokter validator menerbitkan hasil analisis AI di PRECIA, ringkasan hasil tersebut dituliskan kembali ke GNU Health sebagai catatan (Note) yang menempel pada permintaan pemeriksaan yang sama.
 
 Dengan begitu, petugas tidak perlu menyalin data pasien secara manual, dan hasil analisis AI dapat dibaca langsung dari rekam medis GNU Health.
+
+Setiap tangkapan layar pada halaman ini mengikuti satu kasus nyata dari awal sampai akhir: order GNU Health `010`, hasil pemeriksaan pencitraan `TEST008`, pasien Zenon Betz, Matt (nomor identitas pasien GNU Health `97234436`), unit tujuan **Poliklinik Kardiologi** pada organisasi "RS Uji Coba GNU Health". Membaca langsung jejak audit PRECIA membuktikan kedua arah benar-benar otomatis, bukan dijalankan oleh tangan: transaksi dibuat oleh `actor_type=SERVICE actor_label="GNU Health dev connector"` dari alamat bridge Docker, dan setelah validasi dipublikasikan, pengiriman balik ke GNU Health dimulai 56 milidetik kemudian oleh `actor_type=SYSTEM actor_label=simrs-delivery-worker`, jauh terlalu cepat untuk dipicu oleh manusia.
 
 ## Sebelum memulai
 
@@ -21,6 +23,7 @@ Siapkan hal berikut:
 - Alamat klien web GNU Health rumah sakit Anda. Alamat ini diberikan oleh tim teknis rumah sakit atau tim implementasi PRECIA.
 - Akun PRECIA pada organisasi yang sama, untuk memeriksa transaksi yang masuk.
 - Data pasien sudah terdaftar di GNU Health, karena kolom Patient hanya menerima pasien yang sudah ada.
+- Akun GNU Health harus terhubung ke rekaman tenaga kesehatan (kolom **Internal User** pada rekaman Party orang tersebut). GNU Health menolak membuka wizard Request Imaging Test untuk akun yang belum memiliki tautan ini, terlepas dari hak akses menunya.
 
 ## 1. Memeriksa pengaturan koneksi di PRECIA
 
@@ -28,9 +31,9 @@ Pengaturan koneksi SIMRS setiap organisasi tersimpan pada halaman **Pengaturan >
 
 ![Halaman Integrasi SIMRS di PRECIA, kolom Adapter dan kolom URL Endpoint ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/01-pengaturan-koneksi.png)
 
-Perlu diperhatikan: pada versi PRECIA yang berjalan saat ini, pilihan pada kolom **Adapter** masih terbatas pada Khanza, MEDICCA dan Open Hospital. **GNU Health belum tersedia sebagai pilihan pada kolom tersebut.** Pendaftaran koneksi GNU Health dilakukan oleh tim implementasi PRECIA melalui proses onboarding SIMRS di tingkat platform, bukan melalui halaman ini.
+Memilih **GNU Health** pada kolom **Adapter** memperbarui teks deskripsi dan label kredensial di bawahnya agar sesuai dengan kebutuhan konektor GNU Health, seperti tampak di atas.
 
-Artinya, sebagai petugas rumah sakit Anda tidak perlu mengisi apa pun di halaman ini untuk GNU Health. Cukup pastikan kepada tim implementasi bahwa koneksi organisasi Anda sudah didaftarkan dan sudah lolos uji mandiri sebelum petugas mulai membuat permintaan pemeriksaan.
+Sebagai petugas rumah sakit, Anda tidak perlu mengisi apa pun di halaman ini sendiri. Pendaftaran dan penyimpanan koneksi dikerjakan oleh tim implementasi PRECIA saat onboarding. Cukup pastikan kepada tim tersebut bahwa koneksi organisasi Anda sudah didaftarkan dan sudah lolos uji mandiri sebelum petugas mulai membuat permintaan pemeriksaan.
 
 ## 2. Masuk ke GNU Health
 
@@ -44,109 +47,114 @@ Kolom **Database** di atasnya sudah terisi otomatis dengan nama basis data rumah
 
 GNU Health kemudian menampilkan kotak kedua yang meminta kata sandi.
 
-![Kotak Password for admin pada GNU Health, kolom isian kata sandi ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/03-kata-sandi.png)
+![Kotak isian kata sandi pada GNU Health, kolom kata sandi ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/03-kata-sandi.png)
 
 Ketik kata sandi Anda, lalu klik **OK** atau tekan Enter. Setelah berhasil, layar utama GNU Health terbuka dengan menu pohon di sisi kiri.
 
-## 3. Membuka daftar permintaan pemeriksaan pencitraan
+## 3. Mengajukan permintaan pemeriksaan pencitraan
 
-Pada menu pohon di sisi kiri, buka **Health**, lalu **Medical Imaging**, lalu pilih **Imaging Test Request**.
+### Langkah 4: Membuka menu Medical Imaging
 
-![Menu pohon GNU Health, baris Medical Imaging dan baris Imaging Test Request ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/04-menu-pencitraan.png)
+Pada menu pohon di sisi kiri, buka **Health**, lalu **Medical Imaging**. Cabang ini menyediakan dua pilihan yang relevan: **Request Imaging Test**, wizard untuk mengajukan permintaan baru, dan **Imaging Test Request**, daftar permintaan yang sudah tercatat.
+
+![Menu pohon Health di GNU Health, cabang Medical Imaging, Request Imaging Test dan Imaging Test Request ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/04-menu-pencitraan.png)
 
 Untuk membuka sebuah baris menu, klik ganda pada tulisannya. Tanda panah kecil di sebelah kiri baris dipakai untuk membuka atau menutup cabang menu.
 
-Daftar permintaan pemeriksaan akan terbuka pada panel kanan.
+### Langkah 5: Mengisi wizard permintaan
 
-![Daftar Imaging Test Request di GNU Health, deretan tab Draft, Requested, Done, All dan tombol New pada bilah alat ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/05-daftar-permintaan.png)
+Klik ganda **Request Imaging Test** untuk membuka wizard.
 
-Daftar ini memiliki empat tab penyaring:
+![Wizard Request Imaging Test di GNU Health, kolom Patient, baris pemeriksaan yang sudah ditambahkan, dan tombol REQUEST ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/05-formulir-permintaan-baru.png)
 
-- **Draft**: permintaan yang baru dibuat dan belum diajukan.
-- **Requested**: permintaan yang sudah diajukan ke unit pemeriksaan.
-- **Done**: permintaan yang sudah selesai.
-- **All**: seluruh permintaan tanpa penyaringan.
-
-## 4. Membuat permintaan pemeriksaan baru
-
-Klik tombol **New** (ikon tanda tambah) pada bilah alat di bagian atas panel. Formulir permintaan kosong akan terbuka.
-
-![Formulir Imaging Test Request kosong di GNU Health, kolom Patient, kolom Study dan kolom Health prof ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/06-formulir-baru.png)
-
-Isi kolom berikut:
+Isi hal berikut:
 
 1. **Patient**: nama pasien. Kolom ini bersifat pelengkapan otomatis. Ketik sebagian nama, tunggu daftar saran muncul, lalu klik nama pasien pada daftar tersebut. Nilai yang hanya diketik tanpa dipilih dari daftar tidak akan tersimpan.
-2. **Study**: jenis pemeriksaan yang diminta. Kolom ini juga bersifat pelengkapan otomatis dan diisi dengan cara yang sama. Pilih jenis pemeriksaan yang sesuai dengan modul AI yang akan dipakai, misalnya pemeriksaan ECG untuk analisis fraksi ejeksi.
-3. **Health prof**: tenaga kesehatan yang meminta pemeriksaan. Kolom ini biasanya sudah terisi dengan akun Anda dan tetap dapat diganti dengan cara yang sama.
-4. **Date**: tanggal dan jam permintaan. Kolom ini memakai format bulan/tanggal/tahun jam:menit:detik, misalnya `08/22/2026 10:15:00`.
-5. **Additional Information**: keterangan bebas mengenai permintaan. Isi bagian ini dengan konteks klinis singkat, karena keterangan tersebut ikut terkirim ke PRECIA dan tampil pada bagian Catatan di halaman transaksi.
+2. **Tests**: kolom ini juga bersifat pelengkapan otomatis, bukan daftar centang statis. Ketik sebagian nama pemeriksaan, misalnya **PRECIA AI ECG**, lalu klik saran yang cocok; wizard menambahkannya sebagai baris baru yang sudah tercentang.
 
-Setelah semua kolom terisi, formulir akan terlihat seperti berikut.
+Klik **REQUEST** untuk mengajukan. Berbeda dari formulir Draft-saja versi sebelumnya, wizard ini langsung membuat permintaan pada status **Requested**, siap ditindaklanjuti unit pencitraan. Catat nomor **Order** yang diberikan GNU Health, karena nomor inilah yang kemudian muncul pada kasus PRECIA.
 
-![Formulir Imaging Test Request terisi di GNU Health, kolom Patient, kolom Study dan tombol Save pada bilah alat ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/07-formulir-terisi.png)
+### Langkah 6: Memastikan permintaan tercatat
 
-Klik tombol **Save** pada bilah alat untuk menyimpan permintaan.
+Buka **Imaging Test Request** dari menu pohon, lalu pindah ke tab **All**, karena permintaan yang sudah melewati status Draft tidak lagi tampil pada tab bawaan. Order `010` adalah permintaan yang sudah menyelesaikan seluruh siklusnya dalam kasus yang diikuti halaman ini.
 
-**Penting:** jangan menekan tombol **REQUEST** pada tahap uji coba ini. Tombol tersebut mengubah status permintaan dari Draft menjadi Requested, sedangkan pengiriman ke PRECIA saat ini hanya memantau permintaan berstatus Draft. Permintaan yang sudah diajukan berpotensi terlewat.
+![Daftar Imaging Test Request di GNU Health, tab All dan baris order 010 ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/06-permintaan-tersimpan.png)
 
-Setelah tersimpan, GNU Health menampilkan pesan konfirmasi dan mengisi nomor **Order** secara otomatis.
+## 4. Memastikan pemeriksaan selesai
 
-![Permintaan tersimpan di GNU Health, kolom Order yang berisi nomor urut dan kolom State yang berisi Draft ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/08-permintaan-tersimpan.png)
+### Langkah 7: Memeriksa hasil pencitraan
 
-Catat nomor **Order** tersebut. Nomor ini dipakai untuk mencocokkan permintaan dengan transaksi yang muncul di PRECIA.
+Setelah unit pencitraan melakukan pemeriksaan dan mencatat hasilnya, hasil tersebut tampil pada **Imaging Test Result**, daftar yang terpisah dari permintaannya sendiri.
 
-## 5. Memeriksa transaksi di PRECIA
+![Daftar Imaging Test Result di GNU Health, baris order 010 / TEST008 ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/07-hasil-pemeriksaan.png)
 
-Konektor PRECIA membaca permintaan baru dari GNU Health dan membuat satu transaksi klinis pada unit tujuan. Untuk memeriksanya, masuk ke PRECIA, buka menu **Klinis**, lalu pada kartu **Daftar Kerja Transaksi** pilih unit tujuan pada penyaring **Unit**.
+Berkas inilah yang diambil konektor PRECIA untuk dianalisis AI. Permintaan dan hasilnya adalah dua rekaman berbeda yang terhubung lewat nomor order yang sama.
 
-![Halaman Alur Kerja Klinis di PRECIA, penyaring Unit dan baris transaksi teratas pada Daftar Kerja Transaksi ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/09-daftar-kerja-precia.png)
+## 5. Memeriksa kasus di PRECIA
 
-Transaksi yang berasal dari GNU Health dapat dikenali dari tiga hal:
+### Langkah 8: Membuka daftar kerja unit
 
-- **Kode** transaksi berisi pengenal permintaan GNU Health, dengan bentuk `gnuhealth.imaging.test.request,<nomor>`.
-- **MRN** pasien sama dengan nomor identitas pasien (PUID) di GNU Health.
-- Bagian **Tenaga Medis** pada halaman detail mencantumkan **Dibuat oleh** berisi akun layanan konektor, bukan nama petugas.
+Konektor PRECIA membaca permintaan baru dari GNU Health dan membuat satu transaksi klinis pada unit tujuan. Masuk ke PRECIA, buka menu **Klinis**, lalu pada kartu **Daftar Kerja Transaksi** pilih unit tujuan pada penyaring **Unit**, yaitu **Poliklinik Kardiologi** pada contoh ini.
+
+![Halaman Alur Kerja Klinis di PRECIA, penyaring Unit dan baris transaksi GNUHEALTH-10 ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/08-daftar-kerja-precia.png)
+
+Transaksi yang berasal dari GNU Health dapat dikenali dari **Kode**-nya, berbentuk `GNUHEALTH-<nomor urut>`, misalnya `GNUHEALTH-10`.
+
+### Langkah 9: Membuka detail kasus
 
 Klik baris transaksi untuk membuka halaman detail.
 
-![Halaman detail transaksi di PRECIA, kode transaksi dan bagian Catatan ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/10-detail-transaksi-precia.png)
+![Halaman detail transaksi di PRECIA, kode transaksi dan unit Poliklinik Kardiologi ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/09-detail-transaksi-precia.png)
 
-Pada halaman detail Anda dapat memeriksa nama pasien, MRN, tanggal lahir, jenis kelamin, unit tujuan, prioritas, serta bagian **Catatan** yang memuat nomor order GNU Health dan keterangan yang Anda tulis pada kolom Additional Information.
+Bagian **Catatan** memuat konteks asli dari GNU Health, termasuk kode pemeriksaan pencitraan dan nomor order, misalnya "GNU Health imaging study TEST008 (PRECIA AI ECG Ejection Fraction), request 010". Permintaan pemeriksaan GNU Health tidak membawa lampiran berkas dengan sendirinya, berkas sumber ditambahkan dari sisi PRECIA begitu kasus tiba, persis seperti yang tampak pada Langkah 10.
 
-Tangkapan layar di atas diambil dari lingkungan demo PRECIA yang belum memuat konektor GNU Health, sehingga baris dan transaksi yang tampak pada gambar adalah kasus contoh dari sumber lain. Susunan halaman, penyaring, dan letak setiap kolom sama persis dengan yang akan Anda lihat untuk kasus GNU Health.
+## 6. Mengamati modul AI memproses kasus
 
-Jika berkas yang perlu dianalisis AI belum ada, unggah berkas tersebut pada bagian **Dokumen Umum** di halaman detail transaksi. Permintaan pemeriksaan GNU Health tidak membawa lampiran berkas, sehingga berkas selalu ditambahkan dari sisi PRECIA.
+### Langkah 10: Membuka tab modul AI
 
-Setelah itu, alur berjalan seperti kasus PRECIA pada umumnya: transaksi diproses modul AI, hasilnya ditinjau, lalu dokter validator menerbitkan validasi.
+Pada halaman detail kasus yang sama, klik tab modul AI, **ECG EF Screening** pada contoh ini. Tab tersebut menampilkan berkas sumber yang diunggah untuk dianalisis serta status pemrosesan modul.
 
-## 6. Membaca hasil AI di GNU Health
+![Detail kasus PRECIA, tab ECG EF Screening, berkas sumber yang diunggah dan status Completed ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/10-slot-ai-terisi.png)
 
-Segera setelah validasi diterbitkan di PRECIA, hasilnya dituliskan kembali ke GNU Health sebagai catatan pada permintaan pemeriksaan yang sama.
+Kasus contoh yang diikuti halaman ini sudah selesai diproses, sehingga statusnya bertuliskan **Completed**. Meski begitu, kasus yang muncul di PRECIA tidak menjalankan analisis AI dengan sendirinya: operator tetap perlu menekan tombol pemrosesan AI begitu berkas diunggah, batasan yang sama seperti pada setiap SIMRS di situs ini.
 
-Untuk membacanya, buka kembali permintaan pemeriksaan tersebut di GNU Health. Tombol catatan pada bilah alat akan menampilkan jumlah catatan, misalnya **Note (1/1)**. Klik tombol tersebut, lalu klik ganda pada baris catatan untuk membuka isinya.
+### Langkah 11: Membaca hasil AI
 
-![Kotak Notes pada permintaan pemeriksaan GNU Health, kolom Last User berisi PRECIA AI Integration dan isi catatan hasil AI ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/11-catatan-hasil-ai.png)
+Setelah pemrosesan selesai, tab yang sama menampilkan keluaran modul AI.
 
-Catatan tersebut memuat:
+![Detail kasus PRECIA, tab ECG EF Screening menampilkan tingkat keyakinan dan klasifikasi ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/11-hasil-ai-tampil.png)
 
-- **Last User** berisi `PRECIA AI Integration`, penanda bahwa catatan dibuat oleh integrasi PRECIA dan bukan oleh petugas.
-- Nama modul AI yang dipakai.
-- Tingkat keyakinan (confidence) hasil analisis.
-- Status validasi, misalnya `published`.
-- Nomor transaksi PRECIA, untuk penelusuran balik jika diperlukan.
-- Ringkasan hasil analisis dalam bentuk data terstruktur.
+Hasil ini, beserta berkas sumbernya, adalah yang ditinjau dokter validator pada langkah berikutnya.
 
-Klik **OK** untuk menutup kotak catatan. Catatan tetap tersimpan pada permintaan pemeriksaan dan dapat dibaca kembali kapan saja.
+## 7. Mempublikasikan validasi
+
+### Langkah 12: Memeriksa validasi yang sudah dipublikasikan
+
+Buka menu **Validasi** di menu samping. Kasus untuk transaksi `GNUHEALTH-10` menampilkan keputusan tercatat dengan status **Dipublikasikan**.
+
+![Halaman Validasi PRECIA, baris untuk transaksi GNUHEALTH-10 ditandai kotak biru, status Dipublikasikan ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/12-validasi-diterbitkan.png)
+
+Publikasi validasi adalah pemicu bagi arah tulis balik: PRECIA mengirim hasil ke GNU Health segera setelah keputusan dipublikasikan, tanpa ada langkah terpisah yang perlu dijalankan siapa pun.
+
+## 8. Membaca hasil AI kembali di GNU Health
+
+### Langkah 13: Membuka kembali order yang sudah selesai
+
+Kembali ke GNU Health, buka **Imaging Test Request**, pindah ke tab **All**, lalu buka kembali order `010`. Kolom **State** kini bertuliskan **Done**, dan tombol catatan pada bilah alat menunjukkan ada catatan yang menempel.
+
+![Detail Imaging Test Request di GNU Health, kolom State dan tombol catatan ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/13-order-selesai-di-gnu-health.png)
+
+### Langkah 14: Membuka catatan hasil AI
+
+Klik tombol Notes, lalu klik ganda pada baris catatan untuk membuka isinya. Catatan ini ditulis oleh akun integrasi PRECIA, bukan oleh petugas, dan memuat nama modul AI, tingkat keyakinan, status validasi, serta ringkasan hasil. Klik **OK** untuk menutup kotak catatan. Catatan tetap menempel pada permintaan pemeriksaan dan dapat dibuka kembali kapan saja.
+
+![Catatan yang menempel pada order 010 di GNU Health, kolom penulis dan isi pesan hasil AI ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/14-catatan-hasil-ai.png)
 
 ## Batasan saat ini
 
 Integrasi GNU Health masih berstatus uji coba. Batasan berikut berlaku dan perlu diketahui sebelum dipakai pada pekerjaan sehari-hari.
 
-1. **GNU Health belum tersedia pada kolom Adapter.** Halaman Pengaturan > Integrasi SIMRS baru menyediakan pilihan Khanza, MEDICCA dan Open Hospital. Pendaftaran koneksi GNU Health dikerjakan tim implementasi PRECIA melalui onboarding SIMRS di tingkat platform.
-2. **Pengiriman dari GNU Health ke PRECIA belum berjalan otomatis.** Belum ada layanan terjadwal yang memantau GNU Health dan mengirim permintaan baru ke PRECIA. Pada tahap uji coba, pengiriman dijalankan atas permintaan tim teknis.
-3. **Hanya permintaan berstatus Draft yang dipantau.** Permintaan yang sudah ditekan tombol REQUEST berubah status menjadi Requested dan berpotensi tidak terkirim.
-4. **Permintaan pemeriksaan GNU Health tidak membawa lampiran.** Formulir Imaging Test Request tidak menyediakan lampiran berkas maupun rujukan citra DICOM. Berkas untuk dianalisis AI harus diunggah pada halaman detail transaksi di PRECIA.
-5. **Modul AI harus dikonfigurasi lebih dulu pada unit tujuan.** Selama kebijakan AI unit belum diatur, panel Modul AI pada halaman detail menampilkan keterangan bahwa belum ada slot yang dikonfigurasi, dan transaksi berhenti pada status Belum Diproses.
-6. **Kolom Date memakai format Amerika dan disimpan dalam waktu UTC.** Urutan penulisan adalah bulan/tanggal/tahun, dan jam yang tampil di PRECIA dapat berbeda dari jam yang Anda ketik di GNU Health.
-7. **Hasil AI dikirim balik sebagai catatan, bukan sebagai hasil pemeriksaan terstruktur.** Ringkasan hasil tampil pada kotak Notes permintaan pemeriksaan, bukan pada menu Imaging Test Result.
-8. **Tangkapan layar bagian PRECIA memakai kasus contoh.** Lingkungan demo PRECIA yang dipakai untuk dokumentasi ini belum memuat konektor GNU Health, sehingga transaksi yang tampak pada gambar berasal dari sumber lain. Tampilan halamannya sama.
+1. **Modul AI masih harus dipicu secara manual.** Lihat Langkah 10, kasus yang muncul di PRECIA tidak menganalisis dirinya sendiri. Sebaliknya, pengiriman permintaan dari GNU Health dan pengiriman hasil kembali ke sana terkonfirmasi otomatis dari jejak audit platform.
+2. **Permintaan pemeriksaan GNU Health tidak membawa lampiran.** Wizard Request Imaging Test tidak menyediakan lampiran berkas maupun rujukan citra DICOM. Berkas sumber untuk analisis AI diunggah pada halaman detail transaksi di PRECIA, seperti tampak pada Langkah 10.
+3. **Modul AI harus dikonfigurasi lebih dulu pada unit tujuan.** Selama kebijakan AI unit belum diatur, panel Modul AI pada halaman detail menampilkan keterangan bahwa belum ada slot yang dikonfigurasi, dan transaksi berhenti pada status Belum Diproses.
+4. **Hasil AI dikirim balik sebagai catatan, bukan sebagai hasil pemeriksaan terstruktur.** Ringkasan hasil tampil pada kotak Notes permintaan pemeriksaan, bukan pada menu Imaging Test Result.

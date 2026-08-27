@@ -1,53 +1,89 @@
 /**
- * Alur transaksi GNU Health ke PRECIA (lingkungan dev).
+ * Alur transaksi GNU Health ke PRECIA, dan hasil AI kembali ke GNU Health,
+ * pada lingkungan dev.
  *
- * Tiga sumber tangkapan layar:
+ * PERBAIKAN DARI VERSI SEBELUMNYA: revisi ini mengganti spec lama yang
+ * mendokumentasikan alur Draft-and-Note yang tidak pernah menjadi jalur
+ * pembuktian sesungguhnya. Ingest dan write-back kini terbukti berjalan di
+ * dev DAN prod lewat wizard "Request Imaging Test" dan aksi "Generate
+ * Results" pada Imaging Test Request, bukan lewat form New/Save yang
+ * dibiarkan Draft. Kasus pembuktian dev: order GNU Health 010, transaksi
+ * PRECIA GNUHEALTH-10 (id 223cb1c1-0aa4-41bc-8f2c-37599464cceb), organisasi
+ * "RS Uji Coba GNU Health", unit "Poliklinik Kardiologi", pasien seed Zenon
+ * Betz, Matt (MRN 97234436). Kasus ini sudah selesai lengkap: hasil AI
+ * dipublikasikan dan catatan write-back sudah ada di GNU Health, sehingga
+ * spec ini TIDAK membuat data baru untuk langkah 05 ke atas, hanya membuka
+ * ulang record yang sudah ada. Detail pembuktian: lihat memory
+ * project_gnuhealth_connector_status di agent-memory simrs-connector.
+ *
+ * Dua sumber tangkapan layar:
  *   1. Halaman pengaturan Integrasi SIMRS di PRECIA (peran SUP), untuk
  *      menunjukkan tempat adapter dan URL endpoint organisasi diatur.
- *   2. Klien web GNU Health (Tryton sao) pada instansi dev. Spec ini memakai
- *      URL penuh pada `route` dan TIDAK memakai `role`, karena login GNU Health
- *      berbeda dari login PRECIA.
- *   3. Halaman daftar kerja dan detail transaksi PRECIA, memakai kasus contoh
- *      milik lingkungan demo. Instansi PRECIA demo belum memuat konektor
- *      GNU Health, sehingga kasus GNU Health belum dapat ditampilkan di sana.
- *      Batasan ini ditulis apa adanya pada halaman dokumentasi.
+ *      Pendaftaran konektor GNU Health masih dikerjakan tim implementasi
+ *      lewat onboarding platform, bukan lewat kolom Adapter di halaman ini,
+ *      jadi langkah ini masih berlaku apa adanya dari versi sebelumnya.
+ *   2. Klien web GNU Health (Tryton sao) pada instansi dev, dan halaman
+ *      klinis PRECIA pada organisasi "RS Uji Coba GNU Health". Spec sisi
+ *      GNU Health memakai URL penuh pada `route` dan TIDAK memakai `role`,
+ *      karena login GNU Health berbeda dari login PRECIA. Spec sisi PRECIA
+ *      memakai role GNUHEALTH (env PRECIA_DEMO_GNUHEALTH_EMAIL/PASSWORD),
+ *      bukan SUP, karena organisasi platform default tidak dapat membaca
+ *      daftar kerja maupun transaksi milik organisasi GNU Health.
  *
  * Kredensial GNU Health dibaca dari env GNUHEALTH_UI_USER dan
  * GNUHEALTH_UI_PASSWORD, tidak pernah ditulis di file ini. Jalankan dengan:
- *   GNUHEALTH_UI_USER=... GNUHEALTH_UI_PASSWORD=... \
- *     npm run shots -- --only=integrasi-simrs__gnu-health__
+ *   npm run shots -- --only=integrasi-simrs__gnu-health__
+ * setelah mengisi .env.local (lihat .env.local.example untuk daftar
+ * variabel yang diperlukan bagian ini).
  *
- * Catatan perilaku sao yang sudah diverifikasi:
+ * Catatan perilaku sao yang sudah diverifikasi pada versi sebelumnya dan
+ * masih berlaku:
  *   - Kotak Login hanya meminta nama pengguna. Kata sandi diminta pada kotak
  *     kedua dengan id #ask-dialog-entry setelah tombol LOGIN ditekan.
- *   - Kolom Database sudah terisi dan tidak perlu disentuh. Mengisinya justru
- *     menggantung karena selector #database cocok ke dua elemen.
+ *   - Kolom Database sudah terisi dan tidak perlu disentuh.
  *   - Menu kiri adalah tabel pohon. Baris dibuka dengan klik ganda pada sel
- *     teksnya, bukan pada barisnya, karena klik ganda pada sel relasi akan
- *     membuka record relasi tersebut.
- *   - Kolom Patient, Study dan Health prof adalah many2one dengan pelengkapan
- *     otomatis. Nilai harus dipilih dari daftar saran, bukan sekadar diketik.
+ *     teksnya, bukan pada barisnya.
+ *   - Kolom many2one (Patient, Study, Health prof) memakai pelengkapan
+ *     otomatis. Nilai harus dipilih dari daftar saran, bukan sekadar
+ *     diketik.
  *
- * Langkah 06 dan 07 membuat record baru di layar tetapi TIDAK pernah menyimpan,
- * sehingga tidak menambah data di instansi dev. Langkah 08 dan 11 memakai
- * permintaan yang sudah ada, yaitu Order 007 atas nama Ana Isabel Betz.
+ * Langkah 4-7 dan 13-14 (wizard Request Imaging Test dan record order yang
+ * sudah selesai) sudah diverifikasi hidup 2026-08-27, setelah izin modul
+ * Medical Imaging dan tautan tenaga kesehatan akun docs dibereskan:
+ *   - Field Patient pada wizard "Medical Imaging - New order" memang
+ *     bernama `patient`, sama seperti form Imaging Test Request lama.
+ *   - Baris Tests pada wizard tersebut BUKAN daftar centang statis seperti
+ *     dugaan sebelumnya, melainkan widget many2many: field bernama `tests`
+ *     berupa kolom pelengkapan otomatis, baris baru ditambahkan dengan
+ *     mengetik lalu memilih saran, dan baris yang ditambahkan otomatis
+ *     tercentang.
+ *   - Membuka wizard ini dengan `.dblclick()` pada baris menunya membuka 3
+ *     dialog modal bertumpuk, bukan 1. Dialog yang benar-benar interaktif
+ *     selalu yang PALING BARU di DOM (`.last()`), bukan `.first()`.
+ *   - Akun login harus tertaut ke rekaman tenaga kesehatan (field
+ *     `internal_user` pada `party.party`) atau wizard menolak dibuka
+ *     dengan galat SM-CORE-0007. Akun docs ditautkan ke party "Wilson"
+ *     yang sebelumnya belum dipakai siapa pun (`internal_user` masih
+ *     kosong), bukan membuat party baru maupun menimpa tautan pihak lain.
+ *   - Tombol aksi "Generate Results" pada toolbar Imaging Test Request
+ *     diasumsikan punya `title="Generate Results"`, mengikuti pola tombol
+ *     New dan Save yang sudah terbukti. Ini BELUM pernah diklik oleh
+ *     generator ini; pada bukti round trip yang sudah ada, aksi ini
+ *     dijalankan oleh agen lain secara manual.
  */
 
 const GNUHEALTH_URL = process.env.GNUHEALTH_UI_URL || 'https://gnuhealth-dev.precia.site/'
 
-/** Unit dan transaksi contoh pada organisasi demo PRECIA. */
-const PRECIA_UNIT_ID = 'e6cd3b2a-2515-424c-b218-aebe2173d0db'
-const PRECIA_TX_ID = 'bd386c68-25d6-4195-9fe9-34d27dd86936'
+/** Kasus pembuktian pada organisasi demo "RS Uji Coba GNU Health". */
+const PRECIA_TX_ID = '223cb1c1-0aa4-41bc-8f2c-37599464cceb'
+const PRECIA_UNIT_LABEL = 'Poliklinik Kardiologi'
+const PRECIA_UNIT_ID = 'a876b556-f672-475b-9e4a-44837f06af28'
 
-/** Permintaan pencitraan yang dipakai sebagai contoh pada instansi GNU Health dev. */
-const ORDER_NUMBER = '007'
-const PATIENT_FRAGMENT = 'Ana Isabel'
+/** Order dan hasil pemeriksaan pencitraan pada instansi GNU Health dev. */
+const ORDER_NUMBER = '010'
+const RESULT_NUMBER = 'TEST008'
+const PATIENT_FRAGMENT = 'Zenon Betz'
 const STUDY_FRAGMENT = 'PRECIA AI ECG'
-
-const COMMENT_TEXT = {
-  id: 'Permintaan pemeriksaan untuk analisis PRECIA AI.',
-  en: 'Imaging request submitted for PRECIA AI analysis.'
-}
 
 /**
  * Kotak anotasi yang diukur dari elemen sungguhan saat preActions berjalan.
@@ -136,29 +172,100 @@ async function expandMenu(page, label) {
   await page.waitForTimeout(2000)
 }
 
-async function openImagingTestRequest(page) {
+/** Baris "010" pada tab yang sedang aktif di daftar Imaging Test Request. */
+function requestRow(page) {
+  return page
+    .locator('#tabcontent tbody tr td[data-title="Order: "] div.column-char', {
+      hasText: ORDER_NUMBER
+    })
+    .first()
+    .locator('xpath=ancestor::tr')
+}
+
+/**
+ * "Medical Imaging" is nested under "Health" in the tree menu, and Tryton's
+ * sao client only renders a branch's children after that branch has been
+ * expanded at least once. A fresh login always starts with every branch
+ * collapsed, so "Medical Imaging" does not exist in the DOM yet until
+ * "Health" itself is expanded first. Confirmed live 2026-08-27: expanding
+ * "Medical Imaging" directly after login times out with no such row found.
+ */
+async function openMedicalImagingBranch(page) {
+  await expandMenu(page, 'Health')
   await expandMenu(page, 'Medical Imaging')
+}
+
+async function openImagingTestRequestList(page) {
+  await openMedicalImagingBranch(page)
   await menuCell(page, 'Imaging Test Request').dblclick()
   await page.waitForSelector('#tabcontent button[title="New"]', { timeout: 30000 })
   await page.waitForTimeout(3000)
 }
 
-async function openOrder(page, order) {
-  await page
-    .locator('#tabcontent tbody tr td[data-title="Order: "] div.column-char', { hasText: order })
-    .first()
-    .dblclick()
+/**
+ * Pindah ke tab "All" pada daftar Imaging Test Request. PERLU VERIFIKASI:
+ * order 010 sudah berstatus Done (bukan Draft lagi setelah Generate Results
+ * dijalankan), sehingga tab default "Draft" tidak lagi menampilkannya. Tag
+ * elemen tab (li vs a) belum dipastikan langsung dari DOM, hanya dari
+ * kemiripan visual dengan tab Draft/Requested/Done/All pada bukti raw.
+ */
+async function switchToAllTab(page) {
+  await page.click('#tabcontent li:has-text("All"), #tabcontent a:has-text("All")')
+  await page.waitForTimeout(1500)
+}
+
+/** Buka kembali record order 010 yang sudah lengkap (state Done). */
+async function openExistingOrder(page) {
+  await openImagingTestRequestList(page)
+  await switchToAllTab(page)
+  await requestRow(page).locator('td[data-title="Order: "] div.column-char').dblclick()
   await page.waitForSelector('input[name="patient"]', { timeout: 30000 })
   await page.waitForTimeout(3000)
 }
 
-async function pickCompletion(page, field, fragment) {
-  const input = page.locator(`input[name="${field}"]`).first()
-  await input.click()
-  await input.fill(fragment)
+async function openImagingTestResultList(page) {
+  await openMedicalImagingBranch(page)
+  await menuCell(page, 'Imaging Test Result').dblclick()
+  await page.waitForSelector('#tabcontent tbody tr', { timeout: 30000 })
+  await page.waitForTimeout(3000)
+}
+
+/**
+ * Buka wizard "Request Imaging Test" dan isi Patient serta baris Tests,
+ * TANPA menekan REQUEST. Tidak pernah membuat record baru di instansi dev.
+ *
+ * dblclick() pada baris menu ini membuka wizard LEBIH dari sekali (3 dialog
+ * bertumpuk terkonfirmasi langsung 2026-08-27), berbeda dari baris menu
+ * daftar (Imaging Test Request/Result) yang aman menerima dblclick berulang.
+ * .modal-content terlama (.first()) berada di belakang backdrop dialog yang
+ * lebih baru, sehingga elemen di dalamnya tidak menerima klik ("subtree
+ * intercepts pointer events"). Dialog yang benar-benar interaktif selalu
+ * yang PALING BARU (.last()).
+ */
+async function fillNewOrderWizardWithoutSubmitting(page) {
+  await openMedicalImagingBranch(page)
+  await menuCell(page, 'Request Imaging Test').dblclick()
+  await page.waitForSelector('.modal-content', { timeout: 30000 })
+  await page.waitForTimeout(2000)
+  const modal = page.locator('.modal-content').last()
+  const patientInput = modal.locator('input[name="patient"]').first()
+  await patientInput.click()
+  await patientInput.fill(PATIENT_FRAGMENT)
   await page.waitForTimeout(2500)
-  await page.locator(`input[name="${field}"] ~ ul.dropdown-menu li.completion a`).first().click()
+  await modal.locator('ul.dropdown-menu li.completion a').first().click()
   await page.waitForTimeout(1500)
+  // "Tests" is a many2many widget (add/remove buttons plus one autocomplete
+  // input, name="tests"), not a pre-populated table with checkboxes to tick
+  // as the old comment assumed. Confirmed live 2026-08-27: the grid starts
+  // empty; typing into the autocomplete and picking the matching suggestion
+  // is what adds (and auto-checks) the row.
+  const testsInput = modal.locator('input[name="tests"]').first()
+  await testsInput.click()
+  await testsInput.fill(STUDY_FRAGMENT)
+  await page.waitForTimeout(2500)
+  await modal.locator('.form-many2many-toolbar ul.dropdown-menu li.completion a').first().click()
+  await page.waitForTimeout(1500)
+  return modal
 }
 
 /* ------------------------------------------------------------------ */
@@ -179,6 +286,19 @@ module.exports = [
     preActions: async (page, { locale }) => {
       await page.waitForSelector('#simrs-adapter', { timeout: 20000 })
       await page.waitForTimeout(1500)
+      // The shared platform SUP account's own organization ("System Health
+      // Organization") has a single mutable simrs.adapter record that every
+      // SIMRS needing this settings screen was racing to overwrite via
+      // "Save connection settings" — confirmed live 2026-08-27 by diffing
+      // this page's earlier saved screenshot against Open Hospital's:
+      // byte-identical, same admin@precia.ai identity, same org, whichever
+      // SIMRS saved last silently won. Fixed the same way
+      // integrasi-simrs__khanza.config.js already does: overwrite the form
+      // to GNU Health's own values WITHOUT clicking Save, so the screenshot
+      // is correct regardless of whatever another SIMRS last persisted.
+      await page.selectOption('#simrs-adapter', 'gnuhealth')
+      await page.fill('#simrs-endpoint-url', 'https://simrs.contoh-rs.example/gnuhealth')
+      await page.waitForTimeout(800)
       await measure(page, '01', locale, 'adapter', page.locator('#simrs-adapter'))
       await measure(page, '01', locale, 'endpoint', page.locator('#simrs-endpoint-url'))
     },
@@ -223,127 +343,263 @@ module.exports = [
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
       await loginGnuhealth(page)
-      await expandMenu(page, 'Medical Imaging')
+      await openMedicalImagingBranch(page)
       await measure(page, '04', locale, 'medical-imaging', menuCell(page, 'Medical Imaging'))
-      await measure(page, '04', locale, 'request', menuCell(page, 'Imaging Test Request'))
+      await measure(page, '04', locale, 'request-wizard', menuCell(page, 'Request Imaging Test'))
+      await measure(page, '04', locale, 'request-list', menuCell(page, 'Imaging Test Request'))
     },
-    annotate: ({ locale }) => annotationsFor('04', locale, ['medical-imaging', 'request'])
+    annotate: ({ locale }) =>
+      annotationsFor('04', locale, ['medical-imaging', 'request-wizard', 'request-list'])
   },
   {
-    id: 'integrasi-simrs__gnu-health__05-daftar-permintaan',
+    id: 'integrasi-simrs__gnu-health__05-formulir-permintaan-baru',
     section: SECTION,
     pageSlug: PAGE,
-    stepSlug: '05-daftar-permintaan',
+    stepSlug: '05-formulir-permintaan-baru',
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
       await loginGnuhealth(page)
-      await openImagingTestRequest(page)
-      await measure(page, '05', locale, 'tabs', page.locator('#tabcontent ul.nav-tabs'))
-      await measure(page, '05', locale, 'new', page.locator('#tabcontent button[title="New"]'))
+      const modal = await fillNewOrderWizardWithoutSubmitting(page)
+      await measure(page, '05', locale, 'patient', modal.locator('input[name="patient"]').first())
+      await measure(
+        page,
+        '05',
+        locale,
+        'test-row',
+        modal.locator('table tr', { hasText: STUDY_FRAGMENT }).first()
+      )
+      await measure(page, '05', locale, 'request', modal.locator('button:has-text("REQUEST")'))
     },
-    annotate: ({ locale }) => annotationsFor('05', locale, ['tabs', 'new'])
+    annotate: ({ locale }) => annotationsFor('05', locale, ['patient', 'test-row', 'request'])
   },
   {
-    id: 'integrasi-simrs__gnu-health__06-formulir-baru',
+    id: 'integrasi-simrs__gnu-health__06-permintaan-tersimpan',
     section: SECTION,
     pageSlug: PAGE,
-    stepSlug: '06-formulir-baru',
+    stepSlug: '06-permintaan-tersimpan',
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
       await loginGnuhealth(page)
-      await openImagingTestRequest(page)
-      await page.click('#tabcontent button[title="New"]')
-      await page.waitForSelector('input[name="patient"]', { timeout: 30000 })
-      await page.waitForTimeout(2500)
-      await measure(page, '06', locale, 'patient', page.locator('input[name="patient"]'))
-      await measure(page, '06', locale, 'study', page.locator('input[name="requested_test"]'))
-      await measure(page, '06', locale, 'doctor', page.locator('input[name="doctor"]'))
+      await openImagingTestRequestList(page)
+      await switchToAllTab(page)
+      await measure(page, '06', locale, 'row', requestRow(page), 4)
     },
-    annotate: ({ locale }) => annotationsFor('06', locale, ['patient', 'study', 'doctor'])
+    annotate: ({ locale }) => annotationsFor('06', locale, ['row'])
   },
   {
-    id: 'integrasi-simrs__gnu-health__07-formulir-terisi',
+    id: 'integrasi-simrs__gnu-health__07-hasil-pemeriksaan',
     section: SECTION,
     pageSlug: PAGE,
-    stepSlug: '07-formulir-terisi',
+    stepSlug: '07-hasil-pemeriksaan',
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
       await loginGnuhealth(page)
-      await openImagingTestRequest(page)
-      await page.click('#tabcontent button[title="New"]')
-      await page.waitForSelector('input[name="patient"]', { timeout: 30000 })
-      await page.waitForTimeout(2000)
-      await pickCompletion(page, 'patient', PATIENT_FRAGMENT)
-      await pickCompletion(page, 'requested_test', STUDY_FRAGMENT)
-      await page.locator('textarea[name="comment"]').first().fill(COMMENT_TEXT[locale])
-      await page.waitForTimeout(1000)
-      await measure(page, '07', locale, 'patient', page.locator('input[name="patient"]'))
-      await measure(page, '07', locale, 'study', page.locator('input[name="requested_test"]'))
-      await measure(page, '07', locale, 'save', page.locator('#tabcontent button[title="Save"]'))
+      await openImagingTestResultList(page)
+      const row = page.locator('#tabcontent tbody tr', { hasText: RESULT_NUMBER }).first()
+      await measure(page, '07', locale, 'row', row, 4)
     },
-    annotate: ({ locale }) => annotationsFor('07', locale, ['patient', 'study', 'save'])
+    annotate: ({ locale }) => annotationsFor('07', locale, ['row'])
   },
   {
-    id: 'integrasi-simrs__gnu-health__08-permintaan-tersimpan',
+    id: 'integrasi-simrs__gnu-health__08-daftar-kerja-precia',
     section: SECTION,
     pageSlug: PAGE,
-    stepSlug: '08-permintaan-tersimpan',
-    route: GNUHEALTH_URL,
-    preActions: async (page, { locale }) => {
-      await loginGnuhealth(page)
-      await openImagingTestRequest(page)
-      await openOrder(page, ORDER_NUMBER)
-      await measure(page, '08', locale, 'order', page.locator('input[name="request"]'))
-      await measure(page, '08', locale, 'state', page.locator('select[name="state"]'))
-    },
-    annotate: ({ locale }) => annotationsFor('08', locale, ['order', 'state'])
-  },
-  {
-    id: 'integrasi-simrs__gnu-health__09-daftar-kerja-precia',
-    section: SECTION,
-    pageSlug: PAGE,
-    stepSlug: '09-daftar-kerja-precia',
+    stepSlug: '08-daftar-kerja-precia',
+    // Verified live 2026-08-27: plain /clinical now shows a "Choose a Unit"
+    // card picker with no table at all, not a worklist with a select
+    // filter. Passing ?unit=<id> lands directly on that unit's worklist,
+    // same convention as Bahmni's own step 08.
     route: `/clinical?unit=${PRECIA_UNIT_ID}`,
-    role: 'SUP',
+    role: 'GNUHEALTH',
     preActions: async (page, { locale }) => {
       await page.waitForSelector('table tbody tr', { timeout: 25000 })
-      await page.waitForTimeout(2500)
-      await measure(page, '09', locale, 'unit-filter', page.locator('select').nth(1))
-      await measure(page, '09', locale, 'row', page.locator('table tbody tr').first(), 4)
+      await page.waitForTimeout(1500)
+      // With ?unit= already in the route, select index 1 (0 is Status) is
+      // the Unit filter and is already set to Poliklinik Kardiologi.
+      // selectOption({label: PRECIA_UNIT_LABEL}) failed here: the actual
+      // option label is "KARDIO - Poliklinik Kardiologi" (code prefix
+      // included), not the bare unit name, and reselecting is redundant
+      // anyway since the URL already picked it. Just measure it as-is.
+      const unitFilter = page.locator('select').nth(1)
+      await page.waitForTimeout(2000)
+      await measure(page, '08', locale, 'unit-filter', unitFilter)
+      await measure(
+        page,
+        '08',
+        locale,
+        'row',
+        page.locator('table tbody tr', { hasText: 'GNUHEALTH-10' }).first(),
+        4
+      )
     },
-    annotate: ({ locale }) => annotationsFor('09', locale, ['unit-filter', 'row'])
+    annotate: ({ locale }) => annotationsFor('08', locale, ['unit-filter', 'row'])
   },
   {
-    id: 'integrasi-simrs__gnu-health__10-detail-transaksi-precia',
+    id: 'integrasi-simrs__gnu-health__09-detail-transaksi-precia',
     section: SECTION,
     pageSlug: PAGE,
-    stepSlug: '10-detail-transaksi-precia',
+    stepSlug: '09-detail-transaksi-precia',
     route: `/clinical/transactions/${PRECIA_TX_ID}`,
-    role: 'SUP',
+    role: 'GNUHEALTH',
     preActions: async (page, { locale }) => {
       await page.waitForSelector('h1', { timeout: 25000 })
       await page.waitForTimeout(2500)
-      await measure(page, '10', locale, 'code', page.locator('h1').first())
+      await measure(page, '09', locale, 'code', page.locator('h1').first())
+      await measure(
+        page,
+        '09',
+        locale,
+        'unit',
+        page.locator('text=Poliklinik Kardiologi').first()
+      )
+    },
+    annotate: ({ locale }) => annotationsFor('09', locale, ['code', 'unit'])
+  },
+  {
+    // Two elements both render the text "ECG EF Screening": the AI Modules
+    // chip under Transaction Details (index 0) and the actual tab button
+    // (index 1). .first() was clicking the chip, which does nothing, so the
+    // page stayed on the Patient Info tab and neither locator below was
+    // ever found. Confirmed live 2026-08-27.
+    //
+    // Also: GNUHEALTH-10's AI module already reached status "Completed" by
+    // the time this generator runs (same permanence problem already noted
+    // on step 12's own comment below) — there is no "Trigger AI" button to
+    // capture anymore, and reproducing the pre-trigger moment would mean
+    // reverting a real completed result. This step therefore shows the
+    // uploaded source file together with the module's current status.
+    //
+    // That status text is itself translated (precia-fe lib/i18n/
+    // translations.ts, key "status.completed": "Completed" in English,
+    // "Selesai" in Indonesian) — a literal 'text=Completed' locator only
+    // ever matches the English pass. Confirmed live: on the 'id' pass the
+    // tab click was working correctly the whole time, the page really did
+    // show "Selesai", not "Completed"; hours were lost to this looking
+    // like a click/network bug when it was a hardcoded-English-string bug.
+    id: 'integrasi-simrs__gnu-health__10-slot-ai-terisi',
+    section: SECTION,
+    pageSlug: PAGE,
+    stepSlug: '10-slot-ai-terisi',
+    route: `/clinical/transactions/${PRECIA_TX_ID}`,
+    role: 'GNUHEALTH',
+    fullPage: true,
+    preActions: async (page, { locale }) => {
+      const statusText = locale === 'id' ? 'Selesai' : 'Completed'
+      await page.waitForSelector('h1', { timeout: 25000 })
+      await page.getByText('ECG EF Screening', { exact: true }).nth(1).click()
+      await page.waitForSelector(`text=${statusText}`, { timeout: 20000 })
       await measure(
         page,
         '10',
         locale,
-        'notes',
-        page.locator('p', { hasText: 'Suspected reduced ejection' }).last()
+        'file',
+        page.locator('text=A012599').first()
+      )
+      await measure(
+        page,
+        '10',
+        locale,
+        'status',
+        page.locator(`text=${statusText}`).first()
       )
     },
-    annotate: ({ locale }) => annotationsFor('10', locale, ['code', 'notes'])
+    annotate: ({ locale }) => annotationsFor('10', locale, ['file', 'status'])
   },
   {
-    id: 'integrasi-simrs__gnu-health__11-catatan-hasil-ai',
+    // Confidence/classification render below the fold at the default
+    // viewport height; a non-fullPage screenshot cropped them out entirely
+    // while the step still reported success (boundingBox() doesn't require
+    // the element to be within the visible viewport). Confirmed live
+    // 2026-08-27: the saved PNG was exactly 1440x900 with no annotated
+    // content visible anywhere in it.
+    id: 'integrasi-simrs__gnu-health__11-hasil-ai-tampil',
     section: SECTION,
     pageSlug: PAGE,
-    stepSlug: '11-catatan-hasil-ai',
+    stepSlug: '11-hasil-ai-tampil',
+    route: `/clinical/transactions/${PRECIA_TX_ID}`,
+    role: 'GNUHEALTH',
+    fullPage: true,
+    preActions: async (page, { locale }) => {
+      // "Confidence" is a translated label (precia-fe lib/i18n/
+      // translations.ts, "clinical.colConfidence": "Confidence" / EN,
+      // "Keyakinan" / ID) — a literal 'text=Confidence' locator only
+      // matches the English pass. "Abnormal" is a raw AI classification
+      // value, not translated, confirmed absent from the translations file
+      // as its own key, so it is safe as a literal in both locales.
+      const confidenceLabel = locale === 'id' ? 'Keyakinan' : 'Confidence'
+      await page.waitForSelector('h1', { timeout: 25000 })
+      // Same click-index fix as step 10: index 1 is the actual tab.
+      await page.getByText('ECG EF Screening', { exact: true }).nth(1).click()
+      await page.waitForTimeout(2500)
+      await measure(
+        page,
+        '11',
+        locale,
+        'confidence',
+        page.locator(`text=${confidenceLabel}`).first().locator('xpath=ancestor::div[1]')
+      )
+      await measure(page, '11', locale, 'classification', page.locator('text=Abnormal').first())
+    },
+    annotate: ({ locale }) => annotationsFor('11', locale, ['confidence', 'classification'])
+  },
+  {
+    // Kasus pembuktian GNUHEALTH-10 sudah dipublikasikan secara permanen di
+    // data dev, jadi status "menunggu keputusan" yang tampak pada bukti raw
+    // (_evidence/dev/gnuhealth-10-*.png) tidak dapat direproduksi lagi oleh
+    // generator ini tanpa membatalkan validasi yang sudah tercatat. Langkah
+    // ini karena itu memotret Validation Detail pada keadaannya yang
+    // sekarang, yaitu sudah diterbitkan, bukan keadaan sebelum diputuskan.
+    id: 'integrasi-simrs__gnu-health__12-validasi-diterbitkan',
+    section: SECTION,
+    pageSlug: PAGE,
+    stepSlug: '12-validasi-diterbitkan',
+    route: '/validation',
+    role: 'GNUHEALTH',
+    preActions: async (page, { locale }) => {
+      // Both "Validation Detail" and "Published" are translated labels
+      // (precia-fe lib/i18n/translations.ts: "validation.detailTitle" ->
+      // "Detail Validasi" in Indonesian, "validation.statusPublished" ->
+      // "Dipublikasikan"). Literal English locators only ever matched the
+      // English pass; this is the actual reason this step kept timing out
+      // on the 'id' pass, not the network flakiness it looked like.
+      const detailTitle = locale === 'id' ? 'Detail Validasi' : 'Validation Detail'
+      const publishedLabel = locale === 'id' ? 'Dipublikasikan' : 'Published'
+      await page.waitForSelector(`text=${detailTitle}`, { timeout: 25000 })
+      await page.waitForTimeout(2000)
+      await measure(page, '12', locale, 'transaction', page.locator('text=GNUHEALTH-10').first())
+      await measure(page, '12', locale, 'status', page.locator(`text=${publishedLabel}`).first())
+    },
+    annotate: ({ locale }) => annotationsFor('12', locale, ['transaction', 'status'])
+  },
+  {
+    id: 'integrasi-simrs__gnu-health__13-order-selesai-di-gnu-health',
+    section: SECTION,
+    pageSlug: PAGE,
+    stepSlug: '13-order-selesai-di-gnu-health',
     route: GNUHEALTH_URL,
     preActions: async (page, { locale }) => {
       await loginGnuhealth(page)
-      await openImagingTestRequest(page)
-      await openOrder(page, ORDER_NUMBER)
+      await openExistingOrder(page)
+      await measure(page, '13', locale, 'state', page.locator('select[name="state"]'))
+      await measure(
+        page,
+        '13',
+        locale,
+        'notes-button',
+        page.locator('button[title^="Note"], [title="Notes"]').first()
+      )
+    },
+    annotate: ({ locale }) => annotationsFor('13', locale, ['state', 'notes-button'])
+  },
+  {
+    id: 'integrasi-simrs__gnu-health__14-catatan-hasil-ai',
+    section: SECTION,
+    pageSlug: PAGE,
+    stepSlug: '14-catatan-hasil-ai',
+    route: GNUHEALTH_URL,
+    preActions: async (page, { locale }) => {
+      await loginGnuhealth(page)
+      await openExistingOrder(page)
       await page.click('#tabcontent button[title^="Note"]')
       await page.waitForSelector('.modal-content', { timeout: 30000 })
       await page.waitForTimeout(3000)
@@ -351,9 +607,9 @@ module.exports = [
       await modal.locator('td[data-title="Message: "]').first().dblclick()
       await page.waitForSelector('.modal-content input[name="unread"]', { timeout: 30000 })
       await page.waitForTimeout(2500)
-      await measure(page, '11', locale, 'author', modal.locator('input[name="last_user"]'))
-      await measure(page, '11', locale, 'message', modal.locator('textarea[name="message"]'), 6)
+      await measure(page, '14', locale, 'author', modal.locator('input[name="last_user"]'))
+      await measure(page, '14', locale, 'message', modal.locator('textarea[name="message"]'), 6)
     },
-    annotate: ({ locale }) => annotationsFor('11', locale, ['author', 'message'])
+    annotate: ({ locale }) => annotationsFor('14', locale, ['author', 'message'])
   }
 ]
