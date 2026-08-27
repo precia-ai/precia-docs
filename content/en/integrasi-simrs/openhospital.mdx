@@ -100,15 +100,15 @@ In the sample case, the module reports **71.7%** confidence with classification 
 
 ## 9. Sending the result to clinical validation
 
-A doctor opens the **Validation** menu and finds the case in the worklist. After reviewing the AI result, the doctor records a decision (**Accepted** in the sample case) together with clinical notes, then the case is ready to publish.
+A doctor opens the **Validation** menu and finds the case in the worklist. After reviewing the AI result, the doctor records a decision together with clinical notes. In the sample case, the decision is **Accepted**.
 
-![PRECIA Validation Detail page, the Decision and Status fields, and the Publish validation button marked with blue boxes](/screenshots/en/integrasi-simrs/openhospital/09-validasi-dokter.png)
+![PRECIA Validation Detail page, the Decision field holding Accepted, the Status field, and the Clinical notes field marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/09-validasi-dokter.png)
 
 ## 10. Publishing the validation
 
 Clicking **Publish validation** marks the case as reviewed. The **Status** field changes to **Published** and a **Published at** timestamp is recorded.
 
-![PRECIA Validation Detail page after publishing, the confirmation banner and the Published status marked with blue boxes](/screenshots/en/integrasi-simrs/openhospital/10-validasi-dipublikasikan.png)
+![PRECIA Validation Detail page, the Status field holding Published and the Published at timestamp marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/10-validasi-dipublikasikan.png)
 
 ## 11. Confirming the result reaches Open Hospital
 
@@ -120,11 +120,11 @@ Publishing a validation triggers PRECIA to send the result back to Open Hospital
 
 ## How data is mapped
 
-The table below explains where each piece of data on the PRECIA case comes from, based on the sample case `laboratory-1`.
+The table below explains where each piece of data on the PRECIA case comes from, based on the sample case `laboratory-500001`.
 
 | Data in PRECIA | Source in Open Hospital |
 |---|---|
-| Case code | `<source_type>-<source_code>`, for example `laboratory-1` for the first laboratory examination |
+| Case code | `<source_type>-<source_code>`, for example `laboratory-500001` |
 | Patient name, date of birth, gender | Patient demographics |
 | Medical record number | **PAT.ID** on the patient record |
 | Destination unit | The examination type requested, for example **ECG 12 Lead** maps to the **Kardiologi** unit |
@@ -135,7 +135,7 @@ The table below explains where each piece of data on the PRECIA case comes from,
 
 This section records what is not yet available, so the integration does not raise expectations it cannot meet.
 
-1. **Automatic delivery to PRECIA has been demonstrated, not confirmed as a standing service.** On 22 August 2026, the case used throughout this page (`laboratory-1`) shows a registration timestamp inside Open Hospital's own request data (`registration_date: 2026-08-22T15:35:36`) that matches, to the minute, the case's `Created` timestamp in PRECIA (22 Aug 2026, 22:35, the same instant in UTC+7). The case was created by the **Open Hospital dev connector** service account, not by a staff member. That is evidence of near real time, unattended pickup for this one run. A second case from the same day points the same way: the connector's own log records opening PRECIA case `laboratory-500000` twenty seconds after the matching request was raised in Open Hospital, inside a routine scan cycle rather than a one-off script run (`05:24:21 INFO [app.runner] opened PRECIA case laboratory-500000 unit=CD transaction=c90f1dc3-0cbc-43b3-aaac-903ca5ee52e5`, followed by `cycle done scanned=2 new=1 acknowledged=0 known=1 rejected=0 failed=0`). This documentation did not capture that log itself, so it is included as corroboration reported by the engineer who ran the proof, not as primary evidence the way the timestamps above are. Neither case is the same as a monitored, continuously running service observed over time: this documentation cannot rule out that the connector was started manually for these proofs, and its uptime has not been observed over an extended period.
+1. **Automatic delivery to PRECIA has been demonstrated, not confirmed as a standing service.** On 27 August 2026, the case used throughout this page (`laboratory-500001`) shows a registration timestamp inside Open Hospital's own request data (`registration_date: 2026-08-27T13:58:06`) that matches, to the minute, the case's `Created` timestamp in PRECIA (27 Aug 2026, 20:58, the same instant in UTC+7). The case was created by the **Open Hospital dev connector** service account, not by a staff member. That is evidence of near real time, unattended pickup for this one run. A case from a nearby day points the same way: the connector's own log records opening PRECIA case `laboratory-500000` twenty seconds after the matching request was raised in Open Hospital, inside a routine scan cycle rather than a one-off script run (`05:24:21 INFO [app.runner] opened PRECIA case laboratory-500000 unit=CD transaction=c90f1dc3-0cbc-43b3-aaac-903ca5ee52e5`, followed by `cycle done scanned=2 new=1 acknowledged=0 known=1 rejected=0 failed=0`). This documentation did not capture that log itself, so it is included as corroboration reported by the engineer who ran the proof, not as primary evidence the way the timestamps above are. Neither case is the same as a monitored, continuously running service observed over time: this documentation cannot rule out that the connector was started manually for these proofs, and its uptime has not been observed over an extended period.
 2. **Sending the AI result back to Open Hospital has been confirmed through the API, not yet through the web interface.** Step 11 above shows Open Hospital's own endpoint (`precia-integration/ai-results/{sourceType}/{sourceCode}`) returning the validated result with `validation_status: "published"` and a `synced_at` timestamp, confirming the write back reaches Open Hospital's database. This documentation has not yet found a place in the Open Hospital web interface where that result is shown to staff.
 3. **A case is recorded without an explicit SIMRS-origin marker in the audit trail.** A case created by the connector goes through the ordinary case-recording path, so the audit trail does not show that a case came from Open Hospital. The Notes field on the detail page is currently the only marker available.
 4. **AI modules must be configured on the destination unit first.** Until the unit AI policy is set, the AI Modules panel on the detail page reports that no slots are configured, and the case stops at the Unprocessed status.
