@@ -451,13 +451,21 @@ module.exports = [
   },
 
   /* ---------------------------------------------------------------- */
-  /* Sisi Open Hospital: hasil AI kembali ke rekam medis.               */
-  /* MENUNGGU PEMBUKTIAN — lihat catatan di kepala berkas. Selector di  */
-  /* bawah berasal dari kode UI sungguhan (LaboratoryDetails.tsx), tapi */
-  /* belum pernah dibuktikan terisi oleh kasus nyata yang tuntas sampai */
-  /* publish. Jangan jalankan langkah ini sebagai bukti round trip      */
-  /* sebelum ada kasus yang benar-benar sampai status published dan     */
-  /* callback ai-results sudah tercatat sampai ke panel ini.            */
+  /* Sisi Open Hospital: hasil AI kembali ke rekam medis, dilihat dari  */
+  /* detail satu pemeriksaan (panel di LaboratoryDetails.tsx).          */
+  /* MASIH MENUNGGU PEMBUKTIAN, bukan lagi karena belum ada kasus       */
+  /* published (laboratory-500001 dan -500002 keduanya published), tapi */
+  /* karena tombol "view" bergambar kaca pembesar ([data-cy=            */
+  /* "table-view-action"]) yang membuka panel ini nyatanya tidak pernah */
+  /* dirender sama sekali untuk permintaan CD.01 milik SITI/RUDI --     */
+  /* diverifikasi langsung 2 September 2026 lewat innerHTML tabel       */
+  /* (VIEW_ACTION_COUNT selalu 0). Dugaan: tombol itu hanya muncul       */
+  /* untuk exam yang sudah dieksekusi dengan baris hasil sungguhan di   */
+  /* Open Hospital sendiri (laboratoryRowList terisi), sedangkan kedua  */
+  /* kasus uji ini murni permintaan yang diambil konektor tanpa pernah  */
+  /* dieksekusi di sisi Open Hospital. Tab baru langkah 12 di bawah     */
+  /* (Hasil AI PRECIA pada Patient Dashboard) tidak punya batasan ini   */
+  /* karena tidak bergantung pada tombol view tersebut sama sekali.     */
   /* ---------------------------------------------------------------- */
   {
     id: 'integrasi-simrs__openhospital__07-hasil-ai-di-openhospital--PENDING-PROOF',
@@ -485,7 +493,8 @@ module.exports = [
         throw new Error(
           'Panel "PRECIA AI Result" tidak tampil pada kasus ini. Ini BUKAN kegagalan spec: ' +
             'artinya belum ada kasus di openhospital-dev yang sudah melewati validasi AI sampai ' +
-            'published untuk pasien/exam ini. Jalankan ulang setelah ada kasus semacam itu, jangan ' +
+            'published untuk pasien/exam ini, ATAU tombol view tidak dirender untuk exam yang belum ' +
+            'dieksekusi di Open Hospital sendiri (lihat catatan 2 September 2026 di atas). Jangan ' +
             'dipaksa lulus dengan mengganti pasien/exam tanpa memverifikasi datanya nyata.'
         )
       }
@@ -493,6 +502,54 @@ module.exports = [
       await measure(page, '07', locale, 'result-data', page.locator('.labDetails__content__precia_result_data'))
     },
     annotate: ({ locale }) => annotationsFor('07', locale, ['panel', 'result-data'])
+  },
+
+  /* ---------------------------------------------------------------- */
+  /* Sisi Open Hospital: tab "Hasil AI PRECIA" pada Patient Dashboard.  */
+  /*                                                                    */
+  /* Berbeda dari langkah 07 (detail satu pemeriksaan), tab ini baru,   */
+  /* berdiri sendiri di menu kiri Patient Dashboard, dan mendaftar      */
+  /* SEMUA kunjungan OPD serta permintaan laboratorium pasien sekaligus */
+  /* -- bukan hanya satu pemeriksaan yang sedang dibuka.                */
+  /*                                                                    */
+  /* DIBUKTIKAN 2 September 2026 dengan kasus BARU yang dibuat sungguhan */
+  /* lewat spec ini sendiri hari itu juga: pasien RUDI HARTONO PRECIA   */
+  /* PROOF (PAT_ID 2), permintaan ECG 12 Lead (LAB_ID 500002), diambil  */
+  /* otomatis oleh konektor (Dibuat oleh: Open Hospital dev connector), */
+  /* diproses AI, divalidasi, dan dipublikasikan sampai tersinkron balik */
+  /* -- transaksi cdee8d26-ea1f-4d10-989a-0391474b248a. Data uji ini    */
+  /* permanen di openhospital-dev, sama seperti laboratory-500001 di    */
+  /* atas, jadi TIDAK dibuat ulang oleh spec ini.                       */
+  /* ---------------------------------------------------------------- */
+  {
+    id: 'integrasi-simrs__openhospital__12-tab-hasil-ai-precia',
+    section: SECTION,
+    pageSlug: PAGE,
+    stepSlug: '12-tab-hasil-ai-precia',
+    route: OPENHOSPITAL_LOGIN,
+    locales: ['id'],
+    fullPage: true,
+    preActions: async (page, { locale }) => {
+      await ohLogin(page)
+      await page.goto(`${OPENHOSPITAL_URL}/patients/details/2/precia-ai-results`, {
+        waitUntil: 'domcontentloaded'
+      })
+      await page.waitForSelector('[data-cy="patient-precia-ai-results"]', { timeout: 20000 })
+      await page.waitForTimeout(2000)
+
+      const publishedCard = page.locator('[data-precia-case="laboratory:500002"]')
+      const cardCount = await publishedCard.count()
+      if (cardCount === 0) {
+        throw new Error(
+          'Kartu kasus laboratory:500002 tidak ditemukan pada tab Hasil AI PRECIA. Ini BUKAN ' +
+            'kegagalan spec: artinya data uji permanen yang dipakai langkah ini sudah berubah di ' +
+            'openhospital-dev. Perbarui referensi PAT_ID/LAB_ID di berkas ini, jangan dipaksa lulus.'
+        )
+      }
+      await measure(page, '12', locale, 'menu', page.locator('[data-cy="patient-menu-precia-ai-results"]'))
+      await measureUnion(page, '12', locale, 'card', [publishedCard])
+    },
+    annotate: ({ locale }) => annotationsFor('12', locale, ['menu', 'card'])
   },
 
   /* ---------------------------------------------------------------- */
