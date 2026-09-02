@@ -6,7 +6,7 @@ title: Transaction flow from SIMRS MEDICCA to PRECIA
 
 This page describes the journey of a single patient visit from SIMRS MEDICCA through to PRECIA: the one-time setup that must be done first, then the daily front-desk work that produces a transaction, and finally the place in PRECIA where that transaction is supposed to appear.
 
-Every step on this page was carried out directly against the MEDICCA and PRECIA development environments, most recently re-verified on 27 August 2026. Anything that does not yet work is reported as it stands, in the **Current limitations** section at the bottom of the page. Read that section before scheduling any hospital rollout: a registration now reaches PRECIA automatically and is tagged as coming from a SIMRS, with no person running a script by hand, and the return direction, an AI result flowing back into MEDICCA, is now proven through one demonstration configuration, not yet as something that runs by default for a newly connected organization.
+Every step on this page was carried out directly against the MEDICCA and PRECIA development environments, most recently re-verified on 2 September 2026. Anything that does not yet work is reported as it stands, in the **Current limitations** section at the bottom of the page. A registration reaches PRECIA automatically and is tagged as coming from a SIMRS, with no person running a script by hand, and this now survives a deliberate stop/start of the worker service (the organization's transaction count did not change). The front-desk officer can now also see directly from the registration history whether a delivery succeeded, failed, or is still pending, and can open the AI result from inside MEDICCA itself without signing in to PRECIA.
 
 ## Flow at a glance
 
@@ -19,9 +19,9 @@ What happens is this:
 3. A dedicated worker service, a long-running process that ships alongside the MEDICCA application rather than a script anyone has to run by hand, drains that queue on a fixed interval. It signs in to PRECIA using a service account that belongs to the hospital's own organization, then creates a clinical transaction.
 4. The clinical transaction appears on the worklist of the PRECIA unit that matches the clinic the officer selected.
 
-All four points above happen automatically, verified with real registrations on 23 August and again on 27 August 2026: the case reached the correct organization and the correct unit in PRECIA within seconds of the registration being saved, with no manual step in between, and the transaction is tagged with a SIMRS origin marker rather than a manual one, since the wrong-endpoint defect reported in an earlier version of this page was fixed. The return direction, an AI result flowing back from PRECIA into MEDICCA, is also now proven, though only through a demonstration configuration described in [Current limitations](#current-limitations), not yet as something that happens by default for a newly connected organization.
+All four points above happen automatically, verified with real registrations on 23 August, 27 August, and 2 September 2026: the case reached the correct organization and the correct unit in PRECIA within seconds of the registration being saved, with no manual step in between, and the transaction is tagged with a SIMRS origin marker rather than a manual one. In the 2 September verification, the worker service was also deliberately stopped and started right after a new registration was saved but before it had been processed: once the service came back up, that registration was still delivered exactly once, and this organization's transaction count in PRECIA did not change across a second restart check performed after that registration had already been delivered, five transactions before and after.
 
-By design, one outpatient registration produces one clinical transaction, and the clinic the officer selects determines which PRECIA unit receives that transaction. That clinic-to-unit relationship is now demonstrated directly: a registration placed in the Poliklinik Umum clinic reached the Poliklinik Umum unit in PRECIA, under the correct organization, in the verification below.
+By design, one outpatient registration produces one clinical transaction, and the clinic the officer selects determines which PRECIA unit receives that transaction. That clinic-to-unit relationship is demonstrated directly: a registration placed in the Poliklinik Umum clinic reached the Poliklinik Umum unit in PRECIA, under the correct organization, in the verification below.
 
 ## Part 1. Setup in PRECIA
 
@@ -43,7 +43,7 @@ Check three things on each unit card:
 
 If a clinic has no matching unit yet, press **Register Unit** and create it first.
 
-Besides the units, your organization also needs SIMRS connection settings using the **MEDICCA** adapter along with the hospital's callback address. Those settings live on the **SIMRS Integration** page and are described there. The connection settings can only be opened by an account holding read rights on the organization's SIMRS configuration, so some users will not see the contents even though they can open the page.
+Besides the units, your organization also needs SIMRS connection settings using the **MEDICCA** adapter, the hospital's callback address, and a mapping from MEDICCA clinics to PRECIA units (`settings.simrs.unit_mapping`). Those settings live on the **SIMRS Integration** page and are described there. The connection settings can only be opened by an account holding read rights on the organization's SIMRS configuration, so some users will not see the contents even though they can open the page.
 
 ## Part 2. Setup in MEDICCA
 
@@ -111,7 +111,7 @@ Press **TAMBAH DATA PASIEN BARU**. A form window opens over the list. Fill in th
 
 ![MEDICCA new patient form filled with example data, with the patient name field, the village search field, and the Tambah button marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/06-formulir-pasien-baru.png)
 
-Press **Tambah** to save. The medical record number is generated automatically by the system and does not need to be entered by hand. That medical record number and the patient name are what later travel through to the PRECIA transaction.
+Press **Tambah** to save. The medical record number and the patient's internal identifier are both generated automatically by the system and do not need to be entered by hand. That medical record number and the patient name are what later travel through to the PRECIA transaction.
 
 ### Step 7. Create the outpatient registration
 
@@ -130,13 +130,18 @@ The **Poliklinik** choice is the most important field as far as PRECIA is concer
 
 Press **Tambah** to save the registration. The application returns to the patient list. It is at this moment that MEDICCA records the registration on the integration queue bound for PRECIA. There is no extra button to press.
 
-### Step 8. Check the registration history
+### Step 8. Check the registration history and delivery status
 
 Open the **HISTORI REGISTRASI** menu to confirm the registration was stored. The newest row shows the date, time, patient name, medical record number, clinic, care type, patient type, total fee, and the name of the officer who entered the data.
 
-![MEDICCA registration history page, with the Histori Registrasi menu item and the newest registration row marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/08-histori-registrasi.png)
+Two new columns appear on the left of the table, **Status PRECIA** and **Hasil AI** (AI Result):
 
-That is the end of the front-desk officer's work. There is no further step inside MEDICCA.
+- **Status PRECIA** is a colored badge showing **Menunggu** (pending, just queued, no delivery attempt yet), **Terkirim** (delivered), **Gagal** (failed, the last attempt errored and will be retried automatically by the worker service; hover the badge to see the error message), or **Dilewati** (skipped, this registration's clinic is not enabled for sync). Before this, a delivery failure was recorded only in the server log and was completely invisible to the officer; the registration still looked "saved successfully" even when it never reached PRECIA.
+- **Hasil AI** links to the AI result page (described in Step 11) as soon as this registration has any result record in PRECIA, whether still pending or already received.
+
+![MEDICCA registration history page, with the Histori Registrasi menu item, the Status PRECIA column, and the newest registration row marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/08-histori-registrasi.png)
+
+That is the end of the front-desk officer's work. There is no further step inside MEDICCA, other than opening the AI result in Step 11 once it is available.
 
 ## Part 4. Checking the transaction in PRECIA
 
@@ -146,7 +151,7 @@ Sign in to PRECIA with an account belonging to the same hospital organization, t
 
 ![PRECIA transaction worklist for the MEDICCA organization, with the result counter and the row for patient DEWI LESTARI CONTOH marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/09-daftar-kerja-transaksi-precia.png)
 
-The screenshot above was taken in the **RS Uji Coba MEDICCA** organization, the tenant organization that holds the clinic units from Step 1, and shows a real registration created for this verification: patient DEWI LESTARI CONTOH, medical record number 000004, Poliklinik Umum. The registration was saved in MEDICCA and reached this worklist on its own, through the worker service described in [Flow at a glance](#flow-at-a-glance), with no PRECIA action in between.
+The screenshot above was taken in the **RS Uji Coba MEDICCA** organization, the tenant organization that holds the clinic units from Step 1, and shows a real registration created for this verification. The registration was saved in MEDICCA and reached this worklist on its own, through the worker service described in [Flow at a glance](#flow-at-a-glance), with no PRECIA action in between.
 
 Transactions originating from MEDICCA are recognizable by their transaction code, which is MEDICCA's own registration identifier wrapped in curly braces, for example `{2308202613124489A4962D9641FCE2D2BC5895164EF479}`. The **Search** field accepts a transaction code, a medical record number, or a patient name, so a particular registration can be found quickly.
 
@@ -156,21 +161,28 @@ Click the row to open its detail page. The detail page shows the transaction cod
 
 ![PRECIA transaction detail for the MEDICCA case, the transaction code, the notes field and the Poliklinik Umum unit card marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/10-detail-transaksi-precia.png)
 
-The **notes** field reads "Kunjungan UMUM via MEDICCA", built automatically from the clinic code at registration time. The transaction was created by a MEDICCA-specific service account, not a shared or platform-level account, confirming the connector now authenticates as this hospital's own organization rather than any other tenant. The transaction's origin, an attribute not shown on this screen, now reads simrs rather than manual, confirming the wrong-endpoint defect described in an earlier version of this page is fixed.
+The **notes** field reads "Kunjungan UMUM via MEDICCA", built automatically from the clinic code at registration time. The transaction was created by a MEDICCA-specific service account, not a shared or platform-level account, confirming the connector authenticates as this hospital's own organization rather than any other tenant. The transaction's origin, an attribute not shown on this screen, reads simrs rather than manual.
 
 This example shows the transaction still waiting for examination files, the same as any newly created case. AI processing only starts after clinical staff upload the examination files, then a doctor reviews and validates the result. Each of those stages is described in the [Clinical Cases](/kasus-klinis) section and is identical regardless of which SIMRS the transaction came from.
 
+## Part 5. Viewing the AI result directly from MEDICCA
+
+### Step 11. Open the Hasil AI PRECIA (AI Result) page
+
+Previously, an AI result MEDICCA received through the callback endpoint was only stored in the database and could not be viewed by the officer from inside MEDICCA at all. A read-only page now displays it, reachable through the **Hasil AI** link on a Histori Registrasi row (Step 8), or through the **HASIL AI PRECIA** entry in the top and side menus to browse recent results without needing to know which registration to look for.
+
+![MEDICCA Hasil AI PRECIA page showing a result card for one case, the Hasil Diterima status badge, and the AI result data block marked with blue boxes](/screenshots/en/integrasi-simrs/medicca/11-hasil-ai-medicca.png)
+
+The screenshot above shows a real case whose AI result has genuinely been received from PRECIA (module `ai-ecg-digitization`, status **Hasil Diterima**, "result received"), not a staged empty state. Each card shows the patient identity, registration date, the date the result was received from PRECIA, the AI module, confidence score, model version, an explanation where available, and the structured result data. A registration with no result yet shows a **Menunggu Hasil** (waiting for result) badge instead of empty data, so the officer does not mistake it for a failed case.
+
 ## Current limitations
 
-The limitations below applied at the time this documentation was last re-verified, 27 August 2026, and every one of them was checked directly rather than assumed.
+The limitations below applied at the time this documentation was last re-verified, 2 September 2026, and every one of them was checked directly rather than assumed.
 
-- **The return direction is proven, through a demonstration configuration.** PRECIA only pushes an AI result to a SIMRS once a clinical validation is published, and a unit only produces results once an administrator enables an AI module on it. This organization's unit carried no AI module by default, so the implementation team turned one on as a connectivity proof, not as a permanent configuration. With that module enabled, a validated result was pushed back automatically and reached MEDICCA's production callback endpoint successfully on the first attempt. Treat this as proof the return path works, not as evidence that AI processing runs by default for a newly connected MEDICCA organization.
-- **A similar defect exists in the patient identifier field.** The `Id_Pasien` field carries the same visibility-gate defect that used to hide the medical record number, described below. A fix for this field is in progress and not yet deployed.
-- **The medical record number was seen missing again on one case after the fix.** This has not been confirmed as a repeat of the same defect and may be an isolated occurrence. Treat it as an open risk to watch, not a closed matter.
-- **Delivery failures are invisible to the officer.** MEDICCA still reports the registration as saved even when the push to PRECIA fails, because the two are separate operations. The failure is recorded only in the server log and never appears on the officer's screen.
-- **AI results cannot be viewed from MEDICCA.** Results that are received are stored in the MEDICCA database, but no MEDICCA page displays them. Results can only be read through PRECIA.
+- **The return direction is proven, through a demonstration configuration.** PRECIA only pushes an AI result to a SIMRS once a clinical validation is published, and a unit only produces results once an administrator enables an AI module on it. This organization's unit carried no AI module by default, so the implementation team turned one on as a connectivity proof, not as a permanent configuration. Treat this as proof the return path works, not as evidence that AI processing runs by default for a newly connected MEDICCA organization.
+- **The medical record number was seen missing again on one case, has not recurred since, and the mechanism was never found.** Reading `lokpasien_add.php` (the only place that writes `No_RM`) found no code path that could clear it again after it is saved, and the earlier sighting most likely came from a concurrent write by another agent testing the same installation at the time, not a code defect. Three new log lines with a `PRECIA` prefix (read with `docker logs`) now record whether `No_RM` is present and how long it is, never its value, at three points in time: when the registration is saved (`lokdaftar_row_inserted`), when it is queued (`queue`), and when it is pushed to PRECIA (`push ... stage=fetched`). If this recurs, comparing those three lines for the same `id_daftar` will show exactly where the value went missing, without guessing again. Treat this as a risk that now has a monitoring tool, not a matter closed at the root cause.
 - **Emergency registration is not part of this flow.** Every patient row shows a **UGD** link, but the front-desk access level has no rights on the emergency table, so pressing that link produces a refusal message and returns the officer to the login page. Emergency registrations also never enter the queue bound for PRECIA. Only outpatient registrations are sent.
 - **MEDICCA contains only the registration module.** There is no clinical order, encounter, specimen, or examination result module. Staff cannot raise an examination request or an AI reading request from inside MEDICCA. The only MEDICCA event relevant to PRECIA is the outpatient visit registration.
 - **The MEDICCA interface is available in Indonesian only.** The application offers no other language, so the MEDICCA screenshots on this page are in Indonesian and the on-screen labels are glossed in the text above.
 
-An earlier version of this page reported that registrations never reached PRECIA because the transaction code was too long, that the connector signed in as the platform super admin and targeted the wrong organization, that inbound deliveries carried no SIMRS origin marker, that the medical record number could go missing because of a visibility gate in MEDICCA's configuration, and that the return direction had never been exercised. None of that is current. The code was shortened, the connector now signs in as a MEDICCA-specific service account scoped to this organization, inbound transactions carry a SIMRS origin marker, the medical record number reaches PRECIA correctly as shown in Part 4, and the return direction is proven as described above. What remains open is the same identifier defect recurring in the `Id_Pasien` field and one unconfirmed sighting of the medical record number going missing again.
+An earlier version of this page reported that the `Id_Pasien` field carried the same visibility-gate defect that used to hide the medical record number, that delivery failures were invisible to the officer, and that AI results could not be viewed from MEDICCA. None of that is current. The `Id_Pasien` visibility-gate fix has been merged and deployed to both dev and prod, and was re-verified with a real registration on 2 September: both the internal patient identifier and the medical record number were filled in correctly. Delivery failures are now visible directly through the Status PRECIA badge in Step 8, proven for all three of its states (pending, delivered, failed) at once, including a genuine failure, not a simulated one, produced by enabling a clinic for sync without a matching unit mapping. AI results can now be opened directly from MEDICCA through the page described in Step 11.
