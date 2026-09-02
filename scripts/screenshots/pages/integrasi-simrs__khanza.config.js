@@ -46,9 +46,16 @@ function khanzaWebappsUrl(pathSuffix) {
   return `${base}${pathSuffix}`
 }
 
-const TX_ID = '5a55439c-7ad5-4a19-9f28-0a928db4b9e7'
-const TX_CODE = '2026-07-28-000001-ai-ecg-digitization'
-const CARDIOLOGY_UNIT_ID = 'b377e5f6-85d9-4781-843d-3884342c889b'
+// Diperbarui 2026-09-02 setelah pemetaan unit per poli diperbaiki
+// (fix/khanza-unit-mapping-and-results-access): nilai lama di atas berasal
+// dari UNITPRECIA yang dihardcode dan sudah dihapus, dan tidak lagi
+// merepresentasikan perilaku sungguhan. Kasus di bawah nyata: didaftarkan
+// pada poli U0008 (Radiologi) di Khanza dev, didorong otomatis oleh
+// khanza-precia-service-dev yang sudah berjalan (bukan panggilan API
+// terkontrol), dan diverifikasi lewat audit trail PRECIA.
+const TX_ID = '1db84be0-254a-4ff5-b803-78f958f636b5'
+const TX_CODE = '2026-09-02-000001-ai-ecg-digitization'
+const RAD_UNIT_ID = '303b3072-60af-4313-be3f-70a95b1571bf'
 
 /**
  * Kotak anotasi yang diukur dari elemen sungguhan saat preActions berjalan.
@@ -394,7 +401,7 @@ module.exports = [
     section: 'integrasi-simrs',
     pageSlug: 'khanza',
     stepSlug: '06-daftar-kerja-precia',
-    route: `/clinical?unit=${CARDIOLOGY_UNIT_ID}`,
+    route: `/clinical?unit=${RAD_UNIT_ID}`,
     role: 'DEMOSAD',
     viewport: { width: 1440, height: 900 },
     preActions: async (page, { locale }) => {
@@ -423,7 +430,7 @@ module.exports = [
         '07',
         locale,
         'unit',
-        page.locator('div.rounded-lg.border', { hasText: 'Cardiology' }).last()
+        page.locator('div.rounded-lg.border', { hasText: 'Radiologi' }).last()
       )
     },
     annotate: ({ locale }) => annotationsFor('07', locale, ['kode', 'catatan', 'unit'])
