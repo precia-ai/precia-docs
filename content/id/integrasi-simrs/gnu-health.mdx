@@ -150,6 +150,14 @@ Klik tombol Notes, lalu klik ganda pada baris catatan untuk membuka isinya. Cata
 
 ![Catatan yang menempel pada order 010 di GNU Health, kolom penulis dan isi pesan hasil AI ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/14-catatan-hasil-ai.png)
 
+### Langkah 15: Membaca catatan dalam format JSON terstruktur
+
+Sejak 2026-09-02, isi catatan bukan lagi kalimat bebas seperti pada Langkah 14, melainkan satu dokumen JSON dengan kunci-kunci terpisah: `ai_module`, `classification`, `confidence_score`, `validation_status`, `precia_transaction_id`, `precia_job_id`, dan `result_data` penuh. Tangkapan layar berikut memakai kasus terpisah, order `011` (transaksi PRECIA `GNUHEALTH-0-11`), karena order `010` di atas ditulis sebelum perbaikan ini ada dan catatannya tetap berbentuk teks bebas lama.
+
+![Catatan berformat JSON pada order 011 di GNU Health, kolom penulis dan isi pesan berbentuk JSON ditandai kotak biru](/screenshots/id/integrasi-simrs/gnu-health/15-catatan-json-terstruktur.png)
+
+Bentuk JSON ini bisa dibaca ulang secara programatik (`json.loads` atau setara) kapan pun dibutuhkan, alih-alih harus mengurai kalimat. Field `classification` diambil dari `result_data`, memeriksa beberapa kemungkinan nama kunci karena setiap modul AI menamainya berbeda: `classification` (AI-ECG-DIGITIZATION-EF), `class_label` (AI-ECG-LVEF, modul yang terpasang pada unit ini, nilainya "Normal" pada contoh di atas), atau `predicted_class` (AI-ECG-DIGITIZATION-MITRAL).
+
 ## Batasan saat ini
 
 Integrasi GNU Health masih berstatus uji coba. Batasan berikut berlaku dan perlu diketahui sebelum dipakai pada pekerjaan sehari-hari.
@@ -157,4 +165,4 @@ Integrasi GNU Health masih berstatus uji coba. Batasan berikut berlaku dan perlu
 1. **Modul AI masih harus dipicu secara manual.** Lihat Langkah 10, kasus yang muncul di PRECIA tidak menganalisis dirinya sendiri. Sebaliknya, pengiriman permintaan dari GNU Health dan pengiriman hasil kembali ke sana terkonfirmasi otomatis dari jejak audit platform.
 2. **Permintaan pemeriksaan GNU Health tidak membawa lampiran.** Wizard Request Imaging Test tidak menyediakan lampiran berkas maupun rujukan citra DICOM. Berkas sumber untuk analisis AI diunggah pada halaman detail transaksi di PRECIA, seperti tampak pada Langkah 10.
 3. **Modul AI harus dikonfigurasi lebih dulu pada unit tujuan.** Selama kebijakan AI unit belum diatur, panel Modul AI pada halaman detail menampilkan keterangan bahwa belum ada slot yang dikonfigurasi, dan transaksi berhenti pada status Belum Diproses.
-4. **Hasil AI dikirim balik sebagai catatan, bukan sebagai hasil pemeriksaan terstruktur.** Ringkasan hasil tampil pada kotak Notes permintaan pemeriksaan, bukan pada menu Imaging Test Result.
+4. **Hasil AI dikirim balik sebagai catatan pada Notes, bukan sebagai baris terstruktur pada menu Imaging Test Result.** Isi catatan itu sendiri sudah berbentuk JSON terstruktur sejak 2026-09-02 (lihat Langkah 15), jadi bisa diparsing ulang programatik, tetapi tetap tersimpan sebagai satu catatan, bukan field pada model GNU Health tersendiri. Menambahkan model hasil pemeriksaan terstruktur di sisi GNU Health membutuhkan modul Tryton kustom, di luar cakupan perbaikan ini.

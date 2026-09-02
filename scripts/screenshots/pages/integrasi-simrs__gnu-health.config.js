@@ -86,6 +86,22 @@ const PATIENT_FRAGMENT = 'Zenon Betz'
 const STUDY_FRAGMENT = 'PRECIA AI ECG'
 
 /**
+ * Kasus kedua, terpisah dari 010, dibuat 2026-09-02 khusus untuk membuktikan
+ * body ir.note berformat JSON terstruktur (lihat langkah 15). Order 010
+ * ditulis SEBELUM perbaikan itu ada, jadi catatannya masih memuat teks bebas
+ * lama dan tidak bisa dipakai untuk membuktikan format baru tanpa menjalankan
+ * ulang siklus penuh. Order ini dibuat lewat wizard "Request Imaging Test"
+ * yang sama, direquest, digenerate hasilnya, dipicu AI-nya, lalu divalidasi,
+ * seluruhnya melalui langkah yang identik dengan yang dipakai order 010,
+ * hanya kali ini menghasilkan catatan JSON karena adapter sudah diperbaiki.
+ * Transaksi PRECIA: GNUHEALTH-0-11 (id 59aa7535-9ddd-45f8-b58f-cf0f110de2b5),
+ * pasien seed Ana Isabel Betz, modul AI-ECG-LVEF, classification "Normal"
+ * diambil dari result_data.class_label lewat fallback kunci klasifikasi yang
+ * baru ditambahkan pada sesi yang sama.
+ */
+const JSON_DEMO_ORDER_NUMBER = '011'
+
+/**
  * Kotak anotasi yang diukur dari elemen sungguhan saat preActions berjalan.
  * Kunci: "<stepSlug>:<locale>:<nama>". annotationsFor() melempar galat kalau
  * kosong, supaya tangkapan layar tanpa anotasi tidak mungkin diterbitkan.
@@ -166,10 +182,20 @@ function menuCell(page, label) {
   return page.locator(`#menu div.column-char[title="${label}"]`).first()
 }
 
+/**
+ * A plain Playwright .click() on the expander icon is unreliable here: it
+ * intermittently resolves but never actually toggles the branch, and
+ * sometimes the locator itself never settles before the 30s default
+ * timeout (confirmed live 2026-09-02 on both a fresh script and this file's
+ * own steps 13/14, unrelated to any spec-specific change). A raw DOM
+ * dispatchEvent('click') on the <img> reliably toggles it where the
+ * synthetic pointer click does not.
+ */
 async function expandMenu(page, label) {
   const row = page.locator(`#menu tr:has(div.column-char[title="${label}"])`).first()
-  await row.locator('span.expander img').first().click()
-  await page.waitForTimeout(2000)
+  await row.waitFor({ state: 'visible', timeout: 30000 })
+  await row.locator('span.expander img').first().dispatchEvent('click')
+  await page.waitForTimeout(2500)
 }
 
 /** Baris "010" pada tab yang sedang aktif di daftar Imaging Test Request. */
@@ -191,8 +217,19 @@ function requestRow(page) {
  * "Medical Imaging" directly after login times out with no such row found.
  */
 async function openMedicalImagingBranch(page) {
-  await expandMenu(page, 'Health')
-  await expandMenu(page, 'Medical Imaging')
+  // Whether "Health" starts expanded or collapsed after login turned out to
+  // depend on which account logs in (confirmed live 2026-09-02: already
+  // expanded for GNUHEALTH_UI_USER=admin, matching this file's older
+  // comment about a fresh login starting fully collapsed only for the
+  // docs-viewer account it originally assumed). Toggling unconditionally
+  // therefore risks CLOSING an already-open branch instead of opening it.
+  // Check first, expand only if the child is not already visible.
+  if (!(await menuCell(page, 'Medical Imaging').isVisible().catch(() => false))) {
+    await expandMenu(page, 'Health')
+  }
+  if (!(await menuCell(page, 'Request Imaging Test').isVisible().catch(() => false))) {
+    await expandMenu(page, 'Medical Imaging')
+  }
 }
 
 async function openImagingTestRequestList(page) {
@@ -219,6 +256,20 @@ async function openExistingOrder(page) {
   await openImagingTestRequestList(page)
   await switchToAllTab(page)
   await requestRow(page).locator('td[data-title="Order: "] div.column-char').dblclick()
+  await page.waitForSelector('input[name="patient"]', { timeout: 30000 })
+  await page.waitForTimeout(3000)
+}
+
+/** Sama seperti openExistingOrder, untuk order arbitrer (dipakai langkah 15). */
+async function openOrderByNumber(page, orderNumber) {
+  await openImagingTestRequestList(page)
+  await switchToAllTab(page)
+  await page
+    .locator('#tabcontent tbody tr td[data-title="Order: "] div.column-char', {
+      hasText: orderNumber
+    })
+    .first()
+    .dblclick()
   await page.waitForSelector('input[name="patient"]', { timeout: 30000 })
   await page.waitForTimeout(3000)
 }
@@ -611,5 +662,29 @@ module.exports = [
       await measure(page, '14', locale, 'message', modal.locator('textarea[name="message"]'), 6)
     },
     annotate: ({ locale }) => annotationsFor('14', locale, ['author', 'message'])
+  },
+  {
+    // Order 011, separate from the permanent 010 case above: proves the
+    // structured JSON note body added 2026-09-02. 010 predates that fix, so
+    // its note still holds the old free-text format and cannot show this.
+    id: 'integrasi-simrs__gnu-health__15-catatan-json-terstruktur',
+    section: SECTION,
+    pageSlug: PAGE,
+    stepSlug: '15-catatan-json-terstruktur',
+    route: GNUHEALTH_URL,
+    preActions: async (page, { locale }) => {
+      await loginGnuhealth(page)
+      await openOrderByNumber(page, JSON_DEMO_ORDER_NUMBER)
+      await page.click('#tabcontent button[title^="Note"]')
+      await page.waitForSelector('.modal-content', { timeout: 30000 })
+      await page.waitForTimeout(3000)
+      const modal = page.locator('.modal-content').first()
+      await modal.locator('td[data-title="Message: "]').first().dblclick()
+      await page.waitForSelector('.modal-content input[name="unread"]', { timeout: 30000 })
+      await page.waitForTimeout(2500)
+      await measure(page, '15', locale, 'author', modal.locator('input[name="last_user"]'))
+      await measure(page, '15', locale, 'message', modal.locator('textarea[name="message"]'), 6)
+    },
+    annotate: ({ locale }) => annotationsFor('15', locale, ['author', 'message'])
   }
 ]
