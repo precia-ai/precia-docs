@@ -4,7 +4,7 @@ title: Open Hospital
 
 # Open Hospital Integration
 
-This page explains how to create a laboratory examination request in **Open Hospital** and how to check that request appears as a clinical case in PRECIA.
+This page explains how to create a laboratory examination request in **Open Hospital** and how to follow that request through PRECIA: the case appearing in the unit worklist, the AI result, a doctor's clinical validation, and the validated result syncing back to Open Hospital.
 
 Open Hospital is an open source hospital information system developed by Informatici Senza Frontiere. Staff access it through a web application with separate modules for patients, visits, and laboratory examinations. In this integration, an examination request created by staff in the **Laboratory** module is read by the PRECIA connector and turned into one clinical case in the matching unit.
 
@@ -14,7 +14,9 @@ The flow in short:
 
 1. Staff register the patient (if not already registered) and request a laboratory examination in Open Hospital.
 2. The PRECIA connector reads that request and creates a clinical case in the matching unit.
-3. The case appears in the unit worklist in PRECIA and is ready for the AI module.
+3. The case appears in the unit worklist in PRECIA, ready for the AI module.
+4. Once the AI module runs, a doctor reviews and publishes a clinical validation in PRECIA.
+5. The validated result is sent back to Open Hospital through the same connector.
 
 Every image on this page was taken from PRECIA's Open Hospital trial environment (`openhospital-dev.precia.site`, sample hospital **St. Luke HOSPITAL - Angal**). Your hospital's installation may look slightly different depending on the Open Hospital version and the modules enabled.
 
@@ -68,11 +70,11 @@ Work in Open Hospital is done at this step.
 
 The PRECIA connector reads that request and creates a new clinical case in the matching unit. Sign in to PRECIA, open the **Clinical** menu, then pick the destination unit, for example **Kardiologi** (Cardiology), to see that unit's worklist. Click the newly appeared case to open its detail page.
 
-![Case detail page in PRECIA, the code laboratory-1, the Kardiologi unit, the Notes section holding raw data from Open Hospital, and the Medical Staff section holding Created by Open Hospital dev connector marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
+![Case detail page in PRECIA, the code laboratory-500001, the Kardiologi unit, the Notes section holding raw data from Open Hospital, and the Medical Staff section holding Created by Open Hospital dev connector marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
 
 A case from Open Hospital can be recognized by three things:
 
-- The transaction **code** has the shape `<source type>-<sequence number>`, for example `laboratory-1`.
+- The transaction **code** has the shape `<source type>-<sequence number>`, for example `laboratory-500001`.
 - The **Notes** section holds the raw request data from Open Hospital, including `source_system: "openhospital"`, the examination code and description, and the request date.
 - The **Medical Staff** section lists **Created by** as the connector service account (`Open Hospital dev connector`, address `simrs-svc+openhospital-dev@precia.ai`), not a member of staff.
 
@@ -80,13 +82,57 @@ In the sample case, the destination unit is **Kardiologi**, matching the ECG exa
 
 From here the case is processed like any other PRECIA case: upload supporting files if not already present, run the AI module, then send it to a validator.
 
+## 7. Uploading the file and running the AI module
+
+Still on the case detail page, open the **ECG EF Screening** tab and upload the ECG image. Once the file is attached, its status changes to **Ready** and the **Trigger AI** button becomes available.
+
+![PRECIA case detail page, the ECG EF Screening tab, the Ready badge, and the uploaded ECG file marked with blue boxes](/screenshots/en/integrasi-simrs/openhospital/07-gambar-ekg-terlampir.png)
+
+Clicking **Trigger AI** starts the AI module. This step is still a manual action, see [Current limitations](#current-limitations).
+
+## 8. Reviewing the AI result
+
+Once processing finishes, the same tab shows the AI module's output: a confidence score and a classification.
+
+![PRECIA case detail page, the ECG EF Screening result with the confidence score and the Abnormal classification marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/08-hasil-ai.png)
+
+In the sample case, the module reports **71.7%** confidence with classification **Abnormal**. This result is a screening aid, not a diagnosis, and still needs formal validation by a doctor.
+
+## 9. Sending the result to clinical validation
+
+A doctor opens the **Validation** menu and finds the case in the worklist. After reviewing the AI result, the doctor records a decision together with clinical notes. In the sample case, the decision is **Accepted**.
+
+![PRECIA Validation Detail page, the Decision field holding Accepted, the Status field, and the Clinical notes field marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/09-validasi-dokter.png)
+
+## 10. Publishing the validation
+
+Clicking **Publish validation** marks the case as reviewed. The **Status** field changes to **Published** and a **Published at** timestamp is recorded.
+
+![PRECIA Validation Detail page, the Status field holding Published and the Published at timestamp marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/10-validasi-dipublikasikan.png)
+
+## 11. Confirming the result reaches Open Hospital
+
+Publishing a validation triggers PRECIA to send the result back to Open Hospital through the same connector. Open Hospital exposes an endpoint (`precia-integration/ai-results/{sourceType}/{sourceCode}`) that stores this result; querying it confirms the data landed on the Open Hospital side.
+
+![Open Hospital API response for the stored AI result, the request URL and HTTP 200 status, and the validation_status and synced_at fields marked with blue boxes](/screenshots/en/integrasi-simrs/openhospital/11-hasil-tersinkron-ke-open-hospital.png)
+
+`validation_status: "published"` and the `synced_at` timestamp confirm the validated result was written back into Open Hospital's own database, not only produced inside PRECIA.
+
+## 12. Viewing the PRECIA AI result on the Patient Dashboard
+
+The result synced in the previous step now also shows up directly in Open Hospital's own web interface, not only through the API. On that patient's **Patient Dashboard**, open the **Hasil AI PRECIA** (PRECIA AI Result) section in the left panel.
+
+![Left panel of the Open Hospital Patient Dashboard, the Hasil AI PRECIA menu marked with a blue box, and the ECG 12 Lead case card with the validated result marked with a blue box](/screenshots/en/integrasi-simrs/openhospital/12-tab-hasil-ai-precia.png)
+
+This section lists every OPD visit and laboratory request for that patient, then shows the PRECIA AI result for each case that already has a doctor's validation published. A case not yet processed by AI or not yet validated still appears in the list, with a note that its result is pending, so staff can see the status of every request without opening PRECIA or calling the API by hand.
+
 ## How data is mapped
 
-The table below explains where each piece of data on the PRECIA case comes from, based on the sample case `laboratory-1`.
+The table below explains where each piece of data on the PRECIA case comes from, based on the sample case `laboratory-500001`.
 
 | Data in PRECIA | Source in Open Hospital |
 |---|---|
-| Case code | `<source_type>-<source_code>`, for example `laboratory-1` for the first laboratory examination |
+| Case code | `<source_type>-<source_code>`, for example `laboratory-500001` |
 | Patient name, date of birth, gender | Patient demographics |
 | Medical record number | **PAT.ID** on the patient record |
 | Destination unit | The examination type requested, for example **ECG 12 Lead** maps to the **Kardiologi** unit |
@@ -97,8 +143,8 @@ The table below explains where each piece of data on the PRECIA case comes from,
 
 This section records what is not yet available, so the integration does not raise expectations it cannot meet.
 
-1. **Delivery to PRECIA has not yet been proven to run without human involvement.** The SIMRS Integration page lists Open Hospital as a callback connector, but on the trial environment, reading the request from Open Hospital and creating the case in PRECIA was run by the technical team. There is no evidence yet that this process runs on its own as a continuously active service.
-2. **Sending the AI result back to Open Hospital has only been verified through the API, not through the web interface.** Open Hospital exposes an endpoint (`precia-integration/ai-results/...`) that stores the AI result after the validation is published in PRECIA, and that endpoint has been confirmed to return the correct result data. This documentation has not yet found a place in the Open Hospital web interface where that result is shown to staff.
+1. ~~Automatic delivery to PRECIA has been demonstrated, not confirmed as a standing service.~~ **Done (2 September 2026).** The connector was switched to a `restart: always` service (previously `unless-stopped`) in both dev and prod, and now has its own Prometheus alert (`PreciaSimrsConnectorRestartLoop`) that fires on more than three restarts in ten minutes. Re-proven with a fresh, genuine case: patient **RUDI HARTONO PRECIA PROOF** was registered through the Open Hospital UI and requested an **ECG 12 Lead** examination (LAB_ID 500002), which the connector picked up automatically on its next routine poll cycle without anyone touching it (connector log: `opened PRECIA case laboratory-500002 unit=CD transaction=cdee8d26-...`, and the PRECIA case itself lists **Created by** as the connector's service account). The connector was then stopped and started explicitly (`docker stop` then `docker start`, not `restart`): the organization's transaction count in PRECIA stayed the same before and after, and the connector's ledger did not resend the case.
+2. ~~Sending the AI result back to Open Hospital has been confirmed through the API, not yet through the web interface.~~ **Done (2 September 2026).** A new **Hasil AI PRECIA** tab was added to the Patient Dashboard, see [step 12](#12-viewing-the-precia-ai-result-on-the-patient-dashboard) above. The endpoint that tab calls (`precia-integration/ai-results/{sourceType}/{sourceCode}`) had only allowed the connector's own service-account authorities (`precia_integration.push`/`callback`), so ordinary clinical staff always got a 403 when opening the tab; fixed by adding `laboratories.read` and `opds.read` as alternative authorities for reads (GET), since viewing a result is a clinical action, not a machine-to-machine call like sending the result in the first place. Proven with case `laboratory-500002`, processed by AI, validated, and published the same day, showing up for real in that tab.
 3. **A case is recorded without an explicit SIMRS-origin marker in the audit trail.** A case created by the connector goes through the ordinary case-recording path, so the audit trail does not show that a case came from Open Hospital. The Notes field on the detail page is currently the only marker available.
 4. **AI modules must be configured on the destination unit first.** Until the unit AI policy is set, the AI Modules panel on the detail page reports that no slots are configured, and the case stops at the Unprocessed status.
 5. **The Trigger AI button in PRECIA still has to be pressed manually.** A case appearing in PRECIA does not automatically run the AI module. Staff or a PRECIA operator still need to upload a file (if not already present) and press the AI processing button on the case detail page.

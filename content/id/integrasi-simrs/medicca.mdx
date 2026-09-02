@@ -6,7 +6,7 @@ title: Alur transaksi dari SIMRS MEDICCA ke PRECIA
 
 Halaman ini menjelaskan perjalanan satu kunjungan pasien dari SIMRS MEDICCA sampai ke PRECIA, mulai dari penyiapan yang wajib dikerjakan sekali di awal, kemudian tindakan harian petugas loket yang menghasilkan transaksi, sampai tempat transaksi tersebut seharusnya muncul di PRECIA.
 
-Seluruh langkah pada halaman ini dijalankan langsung pada lingkungan pengembangan MEDICCA dan PRECIA. Hasil yang belum berfungsi juga dilaporkan apa adanya pada bagian **Batasan yang berlaku hari ini** di bagian bawah halaman. Bacalah bagian tersebut sebelum menjadwalkan pemakaian di rumah sakit, karena rangkaian bolak balik penuh dari MEDICCA sampai hasil AI kembali ke MEDICCA belum berfungsi.
+Seluruh langkah pada halaman ini dijalankan langsung pada lingkungan pengembangan MEDICCA dan PRECIA, terakhir diverifikasi ulang pada 27 Agustus 2026. Hasil yang belum berfungsi juga dilaporkan apa adanya pada bagian **Batasan yang berlaku hari ini** di bagian bawah halaman. Bacalah bagian tersebut sebelum menjadwalkan pemakaian di rumah sakit: registrasi sekarang sampai ke PRECIA secara otomatis dan tercatat sebagai berasal dari SIMRS, tanpa satu pun orang menjalankan skrip secara manual, dan arah baliknya, hasil AI kembali ke MEDICCA, sudah terbukti berhasil lewat satu konfigurasi demonstrasi, bukan sebagai proses yang berjalan otomatis bawaan untuk organisasi baru.
 
 ## Ringkasan alur
 
@@ -14,14 +14,14 @@ Perpindahan data antara MEDICCA dan PRECIA tidak dikerjakan oleh petugas. Tidak 
 
 Yang terjadi adalah sebagai berikut:
 
-1. Petugas loket menyimpan satu registrasi kunjungan rawat jalan di MEDICCA. Bagian ini sudah terbukti berjalan.
-2. MEDICCA mencatat registrasi itu pada antrean integrasi internalnya. Bagian ini sudah terbukti berjalan, yaitu setiap penyimpanan registrasi menambah satu baris antrean.
-3. Sebuah proses latar milik MEDICCA membaca antrean tersebut, masuk ke PRECIA memakai akun layanan yang dikonfigurasi, lalu mencoba membuat transaksi klinis di PRECIA. Yang sudah terbukti hanya sampai proses latar berhasil masuk ke PRECIA. Pembuatan transaksinya belum pernah berhasil, karena permintaannya ditolak PRECIA.
-4. Transaksi klinis seharusnya muncul pada daftar kerja unit di PRECIA, dan sejak titik itu penanganannya mengikuti alur kasus klinis PRECIA yang biasa. Keadaan ini belum pernah tercapai pada lingkungan pengembangan, sehingga tahap tersebut merupakan rancangan, bukan hasil pengamatan.
+1. Petugas loket menyimpan satu registrasi kunjungan rawat jalan di MEDICCA.
+2. MEDICCA mencatat registrasi itu pada antrean integrasi internalnya.
+3. Sebuah layanan worker khusus, proses yang berjalan terus menerus bersama aplikasi MEDICCA, bukan skrip yang harus dijalankan secara manual, mengosongkan antrean tersebut pada interval tetap. Layanan ini masuk ke PRECIA memakai akun layanan milik organisasi rumah sakit itu sendiri, lalu membuat transaksi klinis.
+4. Transaksi klinis muncul pada daftar kerja unit PRECIA yang sesuai dengan poliklinik yang dipilih petugas.
 
-Jadi dari empat butir di atas, dua butir pertama beserta bagian otentikasi pada butir ketiga sudah terbukti berjalan. Pembuatan transaksi di PRECIA, kemunculannya pada daftar kerja, dan pengembalian hasil AI ke MEDICCA belum pernah berhasil dijalankan sampai selesai. Penyebabnya diuraikan pada bagian [Batasan yang berlaku hari ini](#batasan-yang-berlaku-hari-ini).
+Keempat butir di atas berjalan secara otomatis, dibuktikan dengan registrasi nyata pada 23 Agustus dan diperiksa ulang pada 27 Agustus 2026: kasusnya sampai ke organisasi dan unit yang benar di PRECIA dalam hitungan detik setelah registrasi disimpan, tanpa satu pun langkah manual di antaranya, dan transaksinya ditandai dengan penanda asal SIMRS, bukan penanda manual, karena cacat titik akses yang keliru yang dilaporkan pada versi halaman ini sebelumnya sudah diperbaiki. Arah baliknya, hasil AI mengalir kembali dari PRECIA ke MEDICCA, juga sudah terbukti, meski baru lewat satu konfigurasi demonstrasi yang dijelaskan pada bagian [Batasan yang berlaku hari ini](#batasan-yang-berlaku-hari-ini), bukan sebagai sesuatu yang terjadi otomatis bawaan untuk organisasi baru.
 
-Menurut rancangannya, satu registrasi rawat jalan menghasilkan satu transaksi klinis, dan poliklinik yang dipilih petugas menentukan unit PRECIA yang menerima transaksi tersebut. Hubungan poliklinik ke unit itu belum dapat dibuktikan hari ini, karena pemetaan yang aktif pada konfigurasi masih mengarah ke unit organisasi lain.
+Menurut rancangannya, satu registrasi rawat jalan menghasilkan satu transaksi klinis, dan poliklinik yang dipilih petugas menentukan unit PRECIA yang menerima transaksi tersebut. Hubungan poliklinik ke unit itu sekarang dapat dibuktikan langsung: registrasi yang dibuat di poliklinik Umum sampai ke unit Poliklinik Umum di PRECIA, di bawah organisasi yang benar, pada pembuktian di bawah ini.
 
 ## Bagian 1. Penyiapan di PRECIA
 
@@ -126,7 +126,7 @@ Kolom yang perlu dipilih petugas:
 
 ![Formulir registrasi rawat jalan MEDICCA, kelompok pilihan Poliklinik, kelompok pilihan Biaya Daftar, dan tombol Tambah ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/07-formulir-registrasi-rawat-jalan.png)
 
-Pilihan **Poliklinik** adalah kolom terpenting bagi PRECIA, karena poliklinik inilah yang dirancang menentukan unit PRECIA penerima transaksi. Perlu dicatat bahwa penentuan tersebut belum dapat dibuktikan hari ini, sebab pemetaan poliklinik ke unit pada konfigurasi yang aktif masih mengarah ke unit organisasi lain, sebagaimana diuraikan pada bagian [Batasan yang berlaku hari ini](#batasan-yang-berlaku-hari-ini). Meski begitu, pastikan pilihannya tetap sesuai dengan tujuan kunjungan pasien.
+Pilihan **Poliklinik** adalah kolom terpenting bagi PRECIA, karena poliklinik inilah yang menentukan unit PRECIA penerima transaksi. Pastikan pilihannya sesuai dengan tujuan kunjungan pasien.
 
 Tekan **Tambah** untuk menyimpan registrasi. Aplikasi kembali ke daftar pasien. Pada saat inilah MEDICCA mencatat registrasi tersebut ke antrean integrasi menuju PRECIA. Tidak ada tombol tambahan yang perlu ditekan.
 
@@ -144,28 +144,33 @@ Sampai di sini seluruh pekerjaan petugas loket sudah selesai. Tidak ada langkah 
 
 Masuk ke PRECIA memakai akun yang berada pada organisasi rumah sakit yang sama, lalu buka menu **Klinis**. Pilih unit yang sesuai dengan poliklinik tujuan, atau pilih **Semua unit** pada penyaring **Unit** untuk melihat gabungan seluruh unit. Perhatikan bahwa **Umum** pada penyaring tersebut bukan pilihan gabungan, melainkan nama salah satu unit poliklinik, yaitu Poliklinik Umum dengan kode UMUM. Daftar **Daftar Kerja Transaksi** akan tampil beserta penghitung jumlah hasil di sudut kanan atas.
 
-![Daftar Kerja Transaksi PRECIA untuk organisasi MEDICCA, penghitung nol hasil dan pesan Transaksi tidak ditemukan ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/09-daftar-kerja-transaksi-precia.png)
+![Daftar Kerja Transaksi PRECIA untuk organisasi MEDICCA, penghitung hasil dan baris pasien DEWI LESTARI CONTOH ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/09-daftar-kerja-transaksi-precia.png)
 
-Gambar di atas diambil pada organisasi **RS Uji Coba MEDICCA** dengan kode MEDICCA-DEV, yaitu organisasi tenant yang memuat ketiga unit poliklinik pada Langkah 1.
+Gambar di atas diambil pada organisasi **RS Uji Coba MEDICCA**, yaitu organisasi tenant yang memuat unit poliklinik pada Langkah 1, dan menampilkan registrasi nyata yang dibuat untuk pembuktian ini: pasien DEWI LESTARI CONTOH, nomor rekam medis 000004, Poliklinik Umum. Registrasi ini disimpan di MEDICCA dan sampai ke daftar kerja ini dengan sendirinya, lewat layanan worker yang dijelaskan pada [Ringkasan alur](#ringkasan-alur), tanpa satu pun tindakan di PRECIA di antaranya.
 
-Transaksi yang berasal dari MEDICCA dikenali dari kode transaksinya, yang selalu diawali kata MEDICCA. Kolom **Cari** menerima kode transaksi, nomor rekam medis, atau nama pasien, sehingga registrasi tertentu dapat ditemukan dengan cepat.
+Transaksi yang berasal dari MEDICCA dikenali dari kode transaksinya, yaitu pengenal registrasi milik MEDICCA sendiri yang dibungkus kurung kurawal, misalnya `{2308202613124489A4962D9641FCE2D2BC5895164EF479}`. Kolom **Cari** menerima kode transaksi, nomor rekam medis, atau nama pasien, sehingga registrasi tertentu dapat ditemukan dengan cepat.
 
-Perlu dinyatakan terus terang: pada saat dokumentasi ini disusun, daftar tersebut masih kosong dan penghitung menunjukkan **0 hasil**, seperti terlihat pada gambar. Registrasi MEDICCA belum pernah berhasil sampai ke PRECIA. Gambar di atas menampilkan keadaan sebenarnya pada organisasi RS Uji Coba MEDICCA, bukan contoh keadaan kosong yang dibuat buat.
+### Langkah 10. Periksa detail transaksi
 
-Namun daftar kosong tersebut tidak dapat dipakai sebagai bukti mengenai tujuan yang sebenarnya ditulis oleh penghubung MEDICCA. Aplikasi MEDICCA hari ini masuk ke PRECIA memakai akun super admin platform, bukan akun layanan RS Uji Coba MEDICCA, dan memetakan poliklinik ke unit milik organisasi lain. Artinya, seandainya masalah panjang kode transaksi sudah diperbaiki sekalipun, transaksinya belum tentu muncul pada daftar kerja organisasi ini. Penyebabnya diuraikan pada bagian berikut.
+Klik baris tersebut untuk membuka halaman detailnya. Halaman detail menampilkan kode transaksi di bagian atas, identitas pasien yang disalin dari MEDICCA, dan unit tujuan.
+
+![Detail transaksi PRECIA untuk kasus MEDICCA, kode transaksi, kolom catatan, dan kartu unit Poliklinik Umum ditandai kotak biru](/screenshots/id/integrasi-simrs/medicca/10-detail-transaksi-precia.png)
+
+Kolom **catatan** berbunyi "Kunjungan UMUM via MEDICCA", dibentuk otomatis dari kode poliklinik saat registrasi. Transaksi ini dibuat oleh akun layanan khusus MEDICCA, bukan akun bersama atau akun tingkat platform, sehingga terbukti penghubung sekarang masuk sebagai organisasi rumah sakit ini sendiri, bukan tenant lain. Kolom asal transaksi, atribut yang tidak tampil pada layar ini, sekarang bernilai simrs, bukan manual, memastikan cacat titik akses yang keliru yang dilaporkan pada versi halaman ini sebelumnya sudah diperbaiki.
+
+Contoh ini menampilkan transaksi yang masih menunggu berkas pemeriksaan, sama seperti kasus baru mana pun. Pemrosesan AI baru dimulai setelah staf klinis mengunggah berkas pemeriksaan, kemudian dokter meninjau dan memvalidasi hasilnya. Setiap tahap tersebut dijelaskan pada bagian [Kasus Klinis](/kasus-klinis) dan berlaku sama persis tanpa memandang SIMRS asal transaksinya.
 
 ## Batasan yang berlaku hari ini
 
-Batasan berikut berlaku pada saat dokumentasi ini disusun dan semuanya diperiksa langsung, bukan diperkirakan.
+Batasan berikut berlaku pada saat dokumentasi ini terakhir diverifikasi ulang, 27 Agustus 2026, dan semuanya diperiksa langsung, bukan diperkirakan.
 
-- **Registrasi tidak pernah sampai ke PRECIA.** Kode transaksi yang dibentuk MEDICCA menggabungkan awalan tetap sepanjang delapan karakter dengan pengenal registrasi sepanjang empat puluh delapan karakter, sehingga totalnya lima puluh enam karakter. Kolom kode transaksi PRECIA hanya menerima maksimal lima puluh karakter, dan permintaan ditolak dengan galat validasi pada kolom kode. Selama pembentukan kode belum diperpendek, setiap registrasi nyata pasti ditolak dan tetap tertinggal di antrean. Inilah sebab daftar kerja transaksi pada Langkah 9 masih kosong.
-- **Antrean tidak diproses otomatis.** Tidak ada penjadwal bawaan di dalam paket MEDICCA maupun di server yang menjalankan proses latar pengirim antrean atau penarik hasil. Selama proses tersebut belum dijalankan secara manual, registrasi hanya menumpuk di antrean.
+- **Arah balik sudah terbukti, lewat satu konfigurasi demonstrasi.** PRECIA hanya mengirim hasil AI ke SIMRS ketika sebuah validasi klinis dipublikasikan, dan sebuah unit hanya menghasilkan hasil AI setelah administrator mengaktifkan modul AI pada unit tersebut. Unit pada organisasi ini tidak memiliki modul AI aktif secara bawaan, sehingga tim implementasi mengaktifkan satu modul sebagai bukti konektivitas, bukan sebagai konfigurasi permanen. Dengan modul itu aktif, hasil yang tervalidasi dikirim balik secara otomatis dan sampai ke titik akses callback produksi MEDICCA dengan berhasil pada percobaan pertama. Anggap ini sebagai bukti bahwa jalur balik berfungsi, bukan sebagai bukti bahwa pemrosesan AI berjalan otomatis bawaan untuk organisasi MEDICCA yang baru terhubung.
+- **Cacat serupa ada pada kolom identitas pasien.** Kolom `Id_Pasien` membawa cacat gerbang keterlihatan yang sama seperti yang dahulu menyembunyikan nomor rekam medis, yang diuraikan di bawah. Perbaikan untuk kolom ini sedang dikerjakan dan belum diterapkan.
+- **Nomor rekam medis sempat terlihat hilang lagi pada satu kasus setelah perbaikan.** Hal ini belum dikonfirmasi sebagai pengulangan cacat yang sama dan mungkin hanya kejadian tersendiri. Perlakukan sebagai risiko terbuka yang perlu dipantau, bukan perkara yang sudah selesai.
 - **Kegagalan pengiriman tidak terlihat oleh petugas.** MEDICCA tetap menampilkan registrasi berhasil disimpan walaupun pengiriman ke PRECIA gagal, karena kedua hal itu terpisah. Kegagalan hanya tercatat pada log server dan tidak muncul di layar petugas.
-- **Arah balik belum tersambung ke organisasi yang benar.** PRECIA mengirim hasil AI ke SIMRS hanya ketika sebuah validasi klinis dipublikasikan, dan tujuan pengirimannya ditentukan oleh konfigurasi SIMRS pada organisasi pemilik transaksi. Aplikasi MEDICCA masuk ke PRECIA memakai akun super admin platform, bukan akun layanan organisasi rumah sakit, dan konfigurasinya saat ini mengarahkan registrasi ke organisasi lain yang adapter SIMRS-nya bukan MEDICCA, sehingga hasil AI tidak akan kembali ke MEDICCA meskipun masalah panjang kode sudah diperbaiki. Pemetaan poliklinik ke unit pada konfigurasi tersebut juga masih mengarah ke unit organisasi lain itu.
-- **Alamat penerima hasil di MEDICCA sendiri sudah siap.** Titik penerima hasil AI di MEDICCA aktif dan dilindungi rahasia bersama. Permintaan tanpa rahasia yang benar ditolak, dan permintaan dengan rahasia yang benar diteruskan ke pemeriksaan isi data. Jadi kendala arah balik terletak pada penargetan organisasi, bukan pada penerima di MEDICCA.
 - **Hasil AI belum dapat dilihat dari MEDICCA.** Hasil yang diterima memang tersimpan pada basis data MEDICCA, tetapi tidak ada satu pun halaman MEDICCA yang menampilkannya. Hasil hanya dapat dibaca melalui PRECIA.
 - **Registrasi UGD tidak termasuk dalam alur ini.** Pada setiap baris daftar pasien terdapat tautan **UGD**, tetapi level akses Petugas Loket tidak memiliki hak atas tabel UGD, sehingga menekan tautan tersebut menghasilkan pesan penolakan dan mengembalikan petugas ke halaman login. Registrasi UGD juga tidak pernah masuk ke antrean menuju PRECIA. Hanya registrasi rawat jalan yang dikirim.
 - **MEDICCA hanya memuat modul pendaftaran.** Tidak ada modul order klinis, encounter, spesimen, maupun hasil pemeriksaan. Petugas tidak dapat membuat permintaan pemeriksaan atau permintaan pembacaan AI dari dalam MEDICCA. Satu satunya peristiwa MEDICCA yang relevan bagi PRECIA adalah registrasi kunjungan rawat jalan.
 - **Antarmuka MEDICCA hanya tersedia dalam Bahasa Indonesia.** Tidak ada pilihan bahasa lain pada aplikasi MEDICCA.
 
-Selama butir butir di atas belum ditangani, alur MEDICCA berhenti pada registrasi kunjungan. Petugas loket dapat mendaftarkan pasien dan membuat registrasi rawat jalan, dan tidak lebih dari itu.
+Versi halaman ini sebelumnya melaporkan bahwa registrasi tidak pernah sampai ke PRECIA karena kode transaksi terlalu panjang, bahwa penghubung masuk sebagai super admin platform dan menyasar organisasi yang salah, bahwa pengiriman masuk tidak membawa penanda asal SIMRS, bahwa nomor rekam medis dapat hilang karena gerbang keterlihatan pada konfigurasi MEDICCA, dan bahwa arah balik belum pernah dijalankan. Semua itu sudah tidak berlaku. Kode sudah diperpendek, penghubung sekarang masuk sebagai akun layanan khusus MEDICCA yang terikat pada organisasi ini, transaksi masuk membawa penanda asal SIMRS, nomor rekam medis sampai ke PRECIA dengan benar sebagaimana ditunjukkan pada Bagian 4, dan arah balik sudah terbukti sebagaimana diuraikan di atas. Yang masih terbuka adalah cacat identitas yang sama berulang pada kolom `Id_Pasien` dan satu kejadian nomor rekam medis sempat terlihat hilang lagi yang belum dikonfirmasi.

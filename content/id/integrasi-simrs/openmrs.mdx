@@ -6,7 +6,7 @@ title: Integrasi OpenMRS 3
 
 Halaman ini menjelaskan cara kerja integrasi antara **OpenMRS 3** (OpenMRS 3 Reference Application) dan PRECIA, dari sisi petugas rumah sakit. Alurnya sederhana: petugas membuat permintaan pemeriksaan (order) di OpenMRS 3 seperti biasa, lalu konektor PRECIA membaca daftar permintaan tersebut dan membuat kasus klinis yang sepadan di PRECIA.
 
-Yang didokumentasikan di halaman ini adalah **satu arah saja, dari OpenMRS 3 ke PRECIA**. Pengiriman hasil analisis AI kembali ke rekam medis OpenMRS tidak termasuk dalam alur yang ditunjukkan pada tangkapan layar di bawah, dan tidak boleh dianggap sudah berjalan.
+Sebagian besar halaman ini menunjukkan **satu arah, dari OpenMRS 3 ke PRECIA**: pembuatan order sampai kasus terlihat di PRECIA. Bagian terakhir halaman ini, [Melihat hasil AI dan validasi yang tersinkron ke OpenMRS](#melihat-hasil-ai-dan-validasi-yang-tersinkron-ke-openmrs), menunjukkan arah baliknya dengan satu kasus yang sudah benar-benar selesai diproses: hasil AI, keputusan validasi dokter, dan hasil yang tersinkron kembali ke rekam medis OpenMRS. Jangan menganggap kasus lain otomatis mengikuti jalur yang sama; lihat catatan pada bagian tersebut soal cakupannya.
 
 ## Sebelum mulai
 
@@ -129,9 +129,35 @@ Pada kartu **Detail Transaksi**, bagian Modul AI menampilkan keterangan bahwa be
 
 ![Detail kasus PRECIA hasil integrasi OpenMRS 3, kode transaksi dan catatan berisi nomor order OpenMRS ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/15-detail-kasus.png)
 
+## Melihat hasil AI dan validasi yang tersinkron ke OpenMRS
+
+Bagian ini menunjukkan rupa satu kasus setelah benar-benar selesai: AI sudah memproses, dokter sudah memvalidasi, dan hasilnya sudah tersinkron kembali ke OpenMRS. Contoh memakai kasus lain dari Langkah 13 sampai 15 di atas, yaitu transaksi milik pasien **Mary Smith** (OpenMRS ID **10000F1**) pada unit **Kardiologi**, dengan modul AI **ECG Mitral Valve Screening**. Kasus pada Langkah 13 sampai 15 sengaja dibiarkan menunggu (belum ada slot AI yang dikonfigurasi) supaya pembaca melihat kondisi paling umum lebih dulu; kasus pada bagian ini menunjukkan kondisi setelah modul AI benar-benar aktif dan berjalan sampai tuntas. Jangan menyimpulkan bahwa unit Kardiologi selalu memproses kasus baru secara otomatis; keaktifan modul AI pada satu unit dapat berubah dari waktu ke waktu, dan penjelasan lengkapnya ada pada tim implementasi.
+
+### 16. Melihat hasil AI pada detail transaksi
+
+Buka detail transaksi seperti pada Langkah 15, kali ini untuk transaksi milik Mary Smith. Kartu **Detail Transaksi** kini menampilkan modul **ECG Mitral Valve Screening** pada bagian **Modul AI**, menggantikan keterangan "belum ada slot" yang tampil pada Langkah 15. Tab di sisi kanan menunjukkan nama modul yang sama dengan status **Selesai**.
+
+![Detail transaksi PRECIA untuk pasien Mary Smith, bagian Modul AI dan tab hasil ECG Mitral Valve Screening berstatus Selesai ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/16-hasil-ai.png)
+
+### 17. Melihat hasil AI dan keputusan validasi dokter
+
+Status dan keputusan validasi tidak tampil pada halaman detail transaksi, melainkan pada menu **Validasi** yang terpisah. Buka menu tersebut, lalu cari transaksi berkode `eb0d127b-0917-4dc8-8289-61418f3fa2e1` pada daftar **Keputusan Tercatat**. Klik baris tersebut untuk membuka kartu **Detail Validasi**.
+
+![Kartu Detail Validasi PRECIA untuk transaksi eb0d127b, baris Keputusan/Status dan kotak hasil AI berisi skor keyakinan ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/17-hasil-ai-dan-validasi.png)
+
+Kartu ini sekaligus menampilkan hasil AI (skor keyakinan **86.0%**, beserta keterangan bahwa hasil ini bantuan skrining, bukan diagnosis akhir) dan keputusan dokter, yaitu **Diterima** dengan status **Dipublikasikan**. Karena kasus ini sudah selesai divalidasi, bagian ini hanya memotret hasilnya, tidak mengulang langkah pengambilan keputusan itu sendiri; alur pengambilan keputusan dijelaskan pada [Kasus Klinis](/kasus-klinis).
+
+### 18. Memastikan hasil tersinkron kembali ke OpenMRS
+
+Masuk ke OpenMRS 3, buka rekam pasien **Mary Smith**, lalu pilih tab **Results** pada navigasi kiri. Kartu teratas pada panel ini menampilkan hasil dari PRECIA.
+
+![Panel Results OpenMRS 3 pada rekam pasien Mary Smith, kartu PRECIA AI ECG Mitral Regurgitation Assessment dengan nilai Control ditandai kotak biru](/screenshots/id/integrasi-simrs/openmrs/18-hasil-tersinkron-openmrs.png)
+
+Kartu tersebut berjudul **PRECIA AI ECG Mitral Regurgitation Assessment** dengan nilai **Control**, yaitu kategori hasil, bukan angka skor keyakinan. Skor keyakinan hanya ditampilkan pada sisi PRECIA (Langkah 17), tidak pada tampilan OpenMRS ini.
+
 ## Batasan yang perlu diketahui
 
-- **Integrasi ini satu arah.** Permintaan pemeriksaan mengalir dari OpenMRS 3 ke PRECIA. Pengiriman hasil analisis AI kembali ke rekam medis OpenMRS tidak ditunjukkan pada alur ini dan tidak boleh dijanjikan kepada pengguna klinis atas dasar halaman ini.
+- **Arah balik sudah terbukti berjalan, tetapi baru untuk satu kasus yang benar-benar selesai.** Bagian [Melihat hasil AI dan validasi yang tersinkron ke OpenMRS](#melihat-hasil-ai-dan-validasi-yang-tersinkron-ke-openmrs) menunjukkan bukti nyata bahwa hasil AI dan keputusan validasi dapat tersinkron kembali ke rekam medis OpenMRS. Ini bukan jaminan bahwa setiap kasus baru akan otomatis mengikuti jalur yang sama; keaktifan modul AI pada suatu unit dapat berubah dari waktu ke waktu.
 - **Kasus berhenti pada status Belum Diproses** selama unit tujuan belum memiliki modul AI yang aktif. Kasus tetap terlihat dan tetap dapat dibuka, tetapi tidak ada hasil AI yang dihasilkan.
 - **Tombol Add to basket saja tidak cukup.** Permintaan wajib melalui **Order form** dan **Save order**, jika tidak maka tombol **Sign and close** tetap nonaktif.
 - **Keranjang permintaan tidak tersimpan permanen.** Permintaan yang belum ditandatangani hilang saat halaman dimuat ulang.

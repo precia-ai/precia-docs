@@ -19,6 +19,8 @@ Alur ringkasnya sebagai berikut:
 
 Seluruh gambar pada halaman ini diambil dari lingkungan uji coba OpenEMR milik PRECIA. Tampilan pada instalasi rumah sakit Anda dapat berbeda sedikit, tergantung versi OpenEMR dan pengaturan tampilan yang dipakai.
 
+Arah masuk yang dijelaskan di bawah, dari permintaan yang tersimpan di OpenEMR sampai menjadi kasus yang sesuai di PRECIA, sekarang berjalan otomatis, dan setelah dokter memvalidasi hasil AI di PRECIA, hasil tersebut ditulis balik ke rekam OpenEMR pasien yang sama. Kedua arah ini terakhir diverifikasi ulang pada 2 September 2026, termasuk cara melihat hasilnya dari dalam OpenEMR sendiri (lihat [Melihat hasil AI di dalam OpenEMR](#melihat-hasil-ai-di-dalam-openemr)) dan jalur pemberitahuan seketika saat permintaan disimpan yang mempersingkat jeda kemunculan kasus. Hal yang belum tercakup pada halaman ini diuraikan pada bagian [Batasan saat ini](#batasan-saat-ini).
+
 ## Sebelum mulai
 
 Siapkan hal berikut:
@@ -129,7 +131,7 @@ Pekerjaan di OpenEMR selesai pada langkah ini.
 
 ## Melihat kasus yang sama di PRECIA
 
-Setelah permintaan tersimpan, konektor PRECIA membacanya dan membuat kasus klinis baru. Pada lingkungan uji coba, konektor dijalankan oleh tim teknis, sehingga kasus tidak selalu muncul seketika. Lihat bagian [Batasan saat ini](#batasan-saat-ini).
+Setelah permintaan tersimpan, konektor yang masuk sebagai PRECIA membacanya dan membuat kasus klinis baru secara otomatis, biasanya dalam hitungan detik. OpenEMR kini memberi tahu konektor seketika saat permintaan disimpan; konektor juga tetap memeriksa permintaan baru pada interval tetap sebagai cadangan, sehingga kasus tetap muncul walau pemberitahuan seketika itu gagal, hanya sedikit lebih lambat.
 
 ### 1. Membuka daftar unit
 
@@ -155,6 +157,24 @@ Bagian **Catatan** memuat jenis pemeriksaan yang diminta di OpenEMR beserta ruju
 
 Mulai dari titik ini, kasus diproses seperti kasus klinis lain di PRECIA: unggah berkas pendukung, jalankan modul AI, lalu kirim ke validator.
 
+## Melihat hasil AI di dalam OpenEMR
+
+Setelah dokter memvalidasi dan mempublikasikan hasil di PRECIA, konektor menulis hasil itu kembali sebagai dokumen pada rekam pasien di OpenEMR sendiri. Klinisi tidak perlu membuka PRECIA lagi untuk membaca hasilnya.
+
+### 1. Membuka menu Documents
+
+Pada rekam medis pasien, klik tab **Documents**. Pohon kategori di sisi kiri menampilkan seluruh dokumen pasien, dikelompokkan per kategori.
+
+Klik tanda **+** di depan kategori **Lab Report** untuk membukanya. Setiap hasil AI PRECIA masuk ke kategori ini, dengan nama berkas berpola `precia-AI-<modul>-<kode kasus>.txt` dan tanggal dokumen sama dengan tanggal publikasi.
+
+![Tab Documents pada OpenEMR, kategori Lab Report dibuka menampilkan berkas hasil AI PRECIA ditandai kotak merah](/screenshots/id/integrasi-simrs/openemr/15-dokumen-hasil-ai.png)
+
+### 2. Membuka isi hasil
+
+Klik nama berkas untuk membukanya di panel **Document Uploader/Viewer** di sisi kanan. Isinya berupa laporan teks: modul AI yang dipakai, versi model, skor keyakinan, status validasi, penjelasan singkat, dan rujukan ID transaksi PRECIA beserta ID pasien dan kunjungan OpenEMR asalnya, sehingga hasil selalu dapat ditelusuri kembali ke kasus dan permintaan yang tepat.
+
+![Isi dokumen hasil AI PRECIA pada OpenEMR, judul berkas dan tombol Contents ditandai kotak merah](/screenshots/id/integrasi-simrs/openemr/16-isi-hasil-ai.png)
+
 ## Bagaimana data dipetakan
 
 Tabel berikut menjelaskan asal setiap data pada kasus PRECIA.
@@ -172,17 +192,13 @@ Tabel berikut menjelaskan asal setiap data pada kasus PRECIA.
 
 Bagian ini mencatat hal yang belum tersedia, agar tidak menimbulkan salah harapan saat integrasi dipakai.
 
-1. **Perpindahan permintaan ke PRECIA belum otomatis.** Layanan konektor yang berjalan terus-menerus belum dipasang. Pada lingkungan uji coba, pembacaan permintaan dari OpenEMR dijalankan oleh tim teknis, sehingga kasus baru muncul di PRECIA setelah proses tersebut dijalankan.
+1. **Jeda sebelum kasus muncul sudah dipersingkat, tapi belum seketika untuk setiap kasus.** Interval pemeriksaan bawaan konektor dipersingkat dari 30 menjadi 10 detik. Fork OpenEMR yang dipakai (`simrs-openemr-core`) juga menambahkan hook: begitu permintaan tersimpan, OpenEMR langsung memberi tahu konektor lewat panggilan singkat, sehingga pada uji coba nyata kasus tercatat di PRECIA dalam hitungan detik, bukan menunggu siklus penuh. Hook ini bersifat percepatan opsional, bukan pengganti: bila gagal terhubung atau belum dikonfigurasi pada suatu instalasi, permintaan tetap ditemukan lewat pemeriksaan berkala 10 detik itu, hanya sedikit lebih lambat.
 
-2. **OpenEMR tidak mengirim pemberitahuan otomatis.** OpenEMR tidak memiliki mekanisme yang memberitahukan sistem lain saat ada permintaan baru. Konektor harus memeriksa permintaan baru secara berkala, sehingga selalu ada jeda antara penyimpanan permintaan di OpenEMR dan kemunculan kasus di PRECIA.
+2. **Pemetaan unit belum ada di halaman Integrasi SIMRS.** OpenEMR kini sudah muncul pada kolom Adapter di halaman [Integrasi SIMRS](/integrasi-simrs) seperti SIMRS lain, tetapi pemetaan dari nilai OpenEMR, misalnya **Radiology**, ke unit PRECIA, misalnya **Radiologi**, masih disimpan pada konektor, bukan pada pengaturan organisasi di PRECIA. Perubahan pemetaan harus diminta ke tim teknis.
 
-3. **Pengaturan integrasi OpenEMR belum tersedia di halaman Integrasi SIMRS.** Pilihan adapter pada halaman [Integrasi SIMRS](/integrasi-simrs) belum memuat OpenEMR. Pemetaan unit, misalnya **Radiology** ke unit **Radiologi**, saat ini disimpan pada konektor, bukan pada pengaturan organisasi di PRECIA. Perubahan pemetaan harus diminta ke tim teknis.
+3. **Tombol Transmit Order tidak dipakai.** Tombol tersebut milik jalur pertukaran pesan laboratorium bawaan OpenEMR. Integrasi PRECIA tidak memakai jalur itu, dan menekannya tidak mempercepat pemrosesan.
 
-4. **Kasus tercatat tanpa penanda asal SIMRS.** Kasus yang dibuat konektor masuk melalui jalur pencatatan kasus biasa, sehingga pada riwayat audit tidak tampak keterangan bahwa kasus berasal dari OpenEMR. Perlindungan terhadap kasus ganda juga belum aktif, sehingga menjalankan konektor dua kali dapat menghasilkan lebih dari satu kasus untuk satu permintaan.
-
-5. **Tombol Transmit Order tidak dipakai.** Tombol tersebut milik jalur pertukaran pesan laboratorium bawaan OpenEMR. Integrasi PRECIA tidak memakai jalur itu, dan menekannya tidak mempercepat pemrosesan.
-
-6. **Pengembalian hasil AI ke OpenEMR tidak dibahas pada panduan ini.** Panduan ini hanya mencakup arah masuk, yaitu dari OpenEMR ke PRECIA. Hasil pembacaan modul AI dilihat di PRECIA.
+Versi halaman ini sebelumnya melaporkan bahwa layanan konektor yang berjalan terus-menerus belum dipasang, bahwa kasus yang dibuat konektor tidak membawa penanda asal OpenEMR, bahwa perlindungan terhadap kasus ganda belum aktif, dan bahwa pengiriman hasil AI kembali ke OpenEMR tidak terjadi maupun terlihat dari sisi OpenEMR. Semua itu sudah tidak berlaku: konektor sekarang berjalan sebagai layanan tetap, kasus yang dibuat lewat konektor membawa penanda asal SIMRS, memulai ulang konektor tidak memproses ulang permintaan yang sudah pernah ditanganinya, hasil AI yang sudah divalidasi ditulis balik secara otomatis ke rekam OpenEMR pasien, dan cara membukanya dari Documents OpenEMR sendiri sudah diuraikan di bagian [Melihat hasil AI di dalam OpenEMR](#melihat-hasil-ai-di-dalam-openemr) di atas. Yang masih terbuka hanya pemetaan unit yang disebut pada poin 2.
 
 ## Pemecahan masalah
 
@@ -190,6 +206,6 @@ Bagian ini mencatat hal yang belum tersedia, agar tidak menimbulkan salah harapa
 |---|---|---|
 | Kolom **Sending To** tidak memuat PRECIA | Penyedia layanan belum terdaftar di OpenEMR | Periksa halaman **Procedure Providers**, lalu hubungi tim implementasi PRECIA |
 | Pencarian pada jendela **Find Procedure Order** tidak memberi hasil | Jenis pemeriksaan belum ada di kamus order | Periksa halaman **Configure Orders and Results** pada grup **PRECIA Radiology** |
-| Permintaan tersimpan, tetapi kasus tidak muncul di PRECIA | Konektor belum dijalankan, atau **Performer Type** tidak diisi **Radiology** | Buka kembali permintaan di OpenEMR dan periksa isian, lalu hubungi tim teknis |
+| Permintaan tersimpan, tetapi kasus tidak muncul di PRECIA | Konektor belum sempat memeriksa, tunggu satu siklus, atau **Performer Type** tidak diisi **Radiology** | Tunggu sebentar lalu muat ulang, atau buka kembali permintaan di OpenEMR dan periksa isian, lalu hubungi tim teknis |
 | Kasus muncul di unit yang salah | Nilai **Performer Type** tidak sesuai pemetaan unit | Perbaiki isian pada permintaan, lalu minta tim teknis memeriksa pemetaan unit |
-| Kasus muncul lebih dari satu kali | Konektor dijalankan berulang untuk permintaan yang sama | Batalkan kasus berlebih di PRECIA dan laporkan ke tim teknis |
+| Kasus muncul lebih dari satu kali | Ada duplikasi yang tidak terduga | Batalkan kasus berlebih di PRECIA dan laporkan ke tim teknis |

@@ -4,7 +4,7 @@ title: Open Hospital
 
 # Integrasi Open Hospital
 
-Halaman ini menjelaskan cara membuat permintaan pemeriksaan laboratorium di **Open Hospital** dan cara memastikan permintaan tersebut muncul sebagai kasus klinis di PRECIA.
+Halaman ini menjelaskan cara membuat permintaan pemeriksaan laboratorium di **Open Hospital** dan cara mengikuti permintaan tersebut di PRECIA: kasus tampil pada daftar kerja unit, hasil AI, validasi klinis oleh dokter, hingga hasil tervalidasi tersinkron kembali ke Open Hospital.
 
 Open Hospital adalah sistem informasi rumah sakit sumber terbuka yang dikembangkan Informatici Senza Frontiere. Petugas mengaksesnya lewat aplikasi web dengan modul terpisah untuk pasien, kunjungan, dan pemeriksaan laboratorium. Pada integrasi ini, permintaan pemeriksaan yang dibuat petugas pada modul **Laboratory** dibaca oleh konektor PRECIA dan dijadikan satu kasus klinis pada unit yang sesuai.
 
@@ -14,7 +14,9 @@ Alur ringkasnya sebagai berikut:
 
 1. Petugas mendaftarkan pasien (jika belum ada) dan meminta pemeriksaan laboratorium di Open Hospital.
 2. Konektor PRECIA membaca permintaan tersebut dan membuat kasus klinis di unit yang sesuai.
-3. Kasus tampil pada daftar kerja unit di PRECIA dan siap diproses modul AI.
+3. Kasus tampil pada daftar kerja unit di PRECIA, siap diproses modul AI.
+4. Setelah modul AI berjalan, dokter meninjau dan menerbitkan validasi klinis di PRECIA.
+5. Hasil tervalidasi dikirim kembali ke Open Hospital lewat konektor yang sama.
 
 Seluruh gambar pada halaman ini diambil dari lingkungan uji coba Open Hospital milik PRECIA (`openhospital-dev.precia.site`, rumah sakit contoh **St. Luke HOSPITAL - Angal**). Tampilan pada instalasi rumah sakit Anda dapat berbeda sedikit, tergantung versi Open Hospital dan modul yang diaktifkan.
 
@@ -68,11 +70,11 @@ Pekerjaan di Open Hospital selesai pada langkah ini.
 
 Konektor PRECIA membaca permintaan tersebut dan membuat kasus klinis baru pada unit yang sesuai. Masuk ke PRECIA, buka menu **Klinis**, lalu pilih unit tujuan, misalnya **Kardiologi**, untuk melihat daftar kerja unit tersebut. Klik kasus yang baru muncul untuk membuka detailnya.
 
-![Halaman detail kasus di PRECIA, kode kasus laboratory-1, unit Kardiologi, bagian Catatan berisi data mentah dari Open Hospital, dan bagian Tenaga Medis berisi Dibuat oleh Open Hospital dev connector ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
+![Halaman detail kasus di PRECIA, kode kasus laboratory-500001, unit Kardiologi, bagian Catatan berisi data mentah dari Open Hospital, dan bagian Tenaga Medis berisi Dibuat oleh Open Hospital dev connector ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/06-detail-kasus-precia.png)
 
 Kasus dari Open Hospital dapat dikenali dari tiga hal:
 
-- **Kode** transaksi berbentuk `<jenis sumber>-<nomor urut>`, misalnya `laboratory-1`.
+- **Kode** transaksi berbentuk `<jenis sumber>-<nomor urut>`, misalnya `laboratory-500001`.
 - Bagian **Catatan** memuat data mentah permintaan dari Open Hospital, termasuk `source_system: "openhospital"`, kode dan deskripsi pemeriksaan, serta tanggal permintaan.
 - Bagian **Tenaga Medis** mencantumkan **Dibuat oleh** berisi akun layanan konektor (`Open Hospital dev connector`, alamat `simrs-svc+openhospital-dev@precia.ai`), bukan nama petugas.
 
@@ -80,13 +82,57 @@ Pada kasus contoh, unit tujuannya adalah **Kardiologi**, sesuai jenis pemeriksaa
 
 Mulai dari titik ini, kasus diproses seperti kasus klinis lain di PRECIA: unggah berkas pendukung jika belum ada, jalankan modul AI, lalu kirim ke validator.
 
+## 7. Mengunggah berkas dan menjalankan modul AI
+
+Masih pada halaman detail kasus, buka tab **ECG EF Screening** lalu unggah gambar EKG. Setelah berkas terlampir, statusnya berubah menjadi **Ready** dan tombol **Trigger AI** aktif.
+
+![Halaman detail kasus di PRECIA, tab ECG EF Screening, lencana Ready, dan berkas EKG yang terunggah ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/07-gambar-ekg-terlampir.png)
+
+Mengeklik **Trigger AI** menjalankan modul AI. Langkah ini masih berupa tindakan manual, lihat [Batasan saat ini](#batasan-saat-ini).
+
+## 8. Melihat hasil AI
+
+Setelah pemrosesan selesai, tab yang sama menampilkan keluaran modul AI berupa skor keyakinan dan klasifikasi.
+
+![Halaman detail kasus di PRECIA, hasil ECG EF Screening dengan skor keyakinan dan klasifikasi Abnormal ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/08-hasil-ai.png)
+
+Pada kasus contoh, modul melaporkan keyakinan **71,7%** dengan klasifikasi **Abnormal**. Hasil ini adalah alat bantu skrining, bukan diagnosis, dan tetap memerlukan validasi formal oleh dokter.
+
+## 9. Mengirim hasil ke validasi klinis
+
+Dokter membuka menu **Validasi** dan menemukan kasus tersebut pada daftar kerja. Setelah meninjau hasil AI, dokter mencatat keputusan beserta catatan klinis. Pada kasus contoh, keputusannya **Diterima**.
+
+![Halaman Detail Validasi di PRECIA, kolom Keputusan berisi Diterima, kolom Status, dan Catatan klinis ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/09-validasi-dokter.png)
+
+## 10. Menerbitkan validasi
+
+Menekan tombol **Publikasikan validasi** menandai kasus sebagai sudah ditinjau. Kolom **Status** berubah menjadi **Dipublikasikan** dan waktu **Dipublikasikan pada** tercatat.
+
+![Halaman Detail Validasi di PRECIA, kolom Status berisi Dipublikasikan dan waktu Dipublikasikan pada ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/10-validasi-dipublikasikan.png)
+
+## 11. Memastikan hasil sampai ke Open Hospital
+
+Penerbitan validasi memicu PRECIA mengirim hasil kembali ke Open Hospital lewat konektor yang sama. Open Hospital menyediakan endpoint (`precia-integration/ai-results/{sourceType}/{sourceCode}`) yang menyimpan hasil ini; memeriksa endpoint tersebut memastikan data sudah sampai di sisi Open Hospital.
+
+![Respons API Open Hospital untuk hasil AI yang tersimpan, URL permintaan dan status HTTP 200, serta kolom validation_status dan synced_at ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/11-hasil-tersinkron-ke-open-hospital.png)
+
+`validation_status: "published"` dan waktu `synced_at` memastikan hasil tervalidasi tertulis kembali ke database Open Hospital sendiri, tidak hanya terbentuk di dalam PRECIA.
+
+## 12. Melihat hasil AI PRECIA di Patient Dashboard
+
+Hasil yang tersinkron pada langkah sebelumnya kini juga tampil langsung di antarmuka web Open Hospital, tidak hanya lewat API. Pada halaman **Patient Dashboard** pasien yang bersangkutan, buka bagian **Hasil AI PRECIA** di panel kiri.
+
+![Panel kiri Patient Dashboard Open Hospital, menu Hasil AI PRECIA ditandai kotak biru, kartu kasus ECG 12 Lead dengan hasil tervalidasi ditandai kotak biru](/screenshots/id/integrasi-simrs/openhospital/12-tab-hasil-ai-precia.png)
+
+Bagian ini mendaftar seluruh kunjungan OPD dan permintaan laboratorium pasien tersebut, lalu menampilkan hasil AI PRECIA untuk tiap kasus yang sudah punya validasi dokter dipublikasikan. Kasus yang belum diproses AI atau belum divalidasi tetap tampil pada daftar, dengan keterangan bahwa hasilnya masih ditunggu, sehingga petugas tahu status setiap permintaan tanpa harus membuka PRECIA maupun memanggil API secara manual.
+
 ## Bagaimana data dipetakan
 
-Tabel berikut menjelaskan asal setiap data pada kasus PRECIA, berdasarkan kasus contoh `laboratory-1`.
+Tabel berikut menjelaskan asal setiap data pada kasus PRECIA, berdasarkan kasus contoh `laboratory-500001`.
 
 | Data di PRECIA | Asal di Open Hospital |
 |---|---|
-| Kode kasus | `<source_type>-<source_code>`, misalnya `laboratory-1` untuk pemeriksaan laboratorium pertama |
+| Kode kasus | `<source_type>-<source_code>`, misalnya `laboratory-500001` |
 | Nama pasien, tanggal lahir, jenis kelamin | Data demografi pasien |
 | Nomor rekam medis | **PAT.ID** pada data pasien |
 | Unit tujuan | Jenis pemeriksaan yang diminta, misalnya **ECG 12 Lead** dipetakan ke unit **Kardiologi** |
@@ -97,8 +143,8 @@ Tabel berikut menjelaskan asal setiap data pada kasus PRECIA, berdasarkan kasus 
 
 Bagian ini mencatat hal yang belum tersedia, agar tidak menimbulkan salah harapan saat integrasi dipakai.
 
-1. **Perpindahan permintaan ke PRECIA belum terbukti berjalan tanpa campur tangan manusia.** Halaman Integrasi SIMRS menyebut Open Hospital sebagai konektor callback, tetapi pada lingkungan uji coba, pembacaan permintaan dari Open Hospital dan pembuatan kasus di PRECIA dijalankan oleh tim teknis. Belum ada bukti bahwa proses ini berjalan sendiri sebagai layanan yang terus aktif.
-2. **Pengiriman hasil AI kembali ke Open Hospital baru terverifikasi lewat API, belum lewat tampilan web.** Open Hospital menyediakan endpoint (`precia-integration/ai-results/...`) yang menyimpan hasil AI setelah validasi diterbitkan di PRECIA, dan endpoint ini sudah terbukti mengembalikan data hasil yang benar. Namun panduan ini belum menemukan tempat pada antarmuka web Open Hospital yang menampilkan hasil tersebut kepada petugas.
+1. ~~Perpindahan otomatis ke PRECIA sudah dibuktikan, belum terkonfirmasi sebagai layanan tetap.~~ **Selesai (2 September 2026).** Konektor diubah menjadi service `restart: always` (sebelumnya `unless-stopped`) di dev dan prod, dan sekarang punya alert Prometheus tersendiri (`PreciaSimrsConnectorRestartLoop`) yang berbunyi bila terjadi lebih dari tiga kali restart dalam sepuluh menit. Dibuktikan ulang dengan kasus baru sungguhan: pasien **RUDI HARTONO PRECIA PROOF** didaftarkan lewat UI Open Hospital, diminta pemeriksaan **ECG 12 Lead** (LAB_ID 500002), lalu diambil otomatis oleh konektor pada siklus poll rutin berikutnya tanpa disentuh tangan (log konektor: `opened PRECIA case laboratory-500002 unit=CD transaction=cdee8d26-...`, dan kasus PRECIA-nya sendiri mencatat **Dibuat oleh** akun layanan konektor). Setelahnya, konektor dihentikan dan dijalankan ulang secara eksplisit (`docker stop` lalu `docker start`, bukan `restart`): jumlah transaksi organisasi di PRECIA tetap sama sebelum dan sesudahnya, dan ledger konektor tidak mengirim ulang kasus yang sama.
+2. ~~Pengiriman hasil AI kembali ke Open Hospital sudah terkonfirmasi lewat API, belum lewat tampilan web.~~ **Selesai (2 September 2026).** Tab baru **Hasil AI PRECIA** ditambahkan di Patient Dashboard, lihat [langkah 12](#12-melihat-hasil-ai-precia-di-patient-dashboard) di atas. Endpoint `precia-integration/ai-results/{sourceType}/{sourceCode}` yang dipanggil tab ini semula hanya mengizinkan izin akun layanan konektor (`precia_integration.push`/`callback`), sehingga staf klinis biasa selalu mendapat galat 403 saat tab ini dibuka; diperbaiki dengan menambahkan `laboratories.read` dan `opds.read` sebagai izin alternatif untuk pembacaan (GET), karena melihat hasil adalah tindakan klinis, bukan panggilan mesin ke mesin seperti pengiriman hasil itu sendiri. Dibuktikan dengan kasus `laboratory-500002` yang baru diproses AI, divalidasi, dan dipublikasikan pada hari yang sama, tampil nyata di tab tersebut.
 3. **Kasus tercatat tanpa penanda asal SIMRS pada riwayat audit.** Kasus yang dibuat konektor masuk melalui jalur pencatatan kasus biasa, sehingga pada riwayat audit tidak tampak keterangan bahwa kasus berasal dari Open Hospital secara eksplisit. Kolom Catatan pada halaman detail adalah satu-satunya penanda yang tersedia saat ini.
 4. **Modul AI harus dikonfigurasi lebih dahulu pada unit tujuan.** Selama kebijakan AI unit belum diatur, panel Modul AI pada halaman detail menampilkan keterangan bahwa belum ada slot yang dikonfigurasi, dan kasus berhenti pada status Belum Diproses.
 5. **Tombol Trigger AI tetap perlu ditekan secara manual di PRECIA.** Munculnya kasus di PRECIA tidak otomatis menjalankan modul AI. Petugas atau operator PRECIA masih perlu mengunggah berkas (jika belum ada) dan menekan tombol proses AI pada halaman detail kasus.

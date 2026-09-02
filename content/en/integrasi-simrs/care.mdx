@@ -20,7 +20,7 @@ Addresses used in the trial environment:
 The items below are prepared once by the PRECIA implementation team during setup, not by hospital users. Make sure all of them are in place before you try the workflow.
 
 1. **A CARE staff account.** You need a staff username and password on the facility used for the trial. Patient accounts cannot place orders.
-2. **The imaging catalogue in CARE.** Stock CARE only provides a laboratory catalogue. The implementation team adds the **Imaging** category together with the **Chest X-ray (PRECIA AI)** examination. Without that addition, the ordering combobox offers no radiology examination at all and this workflow cannot be run.
+2. **The imaging catalogue in CARE.** Stock CARE only provides a laboratory catalogue. The implementation team adds the **Imaging** category together with two examinations, **Chest X-ray (PRECIA AI)** and **ECG 12 lead (PRECIA AI)**. Without that addition, the ordering combobox offers no radiology examination at all and this workflow cannot be run.
 3. **The organization and unit in PRECIA.** The hospital organization must already be registered in PRECIA and must have a radiology unit, named **RAD - Radiologi** in this example.
 4. **A PRECIA account with access to that unit.** Your PRECIA account must belong to the same organization and be allowed to read the radiology unit worklist.
 
@@ -96,6 +96,58 @@ Click one of the rows to open the case detail. The detail page shows the case co
 
 From this point the case behaves exactly like a case created directly in PRECIA. You can upload supporting files and pass the case on to a validator with the **Send to Validator** button.
 
+## Step 10. Ordering an ECG examination
+
+The CARE catalogue in the **Imaging** category is not limited to Chest X-ray. Right above **Chest X-ray (PRECIA AI)** sits an **ECG 12 lead (PRECIA AI)** examination. Open the **Service Request** form again on the same encounter as in Step 3, press the **Select Activity Definition** combobox, then press the **Imaging** category, exactly as in Step 4.
+
+![CARE examination catalogue in the Imaging category, the Root to Imaging breadcrumb and the ECG 12 lead (PRECIA AI) examination marked with blue boxes](/screenshots/en/integrasi-simrs/care/10-memilih-pemeriksaan-ecg.png)
+
+Press the examination name, **ECG 12 lead (PRECIA AI)**, to select it.
+
+## Step 11. Sending the ECG request
+
+The selected examination appears as a row on the form, complete with the **Imaging** category badge and the name of the ordering doctor, the same pattern as Step 6. Press **Submit** to send the request.
+
+![CARE Service Request form holding ECG 12 lead (PRECIA AI) with the Imaging badge, the examination row and the Submit button marked with blue boxes](/screenshots/en/integrasi-simrs/care/11-mengirim-permintaan-ecg.png)
+
+## Step 12. Confirming the ECG request was recorded in CARE
+
+Return to the **Service Requests** tab on the encounter. The list sorts newest first, so the **ECG 12 lead (PRECIA AI)** row appears at the top, above every Chest X-ray row already there, with status **Active** and priority **Routine**.
+
+![Service Requests tab in CARE, the newest ECG 12 lead (PRECIA AI) row at the top with status Active marked with a blue box](/screenshots/en/integrasi-simrs/care/12-daftar-permintaan-ecg.png)
+
+This request follows the same path as the Chest X-ray request in Steps 7 through 9. Once it is **Active**, it is eligible to be read into PRECIA through the identical mechanism, regardless of examination type.
+
+## Seeing an AI result from a CARE case, and its result written back to CARE
+
+This section shows what a CARE-origin case looks like once AI has actually finished processing it and the result has been written back as a new diagnostic report in CARE. The example in Steps 13 through 15 uses a **different** case from the ECG request in Steps 10 through 12: a **Chest X-ray** case that already existed in the trial environment, coded `CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f`.
+
+**Demonstration configuration to exercise the CARE dev pipeline end to end.** The AI module that ran on this case, **ECG Low Ejection Fraction Screening**, was enabled by the implementation team on the **RAD - Radiologi** unit as a connectivity proof, not a clinical recommendation for this department. Ejection-fraction screening from an ECG does not match the Chest X-ray examination actually ordered on this case; the result value shown in Step 13 exists solely to prove that AI processing and writing the result back to CARE genuinely works end to end, not as a clinical finding that applies to a radiology examination.
+
+## Step 13. Viewing the AI result in PRECIA
+
+Sign in to PRECIA, open the **Clinical** menu, select the **RAD - Radiologi** unit as in Step 8, then press the **By AI Module** tab. Set the **Slot Status** filter to **Completed**. Click the row coded `CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f` to open its result detail.
+
+![PRECIA Transaction Worklist on the By AI Module tab, the CARE-c39c9dd4-265f-429a-bf9c-3f13a6bb8f3f case row and the ECG Low Ejection Fraction Screening AI result panel marked with blue boxes](/screenshots/en/integrasi-simrs/care/13-hasil-ai-modul-precia.png)
+
+The panel that opens shows a confidence score of **65.8%**, classification **EF-Low**, and a note that this result is a screening aid, not a final diagnosis. The clinical decision remains with the treating doctor.
+
+## Step 14. Viewing the AI result's diagnostic report in CARE
+
+Once the AI result is validated, PRECIA writes it back into CARE as a new diagnostic report. Open the same CARE encounter, then select the **Diagnostic Reports** tab.
+
+![Diagnostic Reports tab on the CARE encounter, the active tab and the newest Chest X-ray (PRECIA AI) report card marked with blue boxes](/screenshots/en/integrasi-simrs/care/14-laporan-diagnostik-care.png)
+
+The newest report appears at the top of the list, titled the same as the original examination, **Chest X-ray (PRECIA AI)**, with status **Final**.
+
+## Step 15. Opening the diagnostic report detail
+
+Click the report to open its detail. The **Notes** field carries a summary of the AI result: the module code, confidence score, model version, validation status, and the PRECIA transaction and job numbers that can be used to trace back to the original case.
+
+![CARE diagnostic report detail, the Final status badge and the Notes field holding the PRECIA AI result summary marked with blue boxes](/screenshots/en/integrasi-simrs/care/15-detail-laporan-diagnostik-care.png)
+
+Below that summary, the same **Notes** field also carries the raw ECG waveform data in JSON, as part of the AI module's technical output. That data is not meant for staff to read and is being reported as a display cleanup item to the technical team.
+
 ## Matching a PRECIA case to a CARE request
 
 Two markers connect the two, and both can be read straight off the screen.
@@ -109,13 +161,16 @@ If you need to confirm one specific case, copy part of that number and paste it 
 
 This section describes what does not yet work in the trial environment. Every item below was observed directly, not assumed.
 
-1. **Moving a case from CARE to PRECIA is not yet automatic.** The connector that reads requests from CARE is not installed as a scheduled running service. During the demonstration that step is performed by the implementation team after the request has been sent. Do not wait for the case to appear in PRECIA on its own, and do not conclude that something has failed when the case is not yet visible.
-2. **AI results are not sent back to CARE.** PRECIA does not write examination results into the CARE **Diagnostic Reports** tab in this environment. The return direction has been tested separately by the technical team, but it is not connected to the PRECIA workflow, so users cannot rely on it yet.
-3. **No AI module is attached to the radiology unit.** On the case detail, the **AI Modules** section states that no slot is configured. This means the case from CARE is stored correctly, but no AI analysis runs on it.
-4. **The medical record number is filled with the CARE patient number.** The value in the MRN column is the patient identifier in CARE, not the hospital medical record number. It is consistent and can be used for searching, but do not treat it as the same as the medical record number in the registration system.
-5. **Priority is not taken from CARE.** Every request in the example above is **Routine** in CARE, while one of the cases in PRECIA is recorded as **Urgent**. Case priority is set at the moment the case is brought into PRECIA, so check the value again in PRECIA if priority matters to your workflow.
+1. **Moving a case from CARE to PRECIA is now automatic, structurally.** PRECIA's backend fork (`care-backend-fork`) adds a signal that calls the connector every time a `ServiceRequest` is created in CARE; the connector reacts within a few hundred milliseconds rather than waiting for a poll cycle. Measured directly from container logs in dev and prod: on one run, the order was created at `10:30:26.364`, the connector received the webhook at `10:30:26.389` (25 milliseconds later), and the PRECIA case existed at `10:30:26.592`, entirely without a manual step. Polling still runs as a fallback in case the webhook fails to deliver, so no order can be lost silently. The connector was also proven safe across a container restart: stopped and started, the case count in PRECIA for this organization stayed unchanged before and after.
+2. **AI results have been proven to be sent back to CARE, but only for one demonstration case.** Steps 13 through 15 above show real evidence that PRECIA can write examination results into the CARE **Diagnostic Reports** tab. This is not a capability that runs automatically for every new case, because the AI module that produced it was enabled specifically for that case as a connectivity proof, not as a permanent configuration on the radiology unit.
+3. **The AI module on the radiology unit is only active for one demonstration case.** New cases from CARE, including the ECG request in Steps 10 through 12, still stop at the **Unprocessed** status, because the **AI Modules** section on the case detail states that no slot is configured for this unit in general. Do not treat the result in Step 13, which uses the **ECG Low Ejection Fraction Screening** module, as clinical fitness between that module and an ordinary radiology examination; the module was enabled solely to prove the AI-to-CARE path works end to end.
+4. **The hospital medical record number can now be filled in, but it does not yet appear in PRECIA's own MRN column.** `care-backend-fork` adds a new identifier called **Nomor Rekam Medis (MRN)** to CARE's patient form (see the screenshot below), using the generic identifier system CARE already has, so no change to `simrs-care-fe` was needed. When a registration clerk fills it in, the connector reads it and writes it as its own line in the PRECIA case's **Notes** field, reading "No. RM rumah sakit: ...". That value does not yet replace PRECIA's own MRN column, which still shows the CARE patient identifier: the adapter that writes AI results back to CARE uses that column literally as the write-back address, so replacing its content with the medical record number would break the return path. This is a limitation on PRECIA's side, not CARE's, and stays open until PRECIA has a separate column for each purpose.
+
+   ![CARE patient update form, page title and the Nomor Rekam Medis (MRN) field with its value boxed in blue](/screenshots/en/integrasi-simrs/care/16-nomor-rekam-medis.png)
+
+5. **Priority is now taken from CARE correctly.** The mapping `stat → Urgent`, `urgent`/`asap → High`, and `routine → Normal` has run since the connector was first installed, and was re-verified with fresh evidence: a CARE request with **STAT** priority produced a PRECIA case with **Urgent** priority, recorded in both the connector log and the PRECIA audit trail (the caller was a service account, not a human user). The example in Steps 1 through 12 above still uses CARE's default **Routine** priority simply because that is the form's default value, not because the mapping does not run.
 6. **Genders PRECIA does not recognise are mapped to Other.** The CARE trial data contains gender values that have no equivalent in PRECIA. Such values are displayed as **Other** on the case detail.
-7. **The CARE interface is available only in English on this installation.** CARE screenshots therefore keep their English wording regardless of the language you select for this documentation. PRECIA wording follows your chosen language.
+7. **The CARE interface now defaults to Bahasa Indonesia on this installation**, no longer English. Because this change happened after Steps 1 through 15 above were captured, those screenshots still show the English interface and have not been retaken; only the screenshot under item 4 above reflects the current Indonesian interface. Coverage includes sign-in, patient registration, service request creation, and the main navigation; terms outside that scope (mainly rare clinical enum values) still render in English until translated. Users can still switch to another language from CARE's own language selector.
 8. **Every patient and examination in this environment is sample data.** There is no real patient data in it.
 
 ## If the case does not appear in PRECIA
@@ -126,4 +181,4 @@ Check in this order:
 2. **The examination category.** Confirm the selected examination sits in the **Imaging** category. Laboratory examinations do not reach the PRECIA radiology unit.
 3. **The unit you are viewing in PRECIA.** Confirm the **Unit** filter on the worklist points at **RAD - Radiologi** and not at another unit.
 4. **The organization of your PRECIA account.** A case is only visible to accounts inside the organization that owns it. If the worklist is empty although the unit is correct, contact your organization administrator.
-5. **The synchronisation has not been run.** As stated in limitation one above, moving cases is not yet automatic. Contact the PRECIA implementation team to run it.
+5. **A reasonable wait.** Moving cases runs automatically (see limitation one above) and usually finishes within seconds, but the connector's polling fallback only looks again every 30 seconds if a webhook delivery happened to fail. If the case is still not visible after about a minute, contact the PRECIA implementation team.

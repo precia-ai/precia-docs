@@ -124,6 +124,55 @@ async function openProcedurePicker(page) {
   return { po, picker }
 }
 
+/**
+ * Pasien pembuktian arah balik (Elektrokardiografi 12 Sadapan, unit
+ * KARDIO). Berbeda dari searchPatient()/openPatientChart() di atas, yang
+ * memakai pasien "Budi" dari alur permintaan Foto Toraks PA: unit RAD tidak
+ * memiliki modul AI aktif, sehingga tidak ada hasil untuk difoto di
+ * Documents. Rahmawati adalah pasien yang benar benar punya kasus KARDIO
+ * dengan hasil AI-ECG-LVEF yang sudah dipublikasikan.
+ *
+ * Klik ikon <img onmousedown="objTreeMenu_1.toggleBranch(...)"> lewat
+ * page.click biasa terbukti macet menunggu navigasi yang tidak pernah
+ * selesai pada pohon dokumen OpenEMR (banyak iframe bersarang). Dipanggil
+ * langsung lewat evaluate() sebagai gantinya, sama seperti yang terbukti
+ * jalan saat pembuktian arah balik OpenEMR-2-15.
+ */
+async function openDocumentsLabReport(page) {
+  await page.locator('input[placeholder*="demographics" i]').first().fill('Rahmawati')
+  await page.keyboard.press('Enter')
+  await page.waitForTimeout(8000)
+  const finder = page.frames().find((f) => f.url().includes('dynamic_finder'))
+  await finder.click('text=Rahmawati')
+  await page.waitForTimeout(10000)
+
+  for (const f of page.frames()) {
+    const link = f.locator('a:has-text("Documents")').first()
+    if (await link.count().catch(() => 0)) {
+      await link.click({ timeout: 5000 }).catch(() => {})
+      break
+    }
+  }
+  await page.waitForTimeout(6000)
+
+  let docFrame = null
+  for (let i = 0; i < 20 && !docFrame; i++) {
+    docFrame = page.frames().find((f) => f.url().includes('controller.php') && f.url().includes('document'))
+    if (!docFrame) await page.waitForTimeout(1000)
+  }
+  if (!docFrame) throw new Error('Frame daftar dokumen (controller.php?document) tidak pernah muncul.')
+  await docFrame.evaluate(() => {
+    const all = Array.from(document.querySelectorAll('a'))
+    const target = all.find((a) => a.textContent && a.textContent.trim() === 'Lab Report')
+    if (!target) return
+    const parent = target.closest('li') || target.parentElement
+    const toggle = parent && parent.querySelector('img[onmousedown]')
+    if (toggle) toggle.onmousedown()
+  })
+  await page.waitForTimeout(2500)
+  return docFrame
+}
+
 module.exports = [
   {
     id: 'integrasi-simrs__openemr__01-penyedia-layanan',
@@ -315,5 +364,31 @@ module.exports = [
       { type: 'box', x: 299, y: 114, width: 418, height: 66 },
       { type: 'box', x: 299, y: 406, width: 418, height: 84 }
     ]
+  },
+  {
+    id: 'integrasi-simrs__openemr__15-dokumen-hasil-ai',
+    section: 'integrasi-simrs',
+    pageSlug: 'openemr',
+    stepSlug: '15-dokumen-hasil-ai',
+    route: OPENEMR_LOGIN,
+    preActions: async (page) => {
+      await openemrLogin(page)
+      await openDocumentsLabReport(page)
+    },
+    annotate: [{ type: 'box', x: 15, y: 480, width: 330, height: 60 }]
+  },
+  {
+    id: 'integrasi-simrs__openemr__16-isi-hasil-ai',
+    section: 'integrasi-simrs',
+    pageSlug: 'openemr',
+    stepSlug: '16-isi-hasil-ai',
+    route: OPENEMR_LOGIN,
+    preActions: async (page) => {
+      await openemrLogin(page)
+      const docFrame = await openDocumentsLabReport(page)
+      await docFrame.click('text=precia-AI-ECG-LVEF-OPENEMR-2-15')
+      await page.waitForTimeout(3000)
+    },
+    annotate: [{ type: 'box', x: 383, y: 305, width: 1017, height: 45 }]
   }
 ]

@@ -8,7 +8,7 @@ This page describes the journey of a single case, starting from a patient regist
 
 The Khanza adapter works on a pull model. A companion service on the Khanza side contacts PRECIA at regular intervals; PRECIA never calls Khanza. In other words, every send operation runs from the hospital side, and PRECIA only receives.
 
-All steps below are demonstrated with a real case in the demo environment, namely visit number (No.Rawat) 2026/07/28/000001 for patient ADI KAZAMA with medical record number 000051.
+Steps 1 through 4 (Khanza side) are demonstrated with a real case in the demo environment, visit number (No.Rawat) 2026/07/28/000001 for patient ADI KAZAMA with medical record number 000051. Steps 5 and 6 (PRECIA side) use a more recent real case, visit number 2026/09/02/000001 for patient YOHANA FARIDA with medical record number 000059, registered under the Radiology poli, used specifically to demonstrate the per-poli unit mapping described below.
 
 ## Flow at a glance
 
@@ -27,7 +27,7 @@ The following preparation is done once by the organization admin together with t
 
 **Make sure the PRECIA service account exists.** The companion service on the Khanza side uses one PRECIA account belonging to the organization to create transactions. That account is prepared by the implementation team and is not used by staff to sign in to the application.
 
-**Agree on the destination unit.** The unit a transaction is created in is decided by the service configuration on the Khanza side, not by the unit map stored in PRECIA. One Khanza installation sends all of its cases to the same unit. In the demo environment that unit is Cardiology.
+**The poli-to-unit map is filled in.** The Khanza companion service decides each case's destination unit from its poli of origin (the `kd_poli` field on the Khanza registration), matched against a mapping table on Khanza's own staging database. The implementation team fills in one row per poli during onboarding, mapping each poli to one of the unit keys stored in the organization's unit map on the SIMRS Integration page. A case from a poli with no mapping row fails to send with a clear error, instead of silently landing in the wrong unit.
 
 ## Step 1. Open the Khanza client
 
@@ -87,23 +87,23 @@ Once the case is queued, the Khanza companion service checks the queue every 30 
 
 ## Step 5. Find the transaction in the PRECIA worklist
 
-Sign in to PRECIA with an account in the same organization, open the **Clinical** menu, then select the integration destination unit.
+Sign in to PRECIA with an account in the same organization, open the **Clinical** menu, then select the integration destination unit. For a case from the Radiology poli, that unit is **RAD - Radiologi**.
 
-The new transaction appears in the **Transaction Worklist** with a code built from the visit number, with slashes replaced by hyphens, plus the AI module code. For this example the code is `2026-07-28-000001-ai-ecg-digitization`. Its status is **Unprocessed**, because no examination file has been uploaded yet.
+The new transaction appears in the **Transaction Worklist** with a code built from the visit number, with slashes replaced by hyphens, plus the AI module code. For this example the code is `2026-09-02-000001-ai-ecg-digitization`, built from a Radiology poli case registered that day.
 
-![PRECIA Transaction Worklist for the Cardiology unit, the row of the transaction that came from Khanza marked with a blue box](/screenshots/en/integrasi-simrs/khanza/06-daftar-kerja-precia.png)
+![PRECIA Transaction Worklist for the RAD - Radiologi unit, the row of the transaction that came from Khanza marked with a red box](/screenshots/en/integrasi-simrs/khanza/06-daftar-kerja-precia.png)
 
-If the transaction has not appeared yet, wait one queue cycle and press **Refresh**. Also make sure the selected unit is the integration destination unit, because every case from Khanza lands in the same unit.
+If the transaction has not appeared yet, wait one queue cycle and press **Refresh**. Also make sure the selected unit matches that case's poli of origin per the map the implementation team filled in; cases from other polis appear under other units, not this one.
 
 ## Step 6. Check the transaction detail
 
 Click the transaction row to open its detail. The detail page shows the transaction code at the top, the patient identity copied from Khanza, the destination unit, and the **Notes** field.
 
-The **Notes** field carries the visit number, the AI module code and the data source verbatim, in the form `no_rawat=2026/07/28/000001;ai_module_code=ai-ecg-digitization;sumber_data=radiologi`. This field is what you use to match a PRECIA transaction back to its Khanza registration.
+The **Notes** field carries the visit number, the AI module code and the data source verbatim, in the form `no_rawat=2026/09/02/000001;ai_module_code=ai-ecg-digitization;sumber_data=radiologi`. This field is what you use to match a PRECIA transaction back to its Khanza registration. The **Unit** card shows **Radiologi**, matching this case's poli of origin, not a fixed unit shared by every case.
 
-![PRECIA transaction detail, the transaction code, the Notes field with the visit number and the Unit card marked with blue boxes](/screenshots/en/integrasi-simrs/khanza/07-detail-transaksi.png)
+![PRECIA transaction detail, the transaction code, the Notes field with the visit number and the Unit card showing Radiologi marked with red boxes](/screenshots/en/integrasi-simrs/khanza/07-detail-transaksi.png)
 
-This example shows three AI module slots still waiting for files. AI processing only starts after clinical staff upload the examination files to the transaction.
+In this example the examination file has already been uploaded by the companion service and the ECG EF Screening AI module has already finished processing. AI processing only starts once an examination file is available on the transaction.
 
 ## After the transaction is created
 
@@ -121,8 +121,10 @@ The return direction, sending the AI result back to Khanza, also uses the pull m
 
 **The Periode filter cannot be changed from the demo client.** For the same reason, the Registrasi window only shows registrations on the current date. The visit number of an older case can still be used for sending; only its row cannot be displayed on the demo screen.
 
-**The destination unit does not follow the PRECIA unit map.** The unit map stored in the SIMRS Integration settings is used for configuration checks, not to route cases. The destination unit is taken from the service configuration on the Khanza side, so even a case with the radiology data source still lands in the unit configured there. In the demo environment every case lands in the Cardiology unit.
+**The destination unit no longer follows one fixed value. Fixed and proven on 2 September 2026.** Previously the destination unit came from one value configured as a fixed constant on the Khanza side, so every case, whatever its poli of origin, landed in the same unit. The companion service now reads each case's poli of origin and matches it through a mapping table on Khanza's own staging database, filled in by the implementation team at onboarding. Proven with a real Radiology poli case (visit number 2026/09/02/000001, patient YOHANA FARIDA): the already-running companion service (not a controlled API call) automatically pushed that case to the **RAD - Radiologi** unit, not any other unit, and the PRECIA audit trail records the caller as the organization's service account, not a human session. A case from a poli with no mapping row fails to send with an error, instead of silently landing in the wrong unit.
 
-**The AI result page in Khanza cannot be opened by an operator yet.** The page that displays AI results on the Khanza side requires a separate sign-in session, different from the operator client, so it cannot be turned into a staff work step today.
+**The AI result page in Khanza now has a link from the radiology and lab result screens, but that has not been tested live yet.** Previously the AI result page had no entry link from anywhere and only accepted one session-name pattern. Both are fixed: a "Lihat hasil AI PRECIA" link was added to the radiology and lab result screens, and the page now accepts a session from any login module shared across Khanza's web application. What remains unproven: the Khanza web module (`webapps/`) that hosts this page is not running as a reachable service in any environment this programme uses; only the API bridge service (`api-bridgingprecia`) and the Swing client over noVNC are containerized so far, not Khanza's core web application. Testing this fix directly requires a Khanza install with the core web application running, outside the infrastructure available for this verification.
 
-**The return direction was not exercised in this verification.** The available evidence covers the Khanza to PRECIA direction. Sending an AI result back to Khanza has not been run end to end in the demo environment.
+**The return direction is now proven through the companion service itself, not only at the API level. Verified 2 September 2026.** The Radiology poli case above had its result pulled automatically by that same companion service: the pull cycle runs every 30 seconds per its configuration, and the ECG EF Screening AI module's result (confidence score 0.628) was stored into Khanza's staging result table with no human involvement at the moment of pulling. Two more defects were found and fixed in the course of this proof, not by inspection alone: the companion service read the result fields from the wrong place (confidence_score and the explanation were stored blank on every real case, because the live API response nests them one level deeper than the code read), and the service account credential deployed in the dev environment briefly pointed at a different organization, not RS Uji Coba Khanza, so cases from Khanza briefly landed in the wrong organization before this was fixed.
+
+**The companion service does not recover on its own from a bare restart. Found and fixed on 2 September 2026.** Stopping and starting the container without recreating it (as opposed to a fresh deploy through the pipeline) left behind a virtual-display lock file from the previous process, so the new display refused to start and the service failed permanently until the container was recreated. From the outside the container looked healthy, since the "restart" retry loop kept running, while the service inside it was dead. Fixed by clearing that lock file before the display starts; verified by stopping and starting the container directly, then confirming the service recovered and the organization's transaction count had not grown since before the restart.
