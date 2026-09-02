@@ -581,5 +581,35 @@ module.exports = [
       // report-list panel instead of the right-hand detail panel.
       { type: 'box', x: 686, y: 443, width: 440, height: 140 }
     ]
+  },
+  {
+    // Added when precia-connector gained a hospital MRN identifier and
+    // simrs-care-fe was given a Bahasa Indonesia default. Unlike steps 01
+    // to 15 above, this one is now IDENTICAL for both documentation
+    // locales: CARE's own UI used to stay English regardless of which
+    // locale this documentation page was in, but that assumption no
+    // longer holds now that Indonesian is CARE's default. See the
+    // Batasan/Current limitations section for the full explanation.
+    id: 'integrasi-simrs__care__16-nomor-rekam-medis',
+    section: 'integrasi-simrs',
+    pageSlug: 'care',
+    stepSlug: '16-nomor-rekam-medis',
+    route: `${CARE_ORIGIN}/facility/${FACILITY_ID}/patient/${PATIENT_ID}/update`,
+    preActions: async (page) => {
+      await openCare(page, `${CARE_ORIGIN}/facility/${FACILITY_ID}/patient/${PATIENT_ID}/update`)
+      await page.waitForSelector('text=Nomor Rekam Medis', { timeout: 20000 })
+      // Scroll the field into a stable position before the shot.
+      await page.getByText('Nomor Rekam Medis (MRN)').first().scrollIntoViewIfNeeded()
+      await page.waitForTimeout(600)
+    },
+    fullPage: true,
+    annotate: [
+      // Page title, now in Indonesian by default for this deployment.
+      { type: 'box', x: 428, y: 92, width: 172, height: 34 },
+      // The new "Nomor Rekam Medis (MRN)" field, its helper text and the
+      // input itself, seeded by care-backend-fork migration
+      // 0082_precia_hospital_mrn_identifier with zero care_fe code change.
+      { type: 'box', x: 428, y: 1315, width: 622, height: 128 }
+    ]
   }
 ]
