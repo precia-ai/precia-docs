@@ -8,7 +8,7 @@ Halaman ini menjelaskan perjalanan satu kasus, mulai dari pendaftaran pasien yan
 
 Adapter Khanza bekerja dengan pola tarik. Layanan pendamping di sisi Khanza yang menghubungi PRECIA secara berkala; PRECIA tidak pernah memanggil Khanza. Artinya seluruh kegiatan pengiriman berjalan dari sisi rumah sakit, dan PRECIA hanya menerima.
 
-Seluruh langkah di bawah diperagakan memakai kasus nyata di lingkungan demo, yaitu nomor rawat 2026/07/28/000001 atas nama pasien ADI KAZAMA dengan nomor rekam medis 000051.
+Langkah 1 sampai 4 (sisi Khanza) diperagakan memakai kasus nyata di lingkungan demo, nomor rawat 2026/07/28/000001 atas nama pasien ADI KAZAMA dengan nomor rekam medis 000051. Langkah 5 dan 6 (sisi PRECIA) memakai kasus nyata yang lebih baru, nomor rawat 2026/09/02/000001 atas nama pasien YOHANA FARIDA dengan nomor rekam medis 000059, terdaftar pada poli Radiologi, dipakai khusus untuk membuktikan pemetaan unit per poli yang dijelaskan di bawah.
 
 ## Ringkasan alur
 
@@ -27,7 +27,7 @@ Persiapan berikut cukup dilakukan sekali oleh admin organisasi bersama tim imple
 
 **Akun layanan PRECIA sudah tersedia.** Layanan pendamping di sisi Khanza memakai satu akun PRECIA milik organisasi untuk membuat transaksi. Akun ini disiapkan oleh tim implementasi dan tidak dipakai oleh petugas untuk masuk ke aplikasi.
 
-**Unit tujuan sudah disepakati.** Unit tempat transaksi dibuat ditentukan pada konfigurasi layanan di sisi Khanza, bukan dari peta unit yang tersimpan di PRECIA. Satu instalasi Khanza mengirim seluruh kasusnya ke satu unit yang sama. Pada lingkungan demo, unit tersebut adalah Cardiology.
+**Peta poli ke unit sudah diisi.** Layanan pendamping Khanza menentukan unit tujuan tiap kasus dari poli asalnya (kolom `kd_poli` pada pendaftaran Khanza), dicocokkan lewat tabel pemetaan pada database staging Khanza sendiri. Tim implementasi mengisi satu baris per poli saat onboarding, memetakan tiap poli ke salah satu kunci unit yang tersimpan di peta unit organisasi pada halaman Integrasi SIMRS. Kasus dari poli yang belum punya baris pemetaan gagal terkirim dengan pesan galat yang jelas, bukan diam-diam masuk ke unit yang salah.
 
 ## Langkah 1. Buka klien Khanza
 
@@ -87,23 +87,23 @@ Setelah kasus masuk antrean, layanan pendamping Khanza memeriksa antrean setiap 
 
 ## Langkah 5. Temukan transaksi di daftar kerja PRECIA
 
-Masuk ke PRECIA dengan akun yang berada pada organisasi yang sama, buka menu **Klinis**, lalu pilih unit tujuan integrasi.
+Masuk ke PRECIA dengan akun yang berada pada organisasi yang sama, buka menu **Klinis**, lalu pilih unit tujuan integrasi. Untuk kasus dari poli Radiologi, unitnya adalah **RAD - Radiologi**.
 
-Transaksi baru muncul pada **Daftar Kerja Transaksi** dengan kode yang dibentuk dari nomor rawat, dengan garis miring diganti tanda hubung, ditambah kode modul AI. Untuk contoh ini kodenya adalah `2026-07-28-000001-ai-ecg-digitization`. Statusnya **Belum Diproses**, karena berkas pemeriksaan belum diunggah.
+Transaksi baru muncul pada **Daftar Kerja Transaksi** dengan kode yang dibentuk dari nomor rawat, dengan garis miring diganti tanda hubung, ditambah kode modul AI. Untuk contoh ini kodenya adalah `2026-09-02-000001-ai-ecg-digitization`, terbentuk dari kasus poli Radiologi yang didaftarkan hari itu.
 
-![Daftar Kerja Transaksi PRECIA untuk unit Cardiology, baris transaksi yang berasal dari Khanza ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/06-daftar-kerja-precia.png)
+![Daftar Kerja Transaksi PRECIA untuk unit RAD - Radiologi, baris transaksi yang berasal dari Khanza ditandai kotak merah](/screenshots/id/integrasi-simrs/khanza/06-daftar-kerja-precia.png)
 
-Kalau transaksi belum muncul, tunggu satu siklus pemeriksaan antrean, lalu tekan **Muat Ulang**. Pastikan juga unit yang dipilih adalah unit tujuan integrasi, karena seluruh kasus dari Khanza masuk ke satu unit yang sama.
+Kalau transaksi belum muncul, tunggu satu siklus pemeriksaan antrean, lalu tekan **Muat Ulang**. Pastikan juga unit yang dipilih sudah sesuai dengan poli asal kasus tersebut sesuai peta yang diisi tim implementasi; kasus dari poli lain muncul di unit lain, bukan unit ini.
 
 ## Langkah 6. Periksa detail transaksi
 
 Klik baris transaksi untuk membuka detailnya. Halaman detail menampilkan kode transaksi di bagian atas, identitas pasien yang disalin dari Khanza, unit tujuan, serta kolom **Catatan**.
 
-Kolom **Catatan** berisi nomor rawat, kode modul AI, dan asal data apa adanya, dalam bentuk `no_rawat=2026/07/28/000001;ai_module_code=ai-ecg-digitization;sumber_data=radiologi`. Kolom inilah yang dipakai untuk mencocokkan kembali transaksi PRECIA dengan pendaftaran di Khanza.
+Kolom **Catatan** berisi nomor rawat, kode modul AI, dan asal data apa adanya, dalam bentuk `no_rawat=2026/09/02/000001;ai_module_code=ai-ecg-digitization;sumber_data=radiologi`. Kolom inilah yang dipakai untuk mencocokkan kembali transaksi PRECIA dengan pendaftaran di Khanza. Kartu **Unit** menampilkan **Radiologi**, sesuai poli asal kasus ini, bukan unit tetap yang sama untuk semua kasus.
 
-![Detail transaksi PRECIA, kode transaksi, kolom Catatan berisi nomor rawat, dan kartu Unit ditandai kotak biru](/screenshots/id/integrasi-simrs/khanza/07-detail-transaksi.png)
+![Detail transaksi PRECIA, kode transaksi, kolom Catatan berisi nomor rawat, dan kartu Unit berisi Radiologi ditandai kotak merah](/screenshots/id/integrasi-simrs/khanza/07-detail-transaksi.png)
 
-Pada contoh ini terlihat tiga slot modul AI yang masih menunggu berkas. Pemrosesan AI baru berjalan setelah petugas klinis mengunggah berkas pemeriksaan pada transaksi tersebut.
+Pada contoh ini, berkas pemeriksaan sudah diunggah oleh layanan pendamping dan modul AI **ECG EF Screening** sudah selesai diproses. Pemrosesan AI baru berjalan setelah berkas pemeriksaan tersedia pada transaksi tersebut.
 
 ## Setelah transaksi terbentuk
 
@@ -121,8 +121,10 @@ Arah balik, yaitu pengembalian hasil AI ke Khanza, juga memakai pola tarik. Laya
 
 **Penyaring Periode tidak dapat diubah dari klien demo.** Dengan alasan yang sama, jendela Registrasi hanya menampilkan pendaftaran pada tanggal berjalan. Nomor rawat kasus lama tetap dapat dipakai untuk pengiriman, hanya barisnya yang tidak dapat ditampilkan di layar demo.
 
-**Unit tujuan tidak mengikuti peta unit di PRECIA.** Peta unit yang tersimpan pada pengaturan Integrasi SIMRS dipakai untuk pemeriksaan konfigurasi, bukan untuk menentukan tujuan kasus. Unit tujuan diambil dari konfigurasi layanan di sisi Khanza, sehingga kasus dengan asal data radiologi pun tetap masuk ke unit yang dikonfigurasi di sana. Pada lingkungan demo, seluruh kasus masuk ke unit Cardiology.
+**Unit tujuan tidak lagi mengikuti satu nilai tetap. Diperbaiki dan dibuktikan 2 September 2026.** Sebelumnya unit tujuan diambil dari satu nilai yang dikonfigurasi tetap di sisi Khanza, sehingga seluruh kasus (apa pun poli asalnya) masuk ke unit yang sama. Layanan pendamping sekarang membaca poli asal tiap kasus dan mencocokkannya lewat tabel pemetaan pada database staging Khanza sendiri, diisi tim implementasi saat onboarding. Dibuktikan dengan kasus nyata pada poli Radiologi (nomor rawat 2026/09/02/000001, pasien YOHANA FARIDA): layanan pendamping yang sudah berjalan (bukan panggilan API terkontrol) mendorong kasus itu secara otomatis ke unit **RAD - Radiologi**, bukan ke unit lain, dan jejak audit PRECIA mencatat pemanggilnya sebagai akun layanan organisasi, bukan sesi manusia. Kasus dari poli yang belum punya baris pemetaan gagal terkirim dengan pesan galat, bukan diam-diam masuk ke unit yang salah.
 
-**Halaman hasil AI di Khanza belum dapat dibuka operator.** Halaman yang menampilkan hasil AI di sisi Khanza memerlukan sesi masuk tersendiri yang berbeda dari klien operator, sehingga saat ini belum dapat dijadikan langkah kerja petugas.
+**Halaman hasil AI di Khanza sekarang punya tautan dari layar hasil radiologi dan lab, tetapi belum dapat diuji langsung.** Sebelumnya, halaman hasil AI tidak punya tautan masuk dari mana pun dan hanya menerima satu pola nama sesi login. Kedua hal itu sudah diperbaiki: tautan "Lihat hasil AI PRECIA" ditambahkan pada layar hasil radiologi dan lab, dan halaman itu sekarang menerima sesi dari modul login mana pun yang dipakai bersama di seluruh aplikasi web Khanza. Yang belum bisa dibuktikan: modul web Khanza (`webapps/`) tempat halaman ini berada belum berjalan sebagai layanan yang dapat diakses pada lingkungan mana pun yang dipakai program ini; yang di-containerize sejauh ini hanya layanan penghubung API (`api-bridgingprecia`) dan klien Swing lewat noVNC, bukan aplikasi web inti Khanza. Menguji perbaikan ini secara langsung memerlukan instalasi Khanza dengan aplikasi web inti berjalan, di luar cakupan infrastruktur yang tersedia untuk verifikasi ini.
 
-**Arah balik terbukti di tingkat API, belum lewat layanan pendamping itu sendiri.** Celah hak akses yang ditemukan pada 23 Agustus 2026 sudah diperbaiki: peran akun layanan sekarang memiliki hak baca atas transaksi. Diverifikasi pada 27 Agustus 2026 dengan satu kasus yang dibawa penuh dari masuknya data, pemrosesan AI, sampai validasi dokter, pemanggilan ke titik akses hasil yang sama seperti yang akan ditarik layanan pendamping, memakai kredensial akun layanan itu sendiri, sekarang mengembalikan hasil yang sudah selesai. Pemanggilan itu dilakukan langsung pada pengujian terkendali, bukan dengan menjalankan layanan pendamping Khanza terhadap instalasi Khanza yang hidup, sehingga pengiriman lewat layanan pendamping itu sendiri belum teramati.
+**Arah balik terbukti lewat layanan pendamping itu sendiri, bukan lagi hanya tingkat API. Diverifikasi 2 September 2026.** Kasus poli Radiologi di atas ditarik hasilnya secara otomatis oleh layanan pendamping yang sama: siklus tarik berjalan tiap 30 detik sesuai konfigurasi, dan hasil modul AI ECG EF Screening (skor keyakinan 0.628) tersimpan ke tabel hasil staging Khanza tanpa campur tangan manusia pada saat penarikan. Dua cacat lain ditemukan dan diperbaiki dalam proses pembuktian ini, bukan lewat inspeksi kode semata: layanan pendamping salah membaca field hasil (confidence_score dan penjelasan tersimpan kosong pada setiap kasus sungguhan karena bentuk respons API yang sebenarnya bersarang satu tingkat lebih dalam dari yang dibaca kode), dan kredensial akun layanan yang terpasang di lingkungan dev sempat menunjuk ke organisasi lain, bukan RS Uji Coba Khanza, sehingga kasus dari Khanza sempat masuk ke organisasi yang salah sebelum diperbaiki.
+
+**Layanan pendamping tidak pulih sendiri dari restart mentah. Ditemukan dan diperbaiki 2 September 2026.** Menghentikan lalu menyalakan ulang container tanpa membuat ulang wadahnya (bukan penerapan baru lewat pipeline) meninggalkan berkas penanda tampilan virtual dari proses sebelumnya, sehingga tampilan baru menolak menyala dan layanan gagal permanen sampai wadahnya dibuat ulang. Dari luar, container tetap terlihat sehat karena loop "menjalankan ulang" tetap berjalan, padahal layanan di dalamnya mati. Diperbaiki dengan membersihkan penanda tersebut sebelum tampilan dinyalakan; diverifikasi dengan menghentikan dan menyalakan ulang container secara langsung, lalu memastikan layanan pulih dan jumlah transaksi organisasi tidak bertambah dari sebelum restart.
