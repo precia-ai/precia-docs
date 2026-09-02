@@ -59,6 +59,33 @@ Changes take effect for the entire organization as soon as they're saved. Make s
 
 The card on the right side of the page shows transaction-level delivery status (callback) from the SIMRS connector. At the moment, this card shows "Callback attempt history is not available yet" with an **Endpoint pending** status badge, because the connector backend does not yet expose an endpoint for callback attempt history. This card will automatically populate once that endpoint becomes available, no action needed on your part.
 
+## Unit mapping
+
+Below the **Connection settings** card, this page also shows a **Unit mapping** card that maps the unit/ward/clinic code your SIMRS sends to the matching PRECIA clinical unit. This mapping is what determines which unit's worklist a case pushed from SIMRS lands in.
+
+Before this card existed, unit mapping could only be filled in through the initial onboarding process run by a Platform Admin. This card lets your organization's own system administrator (the **SAD** role) view and change the mapping directly, without asking a Platform Admin to re-run onboarding.
+
+![Unit mapping card showing the mappings already saved for this organization, the SIMRS code and PRECIA unit columns marked with a blue box](/screenshots/en/integrasi-simrs/index/03-unit-mapping.png)
+
+### Filling in one mapping row
+
+Each row maps one code to one unit:
+
+1. **SIMRS code**: the code your SIMRS sends for that unit/ward/clinic, for example `RAD`. This value must match exactly what your SIMRS connector sends in the `unit_code` field.
+2. **PRECIA unit**: pick the destination PRECIA clinical unit from your organization's unit list.
+
+Click **Add mapping** to add another row, or the trash icon at the right end of a row to remove it (at least one row must remain).
+
+![A newly added mapping row, SIMRS code "ONKO" mapped to unit "Oncology (ONCO)", the input fields and Save unit mapping button marked with a blue box](/screenshots/en/integrasi-simrs/index/04-add-mapping-row.png)
+
+### Saving the mapping
+
+Click **Save unit mapping** to save. On success, a confirmation message appears: "Unit mapping saved." The **Adapter**, **Endpoint URL**, and credential settings on the Connection settings card are not affected by this save; the two cards are saved independently of each other. Saving replaces the entire mapping with whatever rows are currently in the form, so a row removed from the form before saving is removed from the stored mapping too.
+
+If one of the mapped units has no active AI module yet, a warning note appears below the save button naming that unit's code. This warning is not a failure; the mapping is still saved. It is a reminder that cases from that unit will still reach PRECIA through the connector, but will not be processed by any AI module until AI policy is activated for that unit (a Platform Admin activates the module for the organization, then the organization's own clinical admin activates it per unit on the **Unit AI Policy** page). This warning text always appears in Indonesian regardless of the page's language, since it comes directly from the backend and is not translated per locale.
+
+![The "Unit mapping saved." message and the AI policy warning note, both marked with a blue box](/screenshots/en/integrasi-simrs/index/05-unit-mapping-saved.png)
+
 ## Connector contract
 
 At the bottom of the page is a **Connector contract** card explaining that integration settings are stored per organization under the SIMRS configuration, and backend authorization still controls who can read or update your organization's settings. In other words, even if you can open this page, your ability to save changes still depends on your account's access rights within that organization.
