@@ -19,7 +19,7 @@ The flow in short:
 
 All screenshots on this page were taken in the PRECIA OpenEMR test environment. The view in your hospital's installation may differ slightly, depending on the OpenEMR version and the display settings in use.
 
-The inbound direction described below, from a saved order in OpenEMR to a matching case in PRECIA, runs automatically today, and once a doctor validates an AI result in PRECIA it is written back into the same patient's OpenEMR record. Both directions were most recently re-verified on 27 August 2026. What is not yet covered on this page is set out in [Current limitations](#current-limitations).
+The inbound direction described below, from a saved order in OpenEMR to a matching case in PRECIA, runs automatically today and is sped up by an instant notification hook, and once a doctor validates an AI result in PRECIA it is written back into the same patient's OpenEMR record and can be opened directly from OpenEMR's Documents menu. Both directions were most recently re-verified on 2 September 2026. What is not yet covered on this page is set out in [Current limitations](#current-limitations).
 
 ## Before you start
 
@@ -131,7 +131,7 @@ The work in OpenEMR ends here.
 
 ## Viewing the matching case in PRECIA
 
-Once the order is saved, a connector signed in as PRECIA reads it and creates a new clinical case automatically. The connector polls for new orders on a fixed interval rather than being notified the instant one is saved, so there can be a short delay before the case appears.
+Once the order is saved, a connector signed in as PRECIA reads it and creates a new clinical case automatically, usually within seconds. OpenEMR now notifies the connector the instant an order is saved; the connector also keeps polling for new orders on a fixed interval as a fallback, so a case still appears if that instant notification fails, just a little later.
 
 ### 1. Open the unit list
 
@@ -157,6 +157,24 @@ The **Notes** section holds the procedure requested in OpenEMR together with a r
 
 From this point the case is handled like any other clinical case in PRECIA: upload supporting files, run the AI module, then send it to a validator.
 
+## Viewing the AI result inside OpenEMR
+
+Once a doctor validates and publishes a result in PRECIA, the connector writes it back into the patient's OpenEMR record as a document. The clinician does not need to open PRECIA again to read it.
+
+### 1. Opening the Documents menu
+
+On the patient record, click the **Documents** tab. The category tree on the left lists every document for the patient, grouped by category.
+
+Click the **+** next to the **Lab Report** category to expand it. Every PRECIA AI result lands in this category, named `precia-AI-<module>-<case code>.txt`, with a document date matching the publication date.
+
+![Documents tab in OpenEMR, the Lab Report category expanded showing the PRECIA AI result file marked with a red box](/screenshots/en/integrasi-simrs/openemr/15-dokumen-hasil-ai.png)
+
+### 2. Opening the result
+
+Click the file name to open it in the **Document Uploader/Viewer** panel on the right. The content is a text report: the AI module used, the model version, the confidence score, the validation status, a short explanation, and a reference to the PRECIA transaction id along with the originating OpenEMR patient and encounter numbers, so the result can always be traced back to the exact case and order.
+
+![Contents of a PRECIA AI result document in OpenEMR, the file title and Contents button marked with a red box](/screenshots/en/integrasi-simrs/openemr/16-isi-hasil-ai.png)
+
 ## How the data is mapped
 
 The table below explains where each field on the PRECIA case comes from.
@@ -174,15 +192,13 @@ The table below explains where each field on the PRECIA case comes from.
 
 This section records what is not available yet, so the integration is not relied on for more than it does.
 
-1. **There can be a short delay before a case appears.** The connector polls OpenEMR for new orders on a fixed interval rather than being notified the instant one is saved, so a new case does not always appear in PRECIA the same second the order is saved in OpenEMR.
+1. **The delay before a case appears is shorter now, but not instant for every case.** The connector's default poll interval was shortened from 30 to 10 seconds. The OpenEMR fork in use (`simrs-openemr-core`) also adds a hook: as soon as an order is saved, OpenEMR immediately notifies the connector with a short call, so in live testing a case lands in PRECIA within seconds rather than waiting a full cycle. This hook is an optional speed-up, not a replacement: if it cannot connect, or is not configured on a given install, the order is still found by the 10-second poll, just a little later.
 
 2. **The unit mapping is not on the SIMRS Integration page.** OpenEMR now appears in the Adapter field on the [SIMRS Integration](/integrasi-simrs) page like every other SIMRS, but the mapping from an OpenEMR value, for example **Radiology**, to a PRECIA unit, for example **Radiologi**, still lives in the connector rather than in the organization settings in PRECIA. Mapping changes have to be requested from the technical team.
 
 3. **The Transmit Order button is not used.** That button belongs to the laboratory messaging path built into OpenEMR. The PRECIA integration does not use that path, and pressing it does not speed up processing.
 
-4. **Viewing the AI result inside OpenEMR is not covered by this guide.** The connector writes a validated AI result back into the patient's OpenEMR record as a document, but this page does not yet walk through opening that document from the OpenEMR side. Reviewing the result in PRECIA remains the documented path.
-
-An earlier version of this page reported that a continuously running connector service was not deployed, that a case created through the connector carried no marker showing it came from OpenEMR, that duplicate protection was not active, and that sending an AI result back into OpenEMR did not happen. None of that is current: the connector now runs as a standing service, a case created through it carries a SIMRS origin marker, restarting the connector does not reprocess an order it already handled, and a validated AI result is written back into the patient's OpenEMR record automatically. What remains open is the unit mapping and the OpenEMR-side viewing walkthrough described above.
+An earlier version of this page reported that a continuously running connector service was not deployed, that a case created through the connector carried no marker showing it came from OpenEMR, that duplicate protection was not active, and that sending an AI result back into OpenEMR did not happen or could not be seen from the OpenEMR side. None of that is current: the connector now runs as a standing service, a case created through it carries a SIMRS origin marker, restarting the connector does not reprocess an order it already handled, a validated AI result is written back into the patient's OpenEMR record automatically, and how to open it from OpenEMR's own Documents tab is now covered in [Viewing the AI result inside OpenEMR](#viewing-the-ai-result-inside-openemr) above. What remains open is only the unit mapping in point 2.
 
 ## Troubleshooting
 
