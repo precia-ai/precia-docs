@@ -144,12 +144,15 @@ This panel holds three values written by the connector: the AI impression (the v
 
 The Bahmni integration is still at trial stage. The limitations below apply as stated and are not usage errors.
 
-- **The data transfer does not run continuously.** The bridging service is run by the implementation team during trials rather than as a permanent service. Outside those periods, new visits in Bahmni will not appear in PRECIA until the service is started again.
-- **Cases do not appear instantly.** There is a delay between saving in Bahmni and the case appearing in PRECIA. Use the **Refresh** button on the Transaction Worklist rather than saving again in Bahmni, because saving again can produce duplicate cases.
-- **Examination findings arrive as text in the Notes field.** Height, weight, blood pressure, and pulse values do not become separate fields in PRECIA and cannot yet be used for searching or sorting.
+- **Cases do not appear instantly.** The bridging service reads the Bahmni visit feed on a short interval rather than the instant it is saved, so a brief delay (a matter of seconds) between saving in Bahmni and the case appearing in PRECIA remains. Use the **Refresh** button on the Transaction Worklist rather than saving again in Bahmni, because saving again can produce duplicate cases. Bahmni is assembled from OpenMRS plus several modules that are not practical to rebuild from source to add a direct push path, so this delay stays until that fork investment is made.
 - **Cases from Bahmni have no AI module slots.** On the case detail, the **AI Modules** section states that no slots are configured. AI analysis has to be set up separately on the destination unit.
 - **The AI module still has to be triggered by hand.** A case appearing in PRECIA does not run AI analysis on its own. Staff or a PRECIA operator still need to press the AI processing button on the case detail page, the same limitation documented for every SIMRS on this site. Once a validator publishes a decision, however, the write-back into Bahmni itself is automatic, not something a person has to run. See [Seeing the AI result written back to Bahmni](#seeing-the-ai-result-written-back-to-bahmni).
 - **Only visits whose examination form was saved are transferred.** A patient who has been registered and whose visit has been opened, but whose examination form has not been saved, will not appear in PRECIA.
+
+Two limitations previously listed here have been fixed and re-verified with real visits in both the development and production environments:
+
+- The bridging service now runs continuously as a service, installed by the automated deploy pipeline and surviving a restart, rather than being started by hand by the implementation team.
+- Height, weight, blood pressure, and pulse values from Bahmni's examination form (Step 5) now land as their own fields on the PRECIA case data instead of being folded into text in the Notes field, so they can be searched and sorted on programmatically. The Transaction Worklist interface does not yet display these as a separate visible column, they are only available through the case data.
 
 ## If the case does not appear in PRECIA
 
@@ -159,4 +162,4 @@ Check in order:
 2. Confirm that the **Latest** panel in Bahmni already shows the values you entered.
 3. Confirm that the **Unit** filter on the PRECIA Transaction Worklist points at the correct unit, then click **Refresh**.
 4. Confirm that the PRECIA account you are using belongs to the same hospital organization.
-5. If all four are correct, contact the PRECIA implementation team. Most likely the bridging service is not running, as described under Current limitations.
+5. If all four are correct, wait a few seconds and click **Refresh** again, since the bridging service reads new visits on a short interval rather than instantly. If the case still does not appear after that, contact the PRECIA implementation team.

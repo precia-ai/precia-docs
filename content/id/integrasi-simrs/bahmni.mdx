@@ -144,12 +144,15 @@ Panel ini memuat tiga nilai yang ditulis oleh konektor: kesan hasil AI (temuan v
 
 Integrasi Bahmni masih berstatus uji coba. Batasan berikut berlaku apa adanya dan bukan kesalahan pemakaian.
 
-- **Penyalinan data belum berjalan terus menerus.** Layanan penghubung dijalankan oleh tim implementasi pada saat uji coba, bukan sebagai layanan permanen. Di luar waktu tersebut, kunjungan baru di Bahmni tidak akan muncul di PRECIA sampai layanan dijalankan kembali.
-- **Kasus tidak muncul seketika.** Ada jeda antara penyimpanan di Bahmni dan kemunculan kasus di PRECIA. Gunakan tombol **Muat Ulang** pada Daftar Kerja Transaksi, jangan menyimpan ulang di Bahmni, karena penyimpanan ulang dapat menghasilkan kasus ganda.
-- **Hasil pemeriksaan masuk sebagai teks pada kolom Catatan.** Nilai tinggi badan, berat badan, tekanan darah, dan denyut nadi tidak menjadi kolom terpisah di PRECIA dan belum dapat dipakai untuk pencarian atau pengurutan.
+- **Kasus tidak muncul seketika.** Layanan penghubung membaca feed kunjungan Bahmni secara berkala, bukan seketika saat disimpan, sehingga tetap ada jeda singkat (dalam hitungan detik) antara penyimpanan di Bahmni dan kemunculan kasus di PRECIA. Gunakan tombol **Muat Ulang** pada Daftar Kerja Transaksi, jangan menyimpan ulang di Bahmni, karena penyimpanan ulang dapat menghasilkan kasus ganda. Bahmni tersusun dari OpenMRS ditambah beberapa modul yang tidak praktis dibangun ulang dari sumber untuk menambah jalur push langsung, sehingga jeda ini tetap ada sampai investasi fork tersebut dilakukan.
 - **Kasus dari Bahmni belum memiliki slot modul AI.** Pada detail kasus, bagian **Modul AI** menampilkan keterangan bahwa belum ada slot yang dikonfigurasi. Analisis AI perlu disiapkan terpisah pada unit tujuan.
 - **Modul AI masih harus dipicu secara manual.** Kasus yang muncul di PRECIA tidak menjalankan analisis AI dengan sendirinya. Petugas atau operator PRECIA tetap perlu menekan tombol pemrosesan AI pada halaman detail kasus, batasan yang sama seperti pada setiap SIMRS di situs ini. Namun setelah validator mempublikasikan keputusan, penulisan balik ke Bahmni itu sendiri berjalan otomatis, tidak perlu dijalankan oleh siapa pun. Lihat [Melihat hasil AI ditulis balik ke Bahmni](#melihat-hasil-ai-ditulis-balik-ke-bahmni).
 - **Hanya kunjungan yang formulir pemeriksaannya disimpan yang terkirim.** Pasien yang sudah terdaftar dan kunjungannya sudah dibuka, tetapi formulir pemeriksaannya belum disimpan, tidak akan muncul di PRECIA.
+
+Dua batasan yang sebelumnya tercantum di sini sudah diperbaiki dan diverifikasi ulang lewat kunjungan sungguhan di lingkungan pengembangan dan produksi:
+
+- Layanan penghubung sekarang berjalan terus menerus sebagai service, dipasang oleh jalur deploy otomatis dan bertahan terhadap restart, bukan lagi dijalankan tangan oleh tim implementasi.
+- Nilai tinggi badan, berat badan, tekanan darah, dan denyut nadi dari formulir pemeriksaan Bahmni (Langkah 5) kini masuk sebagai kolom tersendiri pada data kasus PRECIA, bukan digabung jadi teks pada kolom Catatan, sehingga dapat dipakai untuk pencarian dan pengurutan terprogram. Antarmuka Daftar Kerja Transaksi belum menampilkan kolom ini secara visual sebagai baris terpisah, hanya tersedia lewat data kasus.
 
 ## Bila kasus tidak muncul di PRECIA
 
@@ -159,4 +162,4 @@ Periksa berurutan:
 2. Pastikan panel **Latest** di Bahmni sudah menampilkan nilai yang Anda isi.
 3. Pastikan filter **Unit** pada Daftar Kerja Transaksi PRECIA menunjuk unit yang benar, lalu klik **Muat Ulang**.
 4. Pastikan akun PRECIA yang Anda pakai berada pada organisasi rumah sakit yang sama.
-5. Jika keempat hal di atas sudah benar, hubungi tim implementasi PRECIA. Kemungkinan besar layanan penghubung sedang tidak berjalan, seperti dijelaskan pada bagian Batasan saat ini.
+5. Jika keempat hal di atas sudah benar, tunggu beberapa detik lalu klik **Muat Ulang** sekali lagi, karena layanan penghubung membaca kunjungan baru secara berkala, bukan seketika. Jika kasus tetap tidak muncul setelah itu, hubungi tim implementasi PRECIA.
