@@ -150,6 +150,14 @@ Click the Notes button, then double click the note row to open its contents. The
 
 ![Note attached to order 010 in GNU Health, the author field and the AI result message marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/14-catatan-hasil-ai.png)
 
+### Step 15: Reading the note in structured JSON format
+
+As of 2026-09-02, the note body is no longer free-form prose as shown in Step 14. It is a single JSON document with discrete keys: `ai_module`, `classification`, `confidence_score`, `validation_status`, `precia_transaction_id`, `precia_job_id`, and the full `result_data`. The screenshot below uses a separate case, order `011` (PRECIA transaction `GNUHEALTH-0-11`), because order `010` above was written before this fix existed and its note still holds the old free-text format.
+
+![JSON-formatted note on order 011 in GNU Health, the author field and the JSON message body marked with a blue box](/screenshots/en/integrasi-simrs/gnu-health/15-catatan-json-terstruktur.png)
+
+This shape can be parsed back programmatically (`json.loads()` or equivalent) whenever that is needed, instead of pattern-matching a sentence. The `classification` field is read from `result_data`, checking several possible key names because each AI module names it differently: `classification` (AI-ECG-DIGITIZATION-EF), `class_label` (AI-ECG-LVEF, the module actually configured on this unit, valued "Normal" in the example above), or `predicted_class` (AI-ECG-DIGITIZATION-MITRAL).
+
 ## Current limitations
 
 The GNU Health integration is still at trial stage. The following limitations apply and should be understood before it is used in day-to-day work.
@@ -157,4 +165,4 @@ The GNU Health integration is still at trial stage. The following limitations ap
 1. **The AI module still has to be triggered by hand.** See Step 10; a case appearing in PRECIA does not analyse itself. Both the request delivery from GNU Health and the result delivery back to it, by contrast, are confirmed automatic from the platform's own audit trail.
 2. **A GNU Health imaging test request carries no attachment.** The Imaging Test Request wizard offers neither a file attachment nor a DICOM image reference. The source file for AI analysis is uploaded on the transaction detail page in PRECIA, as shown in Step 10.
 3. **AI modules must be configured on the destination unit first.** Until the unit AI policy is set, the AI Modules panel on the detail page reports that no slots are configured, and the transaction stops at the Unprocessed status.
-4. **The AI result is written back as a note, not as a structured examination result.** The result summary appears in the Notes box of the imaging test request, not under the Imaging Test Result menu.
+4. **The AI result is written back as a Notes entry, not as a structured row under Imaging Test Result.** The note's own body has been structured JSON since 2026-09-02 (see Step 15), so it can be parsed back programmatically, but it is still stored as one note rather than a field on a dedicated GNU Health model. Adding a genuinely structured result model on the GNU Health side would need a custom Tryton module, outside the scope of this fix.
