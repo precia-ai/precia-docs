@@ -3,8 +3,8 @@
  *
  * Spec ini menangkap dua sistem sekaligus:
  *
- *   1. Sisi PRECIA (langkah 01, 09 dan 10). Memakai `role` sehingga helper
- *      login standar dipakai, dengan akun yang benar benar berada di dalam
+ *   1. Sisi PRECIA (langkah 01 dan 09). Memakai `role` sehingga helper login
+ *      standar dipakai, dengan akun yang benar benar berada di dalam
  *      organisasi tenant MEDICCA, bukan organisasi platform. Tanpa itu
  *      tangkapan layar akan menampilkan data organisasi lain dan menyesatkan
  *      pembaca.
@@ -35,22 +35,73 @@
  * melempar galat bila tidak ada satu pun elemen yang terukur, sehingga
  * screenshot tanpa anotasi tidak mungkin dihasilkan.
  *
- * Langkah 09 dan 10 (daftar kerja dan detail transaksi di PRECIA) memakai
- * kasus nyata yang diverifikasi ulang pada 23 Agustus 2026: pasien
- * DEWI LESTARI CONTOH (No RM 000004, Poliklinik Umum), didaftarkan lewat
- * skrip verifikasi terpisah yang benar-benar menekan tombol simpan (generator
- * ini sendiri tidak pernah menyimpan, lihat catatan data di atas), lalu
- * transaksinya muncul otomatis di PRECIA dalam hitungan detik lewat worker
- * MEDICCA yang berjalan terus-menerus. Ini bukti pertama alur MEDICCA sampai
- * ke PRECIA sejak perbaikan panjang kode transaksi dan penargetan organisasi;
- * sebelumnya daftar kerja ini selalu kosong. TX_CODE dan TX_ID di bawah
- * merujuk transaksi itu; ganti keduanya bila kasus itu suatu saat dibersihkan
- * dari data dev.
+ * Catatan verifikasi selektor (diperiksa terhadap simrs/SIMRS-MEDICCA/tpp,
+ * karena host dev sedang mati saat berkas ini disiapkan):
+ *   - #username, #password, button[type="submit"] (login.php): dipastikan.
+ *   - a[href="userpriv.php?userlevelid=2"] (langkah 02): dipastikan, id 2
+ *     untuk 'Petugas Loket' berasal dari seed tpp.sql tabel lokuserlevels.
+ *   - table.ewjtable tr (langkah 02): dipastikan, kelas "ewjtable" memang
+ *     ditambahkan library jquery.ewjtable.js pada elemen <table> yang
+ *     dihasilkan (_createTable -> addClass('ewjtable table table-sm')).
+ *   - #x_Nama_Petugas, #x_NIK, #x_Username, #x_Password, #x_Userlevel,
+ *     #x_Nama_Pasien, #x_No_KTP, #x_Tempat_Lahir, #x_Tgl_Lahir, #x_Alamat,
+ *     #el_lokpasien_Id_Kelurahan, #el_lokdaftar_Id_Poliklinik,
+ *     #el_lokdaftar_Id_BiayaDaftar, #btn-action: dipastikan langsung dari
+ *     berkas *add.php terkait.
+ *   - a[href^="lokdaftaradd.php"] (tautan RAWAT JLN): dipastikan, dibentuk
+ *     literal di classes/lokpasien_list.php.
+ *   - a[href^="/units/"], span.inline-flex.rounded-full (penghitung hasil),
+ *     div.flex.flex-col...bg-card (pesan kosong): dipastikan langsung dari
+ *     precia-fe app/(dashboard)/units/page.tsx dan
+ *     app/(dashboard)/clinical/page.tsx.
+ *
+ *   BELUM DAPAT DIPASTIKAN dari kode saja, perlu dikonfirmasi saat
+ *   penangkapan berjalan:
+ *   - nav a.nav-link.active (langkah 05, 08): kelas "nav-link" berasal dari
+ *     tema AdminLTE3 yang dipakai proyek ini, tetapi penambahan "active"
+ *     dirender lewat Menu->toScript() (phpfn15.php) yang tidak bisa
+ *     ditelusuri sampai satu baris HTML pasti. Kemungkinan besar benar,
+ *     tetap perlu dicek saat capture.
+ *   - a.ew-add-edit.ew-add[data-table="lokpasien"] (langkah 05, 06): kode
+ *     classes/lokpasien_list.php punya DUA varian tombol tambah, satu tautan
+ *     biasa tanpa atribut data-table (non-modal) dan satu tautan modal
+ *     dengan data-table="lokpasien". Mana yang aktif bergantung pengaturan
+ *     modal-dialog yang tidak terlihat dari grep statis. Bila varian non-modal
+ *     yang aktif, ganti selektor jadi 'a.ew-add-edit.ew-add' saja.
+ *   - input[name="x_Id_Poliklinik"] >> nth=1 dan
+ *     input[name="x_Id_BiayaDaftar"] >> nth=1 (langkah 07): definisi Lookup
+ *     di classes/lokdaftar.php tidak menunjukkan filter yang membuang baris
+ *     UGD dari daftar poliklinik, sedangkan mdx menyatakan formulir hanya
+ *     menampilkan tujuh poliklinik rawat jalan tanpa UGD. Urutan render
+ *     sebenarnya (basis pengurutan lookup, kemungkinan diurutkan nama
+ *     poliklinik) tidak dapat dipastikan lewat pembacaan kode saja. index
+ *     nth(1) mengasumsikan opsi kedua yang terlihat adalah pilihan yang
+ *     wajar untuk dicentang, bukan klaim bahwa itu pasti "Penyakit Dalam"
+ *     atau "Umum". Cek urutan opsi nyata saat capture sebelum mengandalkan
+ *     screenshot ini untuk menyebut nama poliklinik tertentu.
+ *
+ * Catatan arah balik (hasil AI ke MEDICCA), diperbarui 2 September 2026:
+ * halaman baca-saja precia_hasil_ai.php sekarang ada (tpp/precia_hasil_ai.php
+ * di repo simrs-medicca), dibuktikan langsung terhadap kasus lama yang
+ * hasilnya sungguhan sudah diterima dari PRECIA (Id_Daftar
+ * {22082026164202E25A7E5C0521394F01FBBCE3BF56F1CA}, modul ai-ecg-digitization,
+ * Sync_Status=received di tabel locairesult). Spec '11-hasil-ai-medicca' di
+ * bawah menangkap halaman itu dalam mode detail untuk kasus tersebut, bukan
+ * salah satu dari registrasi baru yang dibuat spec 06/07 di atas, karena
+ * registrasi baru itu baru sampai status "Terkirim" ke PRECIA dan belum
+ * tentu sudah mendapat hasil AI pada saat generator dijalankan ulang.
+ *
+ * Kolom "Status PRECIA" dan "Hasil AI" pada Histori Registrasi (langkah 08)
+ * juga baru: dibaca dari tabel locpreciasyncstatus lewat helper
+ * preciaSyncStatusBadgeHtml() di locsyncprecia.php, ditambahkan lewat
+ * ListOptions_Load()/ListOptions_Rendered() pada lokdaftar_list.php
+ * (mekanisme yang sama yang sudah dipakai lokpasien_list.php untuk tautan
+ * Kartu Pasien/UGD/Rawat Jln). Selektor dipastikan langsung dari HTML nyata
+ * (td[data-name="preciasyncstatus"], td[data-name="preciahasilai"]), bukan
+ * ditebak dari kode.
  */
 const MEDICCA_BASE = process.env.MEDICCA_BASE_URL || 'https://medicca-dev.precia.site'
 const MEDICCA_LOGIN_URL = `${MEDICCA_BASE}/login.php`
-const TX_CODE = '{2308202613124489A4962D9641FCE2D2BC5895164EF479}'
-const TX_ID = '5d85b627-8a1d-4f62-9585-d3cdd26a3e93'
 const VIEWPORT = { width: 1440, height: 900 }
 const PRECIA_ROLE = 'MDOC'
 
@@ -182,8 +233,8 @@ module.exports = [
       '#x_Username',
       '#x_Password',
       '#x_Userlevel',
-      '.modal-footer button[type="submit"]',
-      '.modal-footer .btn-primary'
+      '#btn-action',
+      '.modal-footer button[type="submit"]'
     ])
   }),
 
@@ -219,8 +270,8 @@ module.exports = [
     await measure(page, id, [
       '#x_Nama_Pasien',
       '#el_lokpasien_Id_Kelurahan',
-      '.modal-footer button[type="submit"]',
-      '.modal-footer .btn-primary'
+      '#btn-action',
+      '.modal-footer button[type="submit"]'
     ])
   }),
 
@@ -243,24 +294,35 @@ module.exports = [
     await loginToMedicca(page, 'OPERATOR')
     await page.goto(`${MEDICCA_BASE}/lokdaftarlist.php`, { waitUntil: 'networkidle' })
     await page.waitForSelector('tbody tr', { timeout: 15000 })
-    await measure(page, id, ['nav a.nav-link.active', 'tbody tr:first-child'])
+    await measure(page, id, [
+      'nav a.nav-link.active',
+      'td[data-name="preciasyncstatus"] >> nth=0',
+      'tbody tr:first-child'
+    ])
   }),
 
   // --- Bagian 4. Memeriksa hasilnya di PRECIA ---
   preciaSpec('09-daftar-kerja-transaksi-precia', '/clinical?unit=general', async (page, id) => {
-    const row = page.locator('tbody tr', { hasText: TX_CODE })
-    await row.first().waitFor({ timeout: 20000 })
-    await page.waitForTimeout(1000)
-    await measure(page, id, ['span.inline-flex.rounded-full', row])
+    await page.waitForSelector('span.inline-flex.rounded-full', { timeout: 20000 })
+    await page.waitForTimeout(1500)
+    await measure(page, id, [
+      'span.inline-flex.rounded-full',
+      'div.flex.flex-col.items-center.justify-center.rounded-lg.border.bg-card'
+    ])
   }),
 
-  preciaSpec('10-detail-transaksi-precia', `/clinical/transactions/${TX_ID}`, async (page, id) => {
-    await page.locator('h1').first().waitFor({ timeout: 20000 })
-    await page.waitForTimeout(1200)
-    await measure(page, id, [
-      page.locator('h1').first(),
-      page.locator('p', { hasText: 'Kunjungan' }).first(),
-      page.locator('div.rounded-lg.border', { hasText: 'Poliklinik Umum' }).last()
-    ])
+  // --- Bagian 5. Melihat hasil AI langsung dari MEDICCA ---
+  // Memakai kasus lama yang hasil AI-nya sungguhan sudah diterima
+  // (Sync_Status = 'received'), bukan salah satu registrasi baru dari spec
+  // di atas yang masih menunggu, supaya screenshot menunjukkan halaman
+  // dalam keadaan terisi, bukan keadaan kosong.
+  mediccaSpec('11-hasil-ai-medicca', async (page, id) => {
+    await loginToMedicca(page, 'OPERATOR')
+    await page.goto(
+      `${MEDICCA_BASE}/precia_hasil_ai.php?Id_Daftar=%7B22082026164202E25A7E5C0521394F01FBBCE3BF56F1CA%7D`,
+      { waitUntil: 'networkidle' }
+    )
+    await page.waitForSelector('.precia-card', { timeout: 15000 })
+    await measure(page, id, ['.card-header .badge', 'pre.precia-result-json'])
   })
 ]
