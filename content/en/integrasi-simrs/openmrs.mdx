@@ -157,8 +157,8 @@ The card is titled **PRECIA AI ECG Mitral Regurgitation Assessment** with value 
 
 ## Known limitations
 
-- **The return direction has been proven to work, but only for one case that genuinely finished.** The [Viewing the AI result and validation synced back to OpenMRS](#viewing-the-ai-result-and-validation-synced-back-to-openmrs) section shows real evidence that an AI result and a validation decision can sync back into the OpenMRS medical record. This is not a guarantee that every new case will automatically follow the same path; whether an AI module is active on a given unit can change over time.
-- **Cases stop at the Unprocessed status** while the target unit has no active AI module. The case stays visible and can be opened, but no AI result is produced.
+- **The return direction has been proven to work, but only for one case that genuinely finished.** The [Viewing the AI result and validation synced back to OpenMRS](#viewing-the-ai-result-and-validation-synced-back-to-openmrs) section shows real evidence that an AI result and a validation decision can sync back into the OpenMRS medical record. **Re-checked 2 September 2026**: both AI modules previously proven to complete on the Kardiologi unit turned out to already be fully active on the production organization (checked via the AI policy enable command, no change was needed), so the concern about module activeness changing over time no longer applies to this unit as of this date.
+- **Cases stop at the Unprocessed status** while the target unit has no active AI module. The case stays visible and can be opened, but no AI result is produced. Does not apply to the Kardiologi unit on the production organization per the note above.
 - **Add to basket alone is not enough.** An order must go through **Order form** and **Save order**, otherwise **Sign and close** stays disabled.
 - **The order basket is not stored permanently.** An unsigned order is lost when the page is reloaded.
 - **The PRECIA unit is decided by the connector**, based on the ordered test type, not on unit data coming from OpenMRS.

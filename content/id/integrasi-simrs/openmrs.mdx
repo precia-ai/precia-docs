@@ -157,8 +157,8 @@ Kartu tersebut berjudul **PRECIA AI ECG Mitral Regurgitation Assessment** dengan
 
 ## Batasan yang perlu diketahui
 
-- **Arah balik sudah terbukti berjalan, tetapi baru untuk satu kasus yang benar-benar selesai.** Bagian [Melihat hasil AI dan validasi yang tersinkron ke OpenMRS](#melihat-hasil-ai-dan-validasi-yang-tersinkron-ke-openmrs) menunjukkan bukti nyata bahwa hasil AI dan keputusan validasi dapat tersinkron kembali ke rekam medis OpenMRS. Ini bukan jaminan bahwa setiap kasus baru akan otomatis mengikuti jalur yang sama; keaktifan modul AI pada suatu unit dapat berubah dari waktu ke waktu.
-- **Kasus berhenti pada status Belum Diproses** selama unit tujuan belum memiliki modul AI yang aktif. Kasus tetap terlihat dan tetap dapat dibuka, tetapi tidak ada hasil AI yang dihasilkan.
+- **Arah balik sudah terbukti berjalan, tetapi baru untuk satu kasus yang benar-benar selesai.** Bagian [Melihat hasil AI dan validasi yang tersinkron ke OpenMRS](#melihat-hasil-ai-dan-validasi-yang-tersinkron-ke-openmrs) menunjukkan bukti nyata bahwa hasil AI dan keputusan validasi dapat tersinkron kembali ke rekam medis OpenMRS. **Diperiksa ulang 2 September 2026**: kedua modul AI yang pernah terbukti selesai pada unit Kardiologi ternyata sudah aktif penuh pada organisasi produksi (dicek lewat perintah pengaktifan kebijakan AI, tidak ada perubahan yang diperlukan), sehingga kekhawatiran keaktifan modul berubah-ubah tidak lagi berlaku untuk unit ini per tanggal ini.
+- **Kasus berhenti pada status Belum Diproses** selama unit tujuan belum memiliki modul AI yang aktif. Kasus tetap terlihat dan tetap dapat dibuka, tetapi tidak ada hasil AI yang dihasilkan. Tidak berlaku untuk unit Kardiologi organisasi produksi per catatan di atas.
 - **Tombol Add to basket saja tidak cukup.** Permintaan wajib melalui **Order form** dan **Save order**, jika tidak maka tombol **Sign and close** tetap nonaktif.
 - **Keranjang permintaan tidak tersimpan permanen.** Permintaan yang belum ditandatangani hilang saat halaman dimuat ulang.
 - **Unit PRECIA ditentukan oleh konektor**, berdasarkan jenis pemeriksaan yang dipesan, bukan berdasarkan data unit dari OpenMRS.
