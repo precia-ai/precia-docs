@@ -59,6 +59,33 @@ Perubahan yang berhasil disimpan langsung berlaku untuk seluruh organisasi. Past
 
 Kartu di sisi kanan halaman menampilkan status pengiriman data (callback) tingkat transaksi dari konektor SIMRS. Saat ini kartu ini masih menampilkan keterangan "Riwayat percobaan callback belum tersedia" dengan label status **Endpoint belum tersedia**, karena backend konektor belum menyediakan endpoint untuk menampilkan riwayat percobaan callback. Riwayat akan otomatis muncul di kartu ini setelah endpoint tersebut tersedia, tanpa perlu tindakan tambahan dari Anda.
 
+## Pemetaan unit SIMRS
+
+Di bawah kartu **Pengaturan koneksi**, halaman ini juga menampilkan kartu **Pemetaan unit** yang memetakan kode unit/poli/bangsal yang dikirim SIMRS Anda ke unit klinis yang sesuai di PRECIA. Pemetaan inilah yang menentukan kasus yang dikirim SIMRS masuk ke worklist unit yang mana.
+
+Sebelum ada kartu ini, pemetaan unit hanya bisa diisi lewat proses onboarding awal oleh Platform Admin. Kartu ini membuat pemetaan bisa dilihat dan diubah sendiri oleh admin sistem organisasi (peran **SAD**), tanpa perlu meminta Platform Admin menjalankan ulang onboarding.
+
+![Kartu Pemetaan unit menampilkan pemetaan yang sudah tersimpan untuk organisasi ini, kolom Kode SIMRS dan Unit PRECIA ditandai kotak biru](/screenshots/id/integrasi-simrs/index/03-pemetaan-unit.png)
+
+### Mengisi satu baris pemetaan
+
+Setiap baris memetakan satu kode ke satu unit:
+
+1. **Kode SIMRS**: kode yang dikirim SIMRS Anda untuk unit/poli/bangsal tersebut, misalnya `RAD`. Nilai ini harus sama persis dengan yang dikirim konektor SIMRS pada bidang `unit_code`.
+2. **Unit PRECIA**: pilih unit klinis PRECIA tujuan dari daftar unit organisasi Anda.
+
+Klik **Tambah pemetaan** untuk menambah baris lain, atau ikon tempat sampah di ujung kanan baris untuk menghapusnya (minimal harus ada satu baris).
+
+![Baris pemetaan baru ditambahkan, kode SIMRS "ONKO" dipetakan ke unit "Oncology (ONCO)", kolom isian dan tombol Simpan pemetaan unit ditandai kotak biru](/screenshots/id/integrasi-simrs/index/04-tambah-baris-pemetaan.png)
+
+### Menyimpan pemetaan
+
+Klik **Simpan pemetaan unit** untuk menyimpan. Kalau berhasil, muncul pesan konfirmasi "Pemetaan unit tersimpan." Pengaturan **Adapter**, **URL Endpoint**, dan kredensial pada kartu Pengaturan koneksi tidak ikut berubah oleh penyimpanan ini; kedua kartu disimpan secara terpisah. Penyimpanan mengganti seluruh pemetaan dengan baris-baris yang ada di form saat itu, jadi baris yang dihapus dari form sebelum menyimpan juga ikut terhapus dari pemetaan yang tersimpan.
+
+Kalau salah satu unit yang dipetakan belum punya modul AI aktif, muncul catatan peringatan di bawah tombol simpan yang menyebutkan kode unit tersebut. Peringatan ini bukan tanda kegagalan; pemetaan tetap tersimpan. Peringatan ini mengingatkan bahwa kasus dari unit itu akan tetap masuk ke PRECIA lewat konektor, tetapi tidak akan diproses modul AI apa pun sampai kebijakan AI diaktifkan untuk unit tersebut (Platform Admin mengaktifkan modul untuk organisasi, lalu admin klinis organisasi mengaktifkannya per unit pada halaman **Kebijakan AI Unit**).
+
+![Pesan "Pemetaan unit tersimpan" dan catatan peringatan kebijakan AI ditandai kotak biru](/screenshots/id/integrasi-simrs/index/05-pemetaan-unit-tersimpan.png)
+
 ## Kontrak konektor
 
 Di bagian bawah halaman terdapat kartu **Kontrak konektor** yang menjelaskan bahwa pengaturan integrasi disimpan per organisasi dalam konfigurasi SIMRS, dan otorisasi di sisi backend tetap menentukan siapa yang boleh membaca atau memperbarui pengaturan organisasi Anda. Artinya, meskipun Anda bisa membuka halaman ini, kemampuan menyimpan perubahan tetap bergantung pada hak akses akun Anda di organisasi tersebut.
